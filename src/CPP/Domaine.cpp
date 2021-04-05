@@ -35,18 +35,19 @@ void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
     for(const auto s: _som)
         m_sommets[s.num] = new Sommet(s.num,s.nom,s.altitude);
 }
-float Domaine::calculDuree(std::string type,int depart, int arrivee)
+float Domaine::calculDuree(std::string nom,std::string type,int depart, int arrivee)
 {
     for(const auto elem : m_matriceDuree)
     {
-        for (int i = 0; i < elem.second.size(); ++i) {
+        for (int i = 0; i < elem.second.size(); i++) {
 
-            if(type == elem.second[i].first){
-                if (elem.first == "BUS")
-                {
-                    return elem.second[i].second[0];
+            if(type == elem.second[i].first || nom == elem.second[i].first){
 
-                }
+                if(elem.second[i].first == nom)
+                    {
+                        return elem.second[i].second.front();
+                    }
+
                 else {
                     if (elem.second[i].second.size() == 0 ){
                         return  ( (elem.second[i].second[0] * abs(depart-arrivee))  / 100 ) ;
@@ -57,16 +58,15 @@ float Domaine::calculDuree(std::string type,int depart, int arrivee)
                     }
                 }
             }
-
         }
     }
-
+    return 6;
 }
 
 
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
-        m_trajets[t.num] = new Trajet(t.num,t.nom,t.type,m_sommets[t.depart],m_sommets[t.arrivee],calculDuree(t.type,t.depart,t.arrivee));
+        m_trajets[t.num] = new Trajet(t.num,t.nom,t.type,m_sommets[t.depart],m_sommets[t.arrivee],calculDuree(t.nom,t.type,t.depart,t.arrivee));
         m_sommets[t.depart]->setAdjactent(m_trajets[t.num]);
     }
 }
