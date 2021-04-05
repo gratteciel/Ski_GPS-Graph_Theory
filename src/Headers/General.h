@@ -5,6 +5,9 @@
 #ifndef SKIPISCINE_GENERAL_H
 #define SKIPISCINE_GENERAL_H
 #include "Domaine.h"
+#include "bibli.h"
+
+
 
 typedef struct t_chargeSommets{
     int num;
@@ -23,15 +26,19 @@ typedef struct t_chargeTrajet{
 class General {
 private:
     Domaine arcs;
+
 public:
     //Constructeur et destructeur
-    General();
+    General(const std::string &nomfichier);
+    void lecturefichier(const std::string &nomfichier);
+
 
     ~General() = default;
 
     //Méthodes
 
     //Getters & Setters
+
 };
 
 

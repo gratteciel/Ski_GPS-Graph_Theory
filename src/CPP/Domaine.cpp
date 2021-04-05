@@ -4,7 +4,6 @@
 
 #include "../Headers/Domaine.h"
 
-//Constructeur et destructeur
 
 Domaine::Domaine() {
 
@@ -17,3 +16,18 @@ Domaine::~Domaine(){
     for (auto t : m_trajets)
         delete t.second;
 }
+
+void Domaine::setOrdre(int _ordre) {
+    m_ordre = _ordre;
+}
+void Domaine::setTaille(int _taille) {
+    m_taille = _taille;
+}
+int Domaine::getOrdre() const {
+    return m_ordre;
+}
+
+int Domaine::getTaille() const {
+    return m_taille;
+}
+

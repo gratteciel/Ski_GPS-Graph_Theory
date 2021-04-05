@@ -5,7 +5,7 @@
 #include "../Headers/AbstractIdentite.h"
 
 AbstractIdentite::AbstractIdentite(const int& _num, const std::string &_nom)
-                :m_num(_num),m_nom(_)
+                :m_num(_num),m_nom(_nom)
 {
 
 }

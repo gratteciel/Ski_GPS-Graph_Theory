@@ -11,8 +11,12 @@
 
 class Domaine {
 private:
+
     std::map<int, Sommet*> m_sommets;
     std::map<int, Trajet*> m_trajets;
+    int m_ordre; // nombre de sommmets
+    int m_taille; // nombre d'aretes
+
 public:
     //Constructeur et destructeur
     Domaine();
@@ -21,6 +25,10 @@ public:
     //Méthodes
 
     //Getters & Setters
+    void setOrdre(int _ordre);
+    void setTaille(int _taille);
+    int getOrdre() const;
+    int getTaille() const;
 };
 
 
