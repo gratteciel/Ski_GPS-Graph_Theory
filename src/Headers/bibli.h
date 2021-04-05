@@ -27,5 +27,7 @@ typedef struct t_chargeFichier{
     std::vector<t_chargeTrajet> trajets;
 }t_chargeFichier;
 
+
+
 #endif //SKIPISCINE_BIBLI_H
 

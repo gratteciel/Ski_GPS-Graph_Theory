@@ -42,6 +42,46 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
             throw std::runtime_error("Probleme lecture pour les sommets");
         fCharge.sommets.push_back(tempSommet);
     }
+    fichier >> temp;// nombre de descentes avce les types
+
+    for (int i = 0; i < temp; ++i) {
+        std::pair<std::string,std::vector<float>> paireDonnee;
+        float donnee;
+        fichier >> paireDonnee.first;
+        fichier >> donnee;
+        paireDonnee.second.push_back(donnee);
+        if(fichier.fail())
+            throw std::runtime_error("Probleme lecture pour les descentes");
+        arcs.getMatriceDuree()["Descente"].push_back(paireDonnee);
+    }
+    fichier >> temp;// nombre de montée
+
+    for (int i = 0; i < temp; ++i) {
+        std::pair<std::string,std::vector<float>> paireDonnee;
+        std::string donnee;
+        fichier >> paireDonnee.first;
+        fichier >> donnee;
+        paireDonnee.second.push_back(std::stof(donnee));
+        fichier >> donnee;
+        paireDonnee.second.push_back(std::stof(donnee));
+        if(fichier.fail())
+            throw std::runtime_error("Probleme lecture pour les montees");
+        arcs.getMatriceDuree()["Montee"].push_back(paireDonnee);
+    }
+    fichier >> temp;// nombre de Bus
+
+    for (int i = 0; i < temp; ++i) {
+        std::pair<std::string,std::vector<float>> paireDonnee;
+        float donnee;
+        fichier >> paireDonnee.first;
+        fichier >> donnee;
+        paireDonnee.second.push_back(donnee);
+        if(fichier.fail())
+            throw std::runtime_error("Probleme lecture pour les Bus");
+        arcs.getMatriceDuree()["BUS"].push_back(paireDonnee);
+    }
+
+
 
     fichier >> temp; // nombre d'arcs dans le graphe
     arcs.setTaille(temp);
