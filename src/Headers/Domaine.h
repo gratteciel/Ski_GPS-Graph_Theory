@@ -5,15 +5,18 @@
 #ifndef SKIPISCINE_DOMAINE_H
 #define SKIPISCINE_DOMAINE_H
 #include "Sommet.h"
+#include "Trajet.h"
+#include <map>
+
 
 class Domaine {
 private:
-
+    std::map<int, Sommet*> m_sommets;
+    std::map<int, Trajet*> m_trajets;
 public:
     //Constructeur et destructeur
     Domaine();
-
-    ~Domaine() = default;
+    ~Domaine();
 
     //Méthodes
 

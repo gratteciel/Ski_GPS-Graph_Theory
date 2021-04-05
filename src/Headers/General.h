@@ -6,6 +6,20 @@
 #define SKIPISCINE_GENERAL_H
 #include "Domaine.h"
 
+typedef struct t_chargeSommets{
+    int num;
+    std::string nom;
+    int alitude;
+}t_chargeSommets;
+
+typedef struct t_chargeTrajet{
+    int num;
+    std::string nom;
+    std::string type;
+    int depart;
+    int arrivee;
+}t_chargeTrajet;
+
 class General {
 private:
     Domaine arcs;

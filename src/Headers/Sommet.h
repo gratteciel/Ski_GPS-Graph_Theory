@@ -4,23 +4,26 @@
 
 #ifndef SKIPISCINE_SOMMET_H
 #define SKIPISCINE_SOMMET_H
-#include <iostream>
 
+#include <vector>
+#include "AbstractIdentite.h"
+#include "Trajet.h"
 
-class Sommet {
+class Trajet;
+
+class Sommet : public AbstractIdentite{
 private:
-    int m_num;
-    std::string m_nom;
     int m_altitude;
+    std::vector<const Trajet*> m_adjacents;
 public:
     //Constructeur et destructeur
-    Sommet(int _num, std::string _nom, int _altitude);
-
+    Sommet(const int& _num, const std::string& _nom, const int& _altitude);
     ~Sommet() = default;
-
     //Méthodes
-
+    void affichage();
     //Getters & Setters
+    int getAltitude() const;
+
 };
 
 

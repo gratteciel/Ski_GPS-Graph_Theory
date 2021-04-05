@@ -3,3 +3,7 @@
 //
 
 #include "../Headers/General.h"
+
+General::General() {
+
+}
