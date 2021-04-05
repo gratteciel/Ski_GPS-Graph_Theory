@@ -4,9 +4,9 @@
 
 #ifndef SKIPISCINE_TRAJET_H
 #define SKIPISCINE_TRAJET_H
-#include "AbstractIdentite.h"
-#include "Sommet.h"
 
+#include "Sommet.h"
+#include "AbstractIdentite.h"
 class Sommet;
 class Trajet : public AbstractIdentite{
 private:

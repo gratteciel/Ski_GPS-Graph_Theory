@@ -10,7 +10,7 @@ Trajet::Trajet(const int &_num, const std::string &_nom, const std::string &_typ
       :AbstractIdentite(_num,_nom), m_type(_type)
 {
     m_sommets.first=depart;
-    m_sommets.first=arrivee;
+    m_sommets.second=arrivee;
 }
 
 //Méthodes

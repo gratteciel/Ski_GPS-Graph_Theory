@@ -5,14 +5,20 @@
 #include "../Headers/General.h"
 
 
+//Constructeur
 
 General::General(const std::string &nomfichier) {
-    lecturefichier(nomfichier);
+    t_chargeFichier fCharge;
+    lecturefichier(nomfichier,fCharge);
+    arcs.initialisation(fCharge);
+
 }
 
-void General::lecturefichier(const std::string &nomfichier) {
-    std::vector<t_chargeSommets> vecteurSommets;
-    std::vector <t_chargeTrajet> vecteurTrajets;
+
+//Méthodes
+
+void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCharge) {
+
     std::ifstream fichier (nomfichier);
     int temp = 0;
 
@@ -31,14 +37,15 @@ void General::lecturefichier(const std::string &nomfichier) {
         t_chargeSommets tempSommet;
         fichier >> tempSommet.num ;
         fichier >> tempSommet.nom ;
-        fichier >> tempSommet.alitude;
+        fichier >> tempSommet.altitude;
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les sommets");
-        vecteurSommets.push_back(tempSommet);
+        fCharge.sommets.push_back(tempSommet);
     }
 
-    fichier >> temp; // nombre d'arêtes dans le graphe
+    fichier >> temp; // nombre d'arcs dans le graphe
     arcs.setTaille(temp);
+
     if ( fichier.fail() )
         throw std::runtime_error("Probleme lecture taille du graphe");
 
@@ -52,12 +59,8 @@ void General::lecturefichier(const std::string &nomfichier) {
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture nom d'une sommet");
 
-        vecteurTrajets.push_back(tempTrajet);
+        fCharge.trajets.push_back(tempTrajet);
 
     }
-
-
-
-
 
 }

@@ -9,9 +9,9 @@
 #include <map>
 
 
+
 class Domaine {
 private:
-
     std::map<int, Sommet*> m_sommets;
     std::map<int, Trajet*> m_trajets;
     int m_ordre; // nombre de sommmets
@@ -23,12 +23,17 @@ public:
     ~Domaine();
 
     //Méthodes
+    void creationSommets(const std::vector<t_chargeSommets>& _som);
+    void initialisation(const t_chargeFichier &fCharge);
 
     //Getters & Setters
     void setOrdre(int _ordre);
     void setTaille(int _taille);
     int getOrdre() const;
     int getTaille() const;
+
+
+    void creationTrajets(const std::vector<t_chargeTrajet> &_tra);
 };
 
 

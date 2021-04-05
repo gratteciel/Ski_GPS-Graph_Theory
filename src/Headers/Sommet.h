@@ -5,7 +5,7 @@
 #ifndef SKIPISCINE_SOMMET_H
 #define SKIPISCINE_SOMMET_H
 
-#include <vector>
+
 #include "AbstractIdentite.h"
 #include "Trajet.h"
 
@@ -21,8 +21,10 @@ public:
     ~Sommet() = default;
     //Méthodes
     void affichage();
+    void setAdjactent(Trajet *_trajet);
     //Getters & Setters
     int getAltitude() const;
+
 
 };
 

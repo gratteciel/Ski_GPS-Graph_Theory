@@ -4,7 +4,7 @@
 
 #ifndef SKIPISCINE_ABSTRACTIDENTITE_H
 #define SKIPISCINE_ABSTRACTIDENTITE_H
-#include <iostream>
+#include "bibli.h"
 
 class AbstractIdentite {
 private:

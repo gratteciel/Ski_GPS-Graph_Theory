@@ -18,6 +18,9 @@ void Sommet::affichage() {
     std::cout << "Sommet" << std::endl;
 }
 
+void Sommet::setAdjactent(Trajet* _trajet){
+    m_adjacents.push_back(_trajet);
+}
 
 
 //Getters & Setters

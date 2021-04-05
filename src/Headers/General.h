@@ -5,23 +5,8 @@
 #ifndef SKIPISCINE_GENERAL_H
 #define SKIPISCINE_GENERAL_H
 #include "Domaine.h"
-#include "bibli.h"
 
 
-
-typedef struct t_chargeSommets{
-    int num;
-    std::string nom;
-    int alitude;
-}t_chargeSommets;
-
-typedef struct t_chargeTrajet{
-    int num;
-    std::string nom;
-    std::string type;
-    int depart;
-    int arrivee;
-}t_chargeTrajet;
 
 class General {
 private:
@@ -30,13 +15,9 @@ private:
 public:
     //Constructeur et destructeur
     General(const std::string &nomfichier);
-    void lecturefichier(const std::string &nomfichier);
-
-
     ~General() = default;
-
     //Méthodes
-
+    void lecturefichier(const std::string &nomfichier,t_chargeFichier& fCharge);
     //Getters & Setters
 
 };
