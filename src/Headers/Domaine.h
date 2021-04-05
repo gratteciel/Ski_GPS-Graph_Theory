@@ -8,6 +8,8 @@
 
 class Domaine {
 private:
+    int m_ordre; // nombre de sommmets
+    int m_taille; // nombre d'aretes
 
 public:
     //Constructeur et destructeur
@@ -18,6 +20,10 @@ public:
     //Méthodes
 
     //Getters & Setters
+    void setOrdre(int _ordre);
+    void setTaille(int _taille);
+    int getOrdre() const;
+    int getTaille() const;
 };
 
 
