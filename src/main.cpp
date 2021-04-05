@@ -1,6 +1,7 @@
-#include <iostream>
+#include "Headers/General.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    General projet;
+
     return 0;
 }

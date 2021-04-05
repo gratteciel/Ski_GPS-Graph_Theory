@@ -4,7 +4,7 @@
 
 #ifndef SKIPISCINE_DOMAINE_H
 #define SKIPISCINE_DOMAINE_H
-
+#include "Sommet.h"
 
 class Domaine {
 private:
