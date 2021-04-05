@@ -6,6 +6,10 @@
 
 //Constructeur & destructeur
 Domaine::Domaine() {
+    m_matriceDuree["BUS"];
+    m_matriceDuree["Montee"];
+    m_matriceDuree["Descente"];
+
 
 }
 
@@ -52,5 +56,10 @@ int Domaine::getOrdre() const {
 
 int Domaine::getTaille() const {
     return m_taille;
+}
+
+std::map<std::string, std::vector<std::pair<std::string,std::vector<float>>>>& Domaine::getMatriceDuree()
+{
+    return m_matriceDuree;
 }
 

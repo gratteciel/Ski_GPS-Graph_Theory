@@ -16,6 +16,8 @@ private:
     std::map<int, Trajet*> m_trajets;
     int m_ordre; // nombre de sommmets
     int m_taille; // nombre d'aretes
+    std::map<std::string, std::vector<std::pair<std::string,std::vector<float>>>> m_matriceDuree;
+
 
 public:
     //Constructeur et destructeur
@@ -31,6 +33,7 @@ public:
     void setTaille(int _taille);
     int getOrdre() const;
     int getTaille() const;
+    std::map<std::string, std::vector<std::pair<std::string,std::vector<float>>>>& getMatriceDuree();
 
 
     void creationTrajets(const std::vector<t_chargeTrajet> &_tra);
