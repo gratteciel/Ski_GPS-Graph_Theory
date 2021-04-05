@@ -64,3 +64,62 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
     }
 
 }
+
+void General::boucle(){
+    int menuActu;
+    while(1==1){
+        system("cls");
+        afficheMenu(menuActu);
+        char donnee;
+        std::cin >> donnee;
+        interactionDonnee(donnee,menuActu);
+    }
+}
+
+void General::interactionDonnee(const char &donnee, int &menuActu) {
+    switch(menuActu){
+        case 1:
+            interactionDonneeMenu1(donnee,menuActu);
+            break;
+    }
+}
+void General::interactionDonneeMenu1(const char& donnee, int& menuActu){
+    switch(donnee){
+        case '1':
+            menuActu=2;
+            break;
+        case '2':
+            menuActu =3;
+            break;
+
+    }
+}
+
+void General::afficheMenu(const int& menuActu){
+    switch(menuActu){
+        case 1:
+            menu1();
+            break;
+        case 2:
+            menu2();
+            break;
+        case 3:
+            menu3();
+            break;
+    }
+}
+
+void General::menu1(){
+    std::cout << "1 : A propos des sommets" << std::endl;
+    std::cout << "2 : A propos des trajets" << std::endl;
+}
+
+void General::menu2(){
+    std::cout << "1 : Afficher tous les sommets" << std::endl;
+    std::cout << "2 : Information sur 1 sommet" << std::endl;
+}
+
+void General::menu3(){
+    std::cout << "1 : Afficher tous les trajets" << std::endl;
+    std::cout << "2 : Information sur 1 trajet" << std::endl;
+}

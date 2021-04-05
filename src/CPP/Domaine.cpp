@@ -39,6 +39,16 @@ void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     }
 }
 
+void Domaine::afficheTrajets(){
+    for(const auto t : m_trajets)
+        t.second->affichage();
+}
+
+void Domaine::afficheSommets(){
+    for(const auto s : m_sommets)
+        s.second->affichage();
+}
+
 //Getters & Setters
 void Domaine::setOrdre(int _ordre) {
     m_ordre = _ordre;

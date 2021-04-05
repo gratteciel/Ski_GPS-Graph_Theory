@@ -25,6 +25,9 @@ public:
     //Méthodes
     void creationSommets(const std::vector<t_chargeSommets>& _som);
     void initialisation(const t_chargeFichier &fCharge);
+    void creationTrajets(const std::vector<t_chargeTrajet> &_tra);
+    void afficheTrajets();
+    void afficheSommets();
 
     //Getters & Setters
     void setOrdre(int _ordre);
@@ -33,7 +36,7 @@ public:
     int getTaille() const;
 
 
-    void creationTrajets(const std::vector<t_chargeTrajet> &_tra);
+
 };
 
 
