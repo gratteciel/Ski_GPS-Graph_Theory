@@ -2,6 +2,7 @@
 // Created by mathis on 05/04/2021.
 //
 
+#include <limits>
 #include "../Headers/General.h"
 
 
@@ -11,7 +12,6 @@ General::General(const std::string &nomfichier) {
     t_chargeFichier fCharge;
     lecturefichier(nomfichier,fCharge);
     arcs.initialisation(fCharge);
-
 }
 
 
@@ -106,33 +106,99 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 }
 
 void General::boucle(){
-    int menuActu;
+    int menuActu=1;
     while(1==1){
-        system("cls");
         afficheMenu(menuActu);
-        char donnee;
+
+        std::string donnee;
+
         std::cin >> donnee;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         interactionDonnee(donnee,menuActu);
     }
 }
 
-void General::interactionDonnee(const char &donnee, int &menuActu) {
+void General::interactionDonnee(const std::string &donnee, int &menuActu) {
     switch(menuActu){
         case 1:
             interactionDonneeMenu1(donnee,menuActu);
             break;
+        case 2:
+            interactionDonneeMenu2(donnee,menuActu);
+            break;
+        case 3:
+            interactionDonneeMenu3(donnee,menuActu);
+            break;
     }
 }
-void General::interactionDonneeMenu1(const char& donnee, int& menuActu){
-    switch(donnee){
-        case '1':
-            menuActu=2;
-            break;
-        case '2':
-            menuActu =3;
-            break;
-
+void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
+    if(donnee.size()==1){
+        switch(donnee[0]){
+            case '1':
+                menuActu=2;
+                break;
+            case '2':
+                menuActu =3;
+                break;
+        }
     }
+
+}
+
+void General::interactionDonneeMenu2(const std::string& donnee, int& menuActu){
+    if(donnee.size()==1){
+        switch(donnee[0]){
+            case '0':
+                menuActu=1;
+                break;
+            case '1':
+                arcs.afficheSommets();
+                break;
+            case '2':
+
+                std::string numSommet;
+
+                std::cout << "Nom ou numero du point: ";
+                std::getline (std::cin,numSommet);
+
+                arcs.afficheSommets(numSommet);
+                break;
+        }
+    }
+
+}
+
+void General::interactionDonneeMenu3(const std::string& donnee, int& menuActu){
+    if(donnee.size()==1){
+        switch(donnee[0]){
+            case '0':
+                menuActu=1;
+                break;
+            case '1':
+                arcs.afficheTrajets();
+                std::cout <<std::endl;
+                break;
+            case '2':
+                arcs.afficheTrajets('D');
+                std::cout <<std::endl;
+                break;
+            case '3':
+                arcs.afficheTrajets('R');
+                std::cout <<std::endl;
+                break;
+            case '4':
+                arcs.afficheTrajets('B');
+                std::cout <<std::endl;
+                break;
+            case '5':
+                std::string numTrajet;
+                std::cout << "Nom ou numero du trajet: ";
+                std::getline (std::cin,numTrajet);
+                arcs.afficheTrajets('T',numTrajet);
+                break;
+        }
+    }
+
 }
 
 void General::afficheMenu(const int& menuActu){
@@ -150,16 +216,21 @@ void General::afficheMenu(const int& menuActu){
 }
 
 void General::menu1(){
-    std::cout << "1 : A propos des sommets" << std::endl;
+    std::cout << "1 : A propos des points" << std::endl;
     std::cout << "2 : A propos des trajets" << std::endl;
 }
 
 void General::menu2(){
-    std::cout << "1 : Afficher tous les sommets" << std::endl;
-    std::cout << "2 : Information sur 1 sommet" << std::endl;
+    std::cout << "0 : Retour en arriere" << std::endl;
+    std::cout << "1 : Afficher tous les points" << std::endl;
+    std::cout << "2 : Information sur 1 point" << std::endl;
 }
 
 void General::menu3(){
+    std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << "1 : Afficher tous les trajets" << std::endl;
-    std::cout << "2 : Information sur 1 trajet" << std::endl;
+    std::cout << "2 : Afficher toutes les pistes" << std::endl;
+    std::cout << "3 : Afficher toutes les remontees" << std::endl;
+    std::cout << "4 : Afficher toutes les navettes" << std::endl;
+    std::cout << "5 : Information sur 1 trajet" << std::endl;
 }

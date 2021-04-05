@@ -14,7 +14,7 @@ class Trajet;
 class Sommet : public AbstractIdentite{
 private:
     int m_altitude;
-    std::vector<const Trajet*> m_adjacents;
+    std::vector<Trajet*> m_adjacents;
 public:
     //Constructeur et destructeur
     Sommet(const int& _num, const std::string& _nom, const int& _altitude);
@@ -26,6 +26,7 @@ public:
     int getAltitude() const;
 
 
+    void affichageComplexe(const std::map<int,Trajet*>& _trajet);
 };
 
 

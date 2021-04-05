@@ -18,17 +18,21 @@ public:
     ~General() = default;
     //Méthodes
     void lecturefichier(const std::string &nomfichier,t_chargeFichier& fCharge);
-    void interactionDonnee(const char& donnee, int& menuActu);
+    void interactionDonnee(const std::string& donnee, int& menuActu);
     void boucle();
     void menu1();
     void afficheMenu(const int &menuActu);
     //Getters & Setters
 
-    void interactionDonneeMenu1(const char &donnee, int &menuActu);
+    void interactionDonneeMenu1(const std::string &donnee, int &menuActu);
 
     void menu2();
 
     void menu3();
+
+    void interactionDonneeMenu2(const std::string &donnee, int &menuActu);
+
+    void interactionDonneeMenu3(const std::string &donnee, int &menuActu);
 };
 
 
