@@ -3,4 +3,4 @@ project(skiPiscine)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(skiPiscine main.cpp)
+add_executable(skiPiscine src/main.cpp src/CPP/Domaine.cpp src/Headers/Domaine.h src/CPP/Sommet.cpp src/Headers/Sommet.h)
