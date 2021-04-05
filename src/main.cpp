@@ -9,8 +9,5 @@ int main() {
         std::cerr << "Attention : " << e.what() << std::endl;
     }
 
-
-
-
     return 0;
 }

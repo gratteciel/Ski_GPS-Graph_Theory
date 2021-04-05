@@ -35,7 +35,25 @@
 34	34	1920		
 35	35	1830		
 36	arc1800	1715		
-37	37	2100		
+37	37	2100
+6
+V 5
+B 4
+R 3
+N 2
+KL 0.167
+SURF 10
+5
+TPH 4 2
+TC 2 3
+TSD 1 3
+TS 1 4
+TK 1 4
+4
+Arc2000-Arc1600 40
+Arc1600-Arc2000 40
+Arc2000-Arc1800 30
+Arc1800-Arc1600 30
 95
 1	aiguille-rouge	TPH	12	5
 2	aiguille-rouge1	N	5	4
@@ -132,5 +150,12 @@
 93	villaroger1	B	8	2
 94	villaroger2	B	2	1
 95	vitesse	KL	12	6
+6
+TPH 1200
+TC 2200
+TSD 2500
+TS 1800
+TK 800
+BUS 300
 
 
