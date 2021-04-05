@@ -40,6 +40,8 @@ public:
 
 
     bool estNombre(const std::string &str);
+
+    std::map<int, int> dijkstra(const int &sInit, std::map<int, int> &poids);
 };
 
 

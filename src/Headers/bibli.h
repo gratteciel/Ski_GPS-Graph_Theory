@@ -8,7 +8,9 @@
 #include <map>
 #include <fstream>
 #include <iostream>
-
+#include <queue>
+#include <limits>
+#include <bits/stdc++.h>
 typedef struct t_chargeSommets{
     int num;
     std::string nom;
@@ -28,7 +30,13 @@ typedef struct t_chargeFichier{
     std::vector<t_chargeTrajet> trajets;
 }t_chargeFichier;
 
-
+struct comparaisonDijkstra
+{
+    bool operator()(const std::pair<int,int>& a, const std::pair<int,int>& b)
+    {
+        return a.second > b.second;
+    }
+};
 
 #endif //SKIPISCINE_BIBLI_H
 
