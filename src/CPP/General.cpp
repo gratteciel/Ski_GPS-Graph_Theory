@@ -42,23 +42,41 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
             throw std::runtime_error("Probleme lecture pour les sommets");
         fCharge.sommets.push_back(tempSommet);
     }
+
+    /// Concernant le remplissage des descentes et des Bus nécéssité de rajouter une ligne vide ///
+
     fichier >> temp;// nombre de descentes avce les types
 
     for (int i = 0; i < temp; ++i) {
         std::pair<std::string,std::vector<int>> paireDonnee;
-        int donnee;
+        int donnee = 0;
         fichier >> paireDonnee.first;
         fichier >> donnee;
         paireDonnee.second.push_back(donnee);
+        paireDonnee.second.push_back(0);
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les descentes");
         arcs.getMatriceDuree()["Descente"].push_back(paireDonnee);
     }
-    fichier >> temp;// nombre de montée
+    fichier >> temp;// nombre de Bus
 
     for (int i = 0; i < temp; ++i) {
         std::pair<std::string,std::vector<int>> paireDonnee;
-        std::string donnee;
+        int donnee = 0;
+        fichier >> paireDonnee.first;
+        fichier >> donnee;
+        paireDonnee.second.push_back(donnee);
+        paireDonnee.second.push_back(0);
+        if(fichier.fail())
+            throw std::runtime_error("Probleme lecture pour les Bus");
+        arcs.getMatriceDuree()["Bus"].push_back(paireDonnee);
+    }
+
+    fichier >> temp;// nombre de montee
+
+    for (int i = 0; i < temp; ++i) {
+        std::pair<std::string,std::vector<int>> paireDonnee;
+        std::string donnee=" ";
         fichier >> paireDonnee.first;
         fichier >> donnee;
         paireDonnee.second.push_back(std::stoi(donnee));
@@ -68,18 +86,9 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
             throw std::runtime_error("Probleme lecture pour les montees");
         arcs.getMatriceDuree()["Montee"].push_back(paireDonnee);
     }
-    fichier >> temp;// nombre de Bus
 
-    for (int i = 0; i < temp; ++i) {
-        std::pair<std::string,std::vector<int>> paireDonnee;
-        int donnee;
-        fichier >> paireDonnee.first;
-        fichier >> donnee;
-        paireDonnee.second.push_back(donnee);
-        if(fichier.fail())
-            throw std::runtime_error("Probleme lecture pour les Bus");
-        arcs.getMatriceDuree()["BUS"].push_back(paireDonnee);
-    }
+
+
 
 
 

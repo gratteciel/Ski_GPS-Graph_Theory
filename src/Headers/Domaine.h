@@ -27,7 +27,7 @@ public:
     //Méthodes
     void creationSommets(const std::vector<t_chargeSommets>& _som);
     void initialisation(const t_chargeFichier &fCharge);
-    float calculDuree(std::string nom,std::string type,int depart, int arrivee);
+    int calculDuree(const std::string nom,const std::string type,int depart, int arrivee);
 
     //Getters & Setters
     void setOrdre(int _ordre);

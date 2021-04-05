@@ -6,7 +6,7 @@
 
 //Constructeur & destructeur
 Domaine::Domaine() {
-    m_matriceDuree["BUS"];
+    m_matriceDuree["Bus"];
     m_matriceDuree["Montee"];
     m_matriceDuree["Descente"];
 
@@ -35,33 +35,31 @@ void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
     for(const auto s: _som)
         m_sommets[s.num] = new Sommet(s.num,s.nom,s.altitude);
 }
-float Domaine::calculDuree(std::string nom,std::string type,int depart, int arrivee)
-{
-    for(const auto elem : m_matriceDuree)
-    {
-        for (int i = 0; i < elem.second.size(); i++) {
+int Domaine::calculDuree(const std::string nom,const std::string type,int depart, int arrivee) {
+    for (const auto elem : m_matriceDuree) {
 
-            if(type == elem.second[i].first || nom == elem.second[i].first){
+        for (int i = 0; i < elem.second.size(); ++i) {
+                if(elem.first == "Descente" && type == elem.second[i].first){
+                        return elem.second[i].second[0] * abs(arrivee - depart) / 100;
 
-                if(elem.second[i].first == nom)
-                    {
-                        return elem.second[i].second.front();
-                    }
-
-                else {
-                    if (elem.second[i].second.size() == 0 ){
-                        return  ( (elem.second[i].second[0] * abs(depart-arrivee))  / 100 ) ;
-                    }
-                    else
-                    {
-                        return (((elem.second[i].second[0] * abs(depart-arrivee))  / 100 ) + elem.second[i].second[1] ) ;
-                    }
                 }
+
+                else if(elem.first == "Bus" && nom == elem.second[i].first) {
+                    return elem.second[i].second[0];
+
+                }
+
+                else if(elem.first == "Montee" && type == elem.second[i].first) {
+                        return elem.second[i].second[0] * abs(arrivee - depart) / 100 + elem.second[i].second[1];
+
+                }
+
+
             }
-        }
     }
-    return 6;
+    return 0;
 }
+
 
 
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){

@@ -7,7 +7,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 typedef struct t_chargeSommets{
     int num;
