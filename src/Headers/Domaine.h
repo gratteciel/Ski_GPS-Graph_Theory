@@ -16,7 +16,7 @@ private:
     std::map<int, Trajet*> m_trajets;
     int m_ordre; // nombre de sommmets
     int m_taille; // nombre d'aretes
-    std::map<std::string, std::vector<std::pair<std::string,std::vector<float>>>> m_matriceDuree;
+    std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>> m_matriceDuree;
 
 
 public:
@@ -27,13 +27,14 @@ public:
     //Méthodes
     void creationSommets(const std::vector<t_chargeSommets>& _som);
     void initialisation(const t_chargeFichier &fCharge);
+    float calculDuree(std::string type,int depart, int arrivee);
 
     //Getters & Setters
     void setOrdre(int _ordre);
     void setTaille(int _taille);
     int getOrdre() const;
     int getTaille() const;
-    std::map<std::string, std::vector<std::pair<std::string,std::vector<float>>>>& getMatriceDuree();
+    std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>>& getMatriceDuree();
 
 
     void creationTrajets(const std::vector<t_chargeTrajet> &_tra);

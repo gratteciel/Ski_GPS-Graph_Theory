@@ -6,8 +6,8 @@
 
 //Constructeur
 
-Trajet::Trajet(const int &_num, const std::string &_nom, const std::string &_type, const Sommet *depart, const Sommet *arrivee)
-      :AbstractIdentite(_num,_nom), m_type(_type)
+Trajet::Trajet(const int &_num, const std::string &_nom, const std::string &_type, const Sommet *depart, const Sommet *arrivee, float _duree)
+      :AbstractIdentite(_num,_nom), m_type(_type), m_duree(_duree)
 {
     m_sommets.first=depart;
     m_sommets.second=arrivee;
@@ -24,3 +24,4 @@ void Trajet::affichage(){
 std::string Trajet::getType() const {
     return m_type;
 }
+

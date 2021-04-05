@@ -45,8 +45,8 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
     fichier >> temp;// nombre de descentes avce les types
 
     for (int i = 0; i < temp; ++i) {
-        std::pair<std::string,std::vector<float>> paireDonnee;
-        float donnee;
+        std::pair<std::string,std::vector<int>> paireDonnee;
+        int donnee;
         fichier >> paireDonnee.first;
         fichier >> donnee;
         paireDonnee.second.push_back(donnee);
@@ -57,13 +57,13 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
     fichier >> temp;// nombre de montée
 
     for (int i = 0; i < temp; ++i) {
-        std::pair<std::string,std::vector<float>> paireDonnee;
+        std::pair<std::string,std::vector<int>> paireDonnee;
         std::string donnee;
         fichier >> paireDonnee.first;
         fichier >> donnee;
-        paireDonnee.second.push_back(std::stof(donnee));
+        paireDonnee.second.push_back(std::stoi(donnee));
         fichier >> donnee;
-        paireDonnee.second.push_back(std::stof(donnee));
+        paireDonnee.second.push_back(std::stoi(donnee));
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les montees");
         arcs.getMatriceDuree()["Montee"].push_back(paireDonnee);
@@ -71,8 +71,8 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
     fichier >> temp;// nombre de Bus
 
     for (int i = 0; i < temp; ++i) {
-        std::pair<std::string,std::vector<float>> paireDonnee;
-        float donnee;
+        std::pair<std::string,std::vector<int>> paireDonnee;
+        int donnee;
         fichier >> paireDonnee.first;
         fichier >> donnee;
         paireDonnee.second.push_back(donnee);

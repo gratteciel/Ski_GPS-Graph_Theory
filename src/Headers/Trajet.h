@@ -13,9 +13,10 @@ private:
     std::pair<const Sommet*, const Sommet*> m_sommets;
 
     std::string m_type;
+    float m_duree;
 public:
     //Constructeur et destructeur
-    Trajet(const int& _num, const std::string& _nom, const std::string& _type, const Sommet* depart, const Sommet* arrivee);
+    Trajet(const int& _num, const std::string& _nom, const std::string& _type, const Sommet* depart, const Sommet* arrivee, float _duree);
     ~Trajet() = default;
     //Méthodes
     void affichage();
