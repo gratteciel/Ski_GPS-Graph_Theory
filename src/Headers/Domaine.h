@@ -6,7 +6,7 @@
 #define SKIPISCINE_DOMAINE_H
 #include "Sommet.h"
 #include "Trajet.h"
-#include <map>
+
 
 
 
@@ -28,7 +28,9 @@ public:
     //Méthodes
     void creationSommets(const std::vector<t_chargeSommets>& _som);
     void initialisation(const t_chargeFichier &fCharge);
-    float calculDuree(const std::string nom,const std::string type,int depart, int arrivee);
+    void creationTrajets(const std::vector<t_chargeTrajet> &_tra);
+    void afficheTrajets(const char& type='N',std::string sommetChoisie="n");
+    void afficheSommets(const std::string& sommetChoisie="n");
 
     //Getters & Setters
     void setOrdre(int _ordre);
@@ -38,7 +40,7 @@ public:
     std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>>& getMatriceDuree();
 
 
-    void creationTrajets(const std::vector<t_chargeTrajet> &_tra);
+    bool estNombre(const std::string &str);
 };
 
 

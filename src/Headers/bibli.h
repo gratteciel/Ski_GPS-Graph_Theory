@@ -5,6 +5,7 @@
 #ifndef SKIPISCINE_BIBLI_H
 #define SKIPISCINE_BIBLI_H
 #include <vector>
+#include <map>
 #include <fstream>
 #include <iostream>
 #include <cmath>
