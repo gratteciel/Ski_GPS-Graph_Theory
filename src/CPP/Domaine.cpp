@@ -154,8 +154,8 @@ void Domaine::plusCourtChemin(int s0, int sF){
     else{
         std::cout << std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
-        std::cout << " Point |       Chemin (liste de trajets)"<<std::endl;
-        std::cout << " final |       de forme \"nomTrajet\" (allant du \"sommet intial\" au  \"sommet final\" )"<<std::endl;
+        std::cout << " Point |  Chemin (liste de trajets)"<<std::endl;
+        std::cout << " final |  de forme \"nomTrajet\" (allant du \"sommet intial\" au  \"sommet final\" )"<<std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
         for(const auto& e : m_sommets){
             if(e.first!=s0)
@@ -170,26 +170,25 @@ std::string Domaine::convertSecondeHeuresMinS(const int& seconde){
 
     if(heure!=0)
         return std::to_string(int(heure)) + "h " + std::to_string(int(minutes%60))
-         +  "m " + std::to_string(int(seconde%60)) +"s.";
+         +  "m " + std::to_string(int(seconde%60)) +"s";
     else{
         if(minutes!=0){
             return std::to_string(int(minutes%60))
-                   +  "m " + std::to_string(int(seconde%60)) +"s.";
+                   +  "m " + std::to_string(int(seconde%60)) +"s";
         }
         else
-            return std::to_string(int(seconde%60)) +"s.";
+            return std::to_string(int(seconde%60)) +"s";
 
     }
 }
 
 void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const int& poids,const bool& complexe){
     std::queue<int> listePoints;
+    bool cheminPossible=true;
+    getPlusCourtCheminRecursif(sF,pred,s0,listePoints,cheminPossible);
 
-    getPlusCourtCheminRecursif(sF,pred,s0,listePoints);
-    listePoints.push(sF);
-    if(complexe)
-        std::cout << std::endl << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl << "   ";
-    else{
+    if(!complexe)
+    {
         std::cout << "  " << sF;
         if(sF/10<1)
             std::cout << " ";
@@ -197,35 +196,53 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
     }
 
 
+    if(cheminPossible){
+        if(complexe)
+            std::cout << std::endl << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl << "   ";
 
-    while(listePoints.size()!=1){
-        int actu = listePoints.front();
-        listePoints.pop();
-        for(const auto& elem: m_sommets[actu]->getAdjacents()){
-            if(elem->getSommets().second->getNum()==listePoints.front()){
-                std::cout << elem->getNom() << " ("<<  actu << "-" <<listePoints.front() << ")";
-                if(listePoints.size()!=1)
-                    std::cout << " -> ";
-                break;
+
+
+        listePoints.push(sF);
+
+        while(listePoints.size()!=1){
+            int actu = listePoints.front();
+            listePoints.pop();
+            for(const auto& elem: m_sommets[actu]->getAdjacents()){
+                if(elem->getSommets().second->getNum()==listePoints.front()){
+                    std::cout << elem->getNom() << " ("<<  actu << "-" <<listePoints.front() << ")";
+                    if(listePoints.size()!=1)
+                        std::cout << " -> ";
+                    break;
+                }
             }
-        }
 
-    }
-    if(complexe){
-        std::cout <<std::endl;
-        std::cout << std::endl<<"   duree= "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+        }
+        if(complexe){
+            std::cout <<std::endl;
+            std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+        }
+        else{
+            std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
+
+        }
     }
     else{
-        std::cout << std::endl<<"       |  duree= "  << convertSecondeHeuresMinS(poids) << std::endl;
-        std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
+        if(complexe)
+            std::cout << std::endl;
+        std::cout << "Impossible de relier ces 2 points!" << std::endl;
     }
+    if(!complexe)
+        std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
+
 
 }
 
 ///Sous-programme permmetant d'afficher récursivement les sommets prédécessants pour aller du sommet initial au sommet i
-void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints){
-    if(initial!=i){
-        getPlusCourtCheminRecursif(pred[i], pred,initial,listePoints);
+void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints,bool& cheminPossible){
+    if(i==-1)
+        cheminPossible=false;
+    else if(initial!=i){
+        getPlusCourtCheminRecursif(pred[i], pred,initial,listePoints,cheminPossible);
         listePoints.push(pred[i]); //On ajoute le point à la file
     }
 }
