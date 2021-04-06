@@ -143,6 +143,9 @@ void General::interactionDonnee(const std::string &donnee, int &menuActu) {
             case 4:
                 interactionDonneeMenu4(donnee,menuActu);
                 break;
+            case 5:
+                interactionDonneeMenu5(donnee,menuActu);
+                break;
         }
     }
 
@@ -151,12 +154,15 @@ void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
         switch(donnee[0]){
             case '1':
-                menuActu=2;
+                menuActu=5;
                 break;
             case '2':
-                menuActu =3;
+                menuActu=2;
                 break;
             case '3':
+                menuActu =3;
+                break;
+            case '4':
                 menuActu=4;
                 break;
         }
@@ -242,6 +248,17 @@ void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu){
 
 }
 
+void General::interactionDonneeMenu5(const std::string& donnee, int& menuActu){
+    if(donnee.size()==1){
+        switch(donnee[0]){
+            case '0':
+                menuActu=1;
+                break;
+        }
+    }
+
+}
+
 void General::afficheMenu(const int& menuActu){
     std::cout << "q : Quitter le programme" <<std::endl;
     switch(menuActu){
@@ -256,13 +273,18 @@ void General::afficheMenu(const int& menuActu){
             break;
         case 4:
             menu4();
+            break;
+        case 5:
+            menu5();
+            break;
     }
 }
 
 void General::menu1(){
-    std::cout << "1 : A propos des points (4.3)" << std::endl;
-    std::cout << "2 : A propos des trajets (4.3)" << std::endl;
-    std::cout << "3 : Plus courts chemins (4.4)" << std::endl;
+    std::cout << "1 : A propos du domaine skiable des Arcs" << std::endl;
+    std::cout << "2 : A propos des points (4.3)" << std::endl;
+    std::cout << "3 : A propos des trajets (4.3)" << std::endl;
+    std::cout << "4 : Plus courts chemins (4.4)" << std::endl;
 }
 
 void General::menu2(){
@@ -284,4 +306,9 @@ void General::menu4(){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << "1 : Tous les plus courts chemin en partant d'un point" << std::endl;
     std::cout << "2 : Plus court chemin entre 2 points" << std::endl;
+}
+
+void General::menu5(){
+    std::cout << "0 : Retour en arriere"<<std::endl<<std::endl;
+    arcs.afficheInfo();
 }

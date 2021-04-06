@@ -212,6 +212,20 @@ void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const in
     }
 }
 
+void Domaine::afficheInfo(){
+    std::map<char, int> traj;
+
+    traj['D']=0;
+    traj['R']=0;
+    traj['B']=0;
+    for(const auto& t: m_trajets)
+        traj[t.second->getGType()]+=1;
+
+    std::cout << "Le domaine skiable possede " << getOrdre() << " points" << std::endl;
+    std::cout << "et " << getTaille() << " trajets";
+    std::cout << " dont " << traj['D'] << " pistes, " << traj['R']<< " remontees et " << traj['B'] << " navettes" <<std::endl;
+
+}
 std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     std::map<int,int> pred;
     std::map<int,bool> marque;
@@ -228,11 +242,10 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
         marque[elem.first]=false;
 
 
-
     //Initialisation de la queue
     //parametre 1 : numéro du sommet
     //parametre 2 : duree du sommet par rapport à sInit
-    //Comparaison selon le classe Comparaison (selon le parametre 2)
+    //Comparaison selon la struct compaisonDijkstra (selon le parametre 2)
     std::priority_queue<std::pair<int,int> ,std::vector<std::pair<int,int>> ,comparaisonDijkstra> queue;
     queue.push(std::make_pair(sInit,0));
 
@@ -255,7 +268,6 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
 
         for(const auto& a : m_sommets[minSom]->getAdjacents()){
             if(!marque[a->getSommets().second->getNum()]){ //Si le sommet adjacent n'est pas marqué
-
                 //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
                 //est inférieur à la distance de l'adjacent à sInit
                 //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
@@ -265,11 +277,7 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
                     queue.push(std::make_pair(a->getSommets().second->getNum(),poids[a->getSommets().second->getNum()]));//On ajoute a à la priority_queue
                 }
             }
-
         }
-
-
-
     }
 
     return pred;

@@ -46,6 +46,8 @@ public:
 
 
     int entreePoint(const std::string &phrase);
+
+    void afficheInfo();
 };
 
 
