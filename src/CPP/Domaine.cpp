@@ -10,8 +10,6 @@ Domaine::Domaine() {
     m_matriceDuree['B'];
     m_matriceDuree['R'];
     m_matriceDuree['D'];
-
-
 }
 
 Domaine::~Domaine(){
@@ -144,6 +142,7 @@ int Domaine::returnPointId(const std::string& entree){
     }
     return -1;
 }
+
 void Domaine::plusCourtChemin(int s0, int sF){
 
     std::map<int,int> poids;
@@ -151,7 +150,13 @@ void Domaine::plusCourtChemin(int s0, int sF){
     std::map<int,int> pred=dijkstra(s0,poids);
     if(sF!=-5)
         affichePlusCourtChemin(s0,sF,pred,poids[sF]);
+
     else{
+        std::cout << std::endl;
+        std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
+        std::cout << " Point |       Chemin (liste de trajets)"<<std::endl;
+        std::cout << " final |       de forme \"nomTrajet\" (allant du \"sommet intial\" au  \"sommet final\" )"<<std::endl;
+        std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
         for(const auto& e : m_sommets){
             if(e.first!=s0)
                 affichePlusCourtChemin(s0,e.first,pred,poids[e.first],false);
@@ -184,14 +189,21 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
     listePoints.push(sF);
     if(complexe)
         std::cout << std::endl << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl << "   ";
-    else
-        std::cout<< std::endl <<"Entre " <<m_sommets[s0]->afficheSimple() << " & " << m_sommets[sF]->afficheSimple()<<": "<<std::endl<<"   ";
+    else{
+        std::cout << "  " << sF;
+        if(sF/10<1)
+            std::cout << " ";
+        std::cout << "   |  ";
+    }
+
+
+
     while(listePoints.size()!=1){
         int actu = listePoints.front();
         listePoints.pop();
         for(const auto& elem: m_sommets[actu]->getAdjacents()){
             if(elem->getSommets().second->getNum()==listePoints.front()){
-                std::cout << elem->getNom() << " (de "<<  actu << " a " <<listePoints.front() << ")";
+                std::cout << elem->getNom() << " ("<<  actu << "-" <<listePoints.front() << ")";
                 if(listePoints.size()!=1)
                     std::cout << " -> ";
                 break;
@@ -199,9 +211,15 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
         }
 
     }
-    if(complexe)
+    if(complexe){
         std::cout <<std::endl;
-    std::cout << std::endl<<"   duree= "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+        std::cout << std::endl<<"   duree= "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+    }
+    else{
+        std::cout << std::endl<<"       |  duree= "  << convertSecondeHeuresMinS(poids) << std::endl;
+        std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
+    }
+
 }
 
 ///Sous-programme permmetant d'afficher récursivement les sommets prédécessants pour aller du sommet initial au sommet i
@@ -256,7 +274,6 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
 
     //Tant qu'il reste des sommets dans la queue (veut aussi dire qu'il reste des sommets non marqués)
     while(!queue.empty()){
-
 
         int minSom=queue.top().first; //Prend le numéro du sommet avec la plus petite distance de sInit qui est dans la queue
         int distMinSom=queue.top().second; //Prend la distance du sommet jusqu'au sommet sInit

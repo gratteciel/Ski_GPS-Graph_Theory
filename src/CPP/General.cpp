@@ -113,7 +113,7 @@ void General::boucle(){
     int menuActu=1;
 
     while(menuActu!=0){
-
+        std::system("clear || cls");
         afficheMenu(menuActu);
         std::cout <<std::endl<< "Menu n'" ;
         std::string donnee;
@@ -143,8 +143,9 @@ void General::interactionDonnee(const std::string &donnee, int &menuActu) {
             case 4:
                 interactionDonneeMenu4(donnee,menuActu);
                 break;
-            case 5:
-                interactionDonneeMenu5(donnee,menuActu);
+
+            case 6:
+                interactionDonneeMenu6(donnee,menuActu);
                 break;
         }
     }
@@ -154,7 +155,10 @@ void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
         switch(donnee[0]){
             case '1':
-                menuActu=5;
+
+                arcs.afficheInfo();
+
+                finProgrammeActu();
                 break;
             case '2':
                 menuActu=2;
@@ -163,7 +167,7 @@ void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
                 menuActu =3;
                 break;
             case '4':
-                menuActu=4;
+                menuActu=6;
                 break;
         }
     }
@@ -178,12 +182,12 @@ void General::interactionDonneeMenu2(const std::string& donnee, int& menuActu){
                 break;
             case '1':
                 arcs.afficheSommets();
+                finProgrammeActu();
                 break;
             case '2':
-
                 std::string numSommet;
-
                 arcs.afficheSommets(numSommet);
+                finProgrammeActu();
                 break;
         }
     }
@@ -198,41 +202,52 @@ void General::interactionDonneeMenu3(const std::string& donnee, int& menuActu){
                 break;
             case '1':
                 arcs.afficheTrajets();
-                std::cout <<std::endl;
+
+                finProgrammeActu();
                 break;
             case '2':
                 arcs.afficheTrajets('D');
-                std::cout <<std::endl;
+
+                finProgrammeActu();
                 break;
             case '3':
                 arcs.afficheTrajets('R');
-                std::cout <<std::endl;
+
+                finProgrammeActu();
                 break;
             case '4':
                 arcs.afficheTrajets('B');
-                std::cout <<std::endl;
+
+                finProgrammeActu();
                 break;
             case '5':
                 std::string numTrajet;
                 std::cout << "Nom ou numero du trajet: ";
                 std::getline (std::cin,numTrajet);
                 arcs.afficheTrajets('T',numTrajet);
+                finProgrammeActu();
                 break;
         }
     }
 
 }
 
+void General::finProgrammeActu(){
+    std::cout <<std::endl<< "Appuyez sur entree pour revenir au menu...........";
+    char ch = getchar();
+
+}
 
 void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
         switch(donnee[0]){
             case '0':
-                menuActu=1;
+                menuActu=6;
                 break;
             case '1':{
                 int s = arcs.entreePoint("Nom ou numero du point initial: ");
                 arcs.plusCourtChemin(s);
+                finProgrammeActu();
                 break;
             }
 
@@ -240,6 +255,7 @@ void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu){
                 int s0 = arcs.entreePoint("Nom ou numero du point initial: ");
                 int sF = arcs.entreePoint("Nom ou numero du point final: ");
                 arcs.plusCourtChemin(s0,sF);
+                finProgrammeActu();
                 break;
             }
 
@@ -248,16 +264,28 @@ void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu){
 
 }
 
-void General::interactionDonneeMenu5(const std::string& donnee, int& menuActu){
+void General::interactionDonneeMenu6(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
         switch(donnee[0]){
             case '0':
                 menuActu=1;
                 break;
+            case '1':{
+                menuActu=4;
+                break;
+            }
+
+            case '2':{
+                menuActu=4;
+                break;
+            }
+
         }
     }
 
 }
+
+
 
 void General::afficheMenu(const int& menuActu){
     std::cout << "q : Quitter le programme" <<std::endl;
@@ -274,14 +302,15 @@ void General::afficheMenu(const int& menuActu){
         case 4:
             menu4();
             break;
-        case 5:
-            menu5();
+
+        case 6:
+            menu6();
             break;
     }
 }
 
 void General::menu1(){
-    std::cout << "1 : A propos du domaine skiable des Arcs" << std::endl;
+    std::cout << std::endl <<"1 : A propos du domaine skiable des Arcs" << std::endl;
     std::cout << "2 : A propos des points (4.3)" << std::endl;
     std::cout << "3 : A propos des trajets (4.3)" << std::endl;
     std::cout << "4 : Plus courts chemins (4.4)" << std::endl;
@@ -289,13 +318,13 @@ void General::menu1(){
 
 void General::menu2(){
     std::cout << "0 : Retour en arriere" << std::endl;
-    std::cout << "1 : Afficher tous les points" << std::endl;
+    std::cout << std::endl <<"1 : Afficher tous les points" << std::endl;
     std::cout << "2 : Information sur 1 point" << std::endl;
 }
 
 void General::menu3(){
     std::cout << "0 : Retour en arriere" << std::endl;
-    std::cout << "1 : Afficher tous les trajets" << std::endl;
+    std::cout <<std::endl << "1 : Afficher tous les trajets" << std::endl;
     std::cout << "2 : Afficher toutes les pistes" << std::endl;
     std::cout << "3 : Afficher toutes les remontees" << std::endl;
     std::cout << "4 : Afficher toutes les navettes" << std::endl;
@@ -304,11 +333,14 @@ void General::menu3(){
 
 void General::menu4(){
     std::cout << "0 : Retour en arriere" << std::endl;
-    std::cout << "1 : Tous les plus courts chemin en partant d'un point" << std::endl;
+    std::cout << std::endl <<"1 : Tous les plus courts chemin en partant d'un point" << std::endl;
     std::cout << "2 : Plus court chemin entre 2 points" << std::endl;
 }
 
-void General::menu5(){
-    std::cout << "0 : Retour en arriere"<<std::endl<<std::endl;
-    arcs.afficheInfo();
+
+
+void General::menu6(){
+    std::cout << "0 : Retour en arriere" << std::endl;
+    std::cout << std::endl <<"1 : Plus court chemin en temps" << std::endl;
+    std::cout << "2 : Plus court chemin en nombre de trajets" << std::endl;
 }
