@@ -129,6 +129,42 @@ void Domaine::afficheSommets(const std::string& sommetChoisie){
 
 }
 
+void Domaine::afficheChangementDuree()
+{
+    std::string choix;
+    unsigned int duree;
+    std::cout << "Voici la liste des temps :" << std::endl;
+    std::cout << "Tous les temps sont en secondes" << std::endl;
+    //affichage de tous les types
+    for (int i = 0; i < getMatriceDuree().size(); ++i) {
+        std::cout << i << ")" << std::endl;
+
+    }
+    std::cin >> choix;
+    while (choix != || std::stoi(choix) != ) {
+
+        std::cout << "Mauvaise saisie veuillez ressayer "
+        std::cin >> choix;
+
+    }
+
+    std::cout << "Vous avez choisi de changer la valeur de ce parametre la : " << << std::endl;
+    std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
+    std::cin >> duree;
+    while(duree < 0)
+    {
+        std::cout << "Veuillez mettre un temps positif svp! " << std::endl;
+        std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
+        std::cin >> duree;
+    }
+
+    std::cout  << "Le parametre: " << << " a ete change, la nouvelle valeur du parametre est : " << duree <<std::endl;
+
+
+
+
+}
+
 //Getters & Setters
 void Domaine::setOrdre(int _ordre) {
     m_ordre = _ordre;
@@ -148,4 +184,5 @@ std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>>& Dom
 {
     return m_matriceDuree;
 }
+
 

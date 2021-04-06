@@ -31,6 +31,7 @@ public:
     void creationTrajets(const std::vector<t_chargeTrajet> &_tra);
     void afficheTrajets(const char& type='N',std::string sommetChoisie="n");
     void afficheSommets(const std::string& sommetChoisie="n");
+    void afficheChangementDuree();
 
     //Getters & Setters
     void setOrdre(int _ordre);
