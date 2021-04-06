@@ -130,82 +130,152 @@ void Domaine::afficheSommets(const std::string& sommetChoisie){
 
 void Domaine::afficheChangementDuree() {
     std::string choix;
-    unsigned int duree;
     std::cout << "Voici la liste des temps :" << std::endl;
     std::cout << "Tous les temps sont en secondes" << std::endl;
     //affichage de tous les types
-    int i =0;
-    int tailleMatriceTotale;
-    std::string parametreChoisi;
 
-    for (const auto &elem : getMatriceDuree()){
-            std::cout << "Dans la categorie : " << elem.first << std::endl;
+    char categorie;
+    float dureeChangement = 0;
+    float nouvelleDuree = 0;
+    std::cout << "Voici les categories " <<std::endl;
+    for (const auto &elem : getMatriceDuree()) {
+        std::cout << elem.first << std::endl;
+    }
+    std::cout << "Veuillez choisir la categorie : ";
+    std::cin >> categorie;
+    while (categorie != 'R' && categorie != 'B' && categorie != 'D') {
+        std::cout << "Mauvaise saisie " << std::endl;
+        std::cout << "Veuillez choisir la categorie : ";
+        std::cin >> categorie;
+    }
+    auto it = getMatriceDuree().find(categorie);
 
-            for (const auto &elem1 : elem.second)
+        std::cout << "Dans la categorie : " << it->first << std::endl;
+
+    char parametre = '0';
+    int i=0;
+    std::map <char,std::map<std::string,std::vector<int>>> mapAssociation;
+    auto it2 = mapAssociation.find(parametre);
+
+
+    switch (it->first) {
+
+        case 'R' :
+            for (const auto &elem1 : it->second)
             {
-                std::cout << "Parametre : " << elem1.first << " avec comme duree ";
-                for (int j = 0; j < elem1.second.size(); ++j) {
-                    std::cout << j+1+i << " : " << elem1.second[j] ;
+                std::map<std::string,std::vector<int>> temp;
+                std::vector<int> temp2;
+                std::cout <<" Parametre : "<< i << elem1.first << " avec comme duree de base : " << elem1.second[0] << " et duree pour le denivele :" << elem1.second[1] << std::endl;
+                temp2.push_back(elem1.second[0]);
+                temp2.push_back(elem1.second[1]);
+                temp[elem1.first] = temp2;
+                mapAssociation [i] = temp;
+                i++;
+            }
+            std::cout << "Choissisez le parametre : " ;
+            std::cin >> parametre;
+            while (i > it->second.size()){
+                std::cout << "Mauvaise saisie !" << std::endl;
+                std::cout << "Choissisez le parametre : " ;
+                std::cin >> parametre;
+            }
+            std::cout << "Vous avez choisi :" << std::endl;
+            std::cout  << "Le parametre " << it2->first << " de la categorie " << it->first;
+            for (auto& elem : it2->second) {
+                std::cout << "Quelle duree voulez vous changer : duree 1 : " << elem.second[0] << "  duree 2 : " << elem.second[1] << std::endl;
+                std::cout << "Tapez 1 ou 2 pour choisir la duree: ";
+                std::cin >> dureeChangement;
+                while (dureeChangement != 1 && dureeChangement != 2) {
+                    std::cout << "Mauvaise saisie !" << std::endl;
+                    std::cout << "Tapez 1 ou 2 pour choisir la duree: ";
+                    std::cin >> dureeChangement;
                 }
-            }
-            i++;
-    }
-    tailleMatriceTotale = i;
-    std::cin >> choix;
-
-    for (const auto& elem: getMatriceDuree()) {
-        auto it = elem.second.find(choix);
-            while (choix != it->first|| std::stoi(choix) <= tailleMatriceTotale) {
-
-                std::cout << "Mauvaise saisie veuillez ressayer " << std::endl;
-                std::cin >> choix;
-
-            }
-    }
-
-    if(estNombre(choix) == true ) {
-        for (int j = 0; j < getMatriceDuree().size(); ++j) {
-            for (int k = 0; k < getMatriceDuree()[j].size(); ++k)
-            {
-                for (const auto& elem: getMatriceDuree()) {
-                    for(const auto& elem1: elem.second) {
-
-                        while (j + k == tailleMatriceTotale) {
-
-                            std::cout << "Vous avez choisi de changer la valeur de ce parametre la : " << elem1.first << std::endl;
-                            std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
-                            std::cin >> duree;
-                            while(duree < 0)
-                            {
-                                std::cout << "Veuillez mettre un temps positif svp! " << std::endl;
-                                std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
-                                std::cin >> duree;
-                            }
-                            std::cout  << "Le parametre: " << elem1.first<< " a ete change, la nouvelle valeur du parametre est : " << duree <<std::endl;
-                        }
-                    }
-
+                std::cout << "Vous avez choisi de changer cette valeur" << elem.second[dureeChangement - 1]
+                          << " veuillez mettre la nouvelle valeur : ";
+                std::cin >> nouvelleDuree;
+                while (nouvelleDuree < 0) {
+                    std::cout << "Veuillez mettre un temps positif svp! " << std::endl;
+                    std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
+                    std::cin >> nouvelleDuree;
                 }
+                elem.second[dureeChangement - 1] = nouvelleDuree;
+            }
+            break;
 
-            }
-        }
-    }
-    else
-    {
-        for (const auto& elem: getMatriceDuree()) {
-            auto it = elem.second.find(choix);
-            std::cout << "Vous avez choisi de changer la valeur de ce parametre la : " << it->first << std::endl;
-            std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
-            std::cin >> duree;
-            while(duree < 0)
+        case 'D':
+            for (const auto &elem1 : it->second)
             {
-                std::cout << "Veuillez mettre un temps positif svp! " << std::endl;
-                std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
-                std::cin >> duree;
+                std::map<std::string,std::vector<int>> temp;
+                std::vector<int> temp2;
+                std::cout << i << " parametre : " << elem1.first << " durée pour le denivele :" << elem1.second[0];
+                temp2.push_back(elem1.second[0]);
+                temp[elem1.first] = temp2;
+                mapAssociation [i] = temp;
+                i++;
             }
-            std::cout  << "Le parametre: " << it->first<< " a ete change, la nouvelle valeur du parametre est : " << duree <<std::endl;
-        }
+            std::cout << "Choissisez le parametre : " ;
+            std::cin >> parametre;
+            while (i > it->second.size()){
+                std::cout << "Mauvaise saisie !" << std::endl;
+                std::cout << "Choissisez le parametre : " ;
+                std::cin >> parametre;
+            }
+            std::cout << "Vous avez choisi :" << std::endl;
+            std::cout  << "Le parametre " << it2->first << " de la categorie " << it->first;
+            for (auto& elem : it2->second) {
+                std::cout << "Vous allez changer cette duree : duree 1 : " << elem.second[0] << std::endl;
+
+                std::cout << "Vous avez choisi de changer cette valeur" << elem.second[0]
+                          << " veuillez mettre la nouvelle valeur : ";
+                std::cin >> nouvelleDuree;
+                while (nouvelleDuree < 0) {
+                    std::cout << "Veuillez mettre un temps positif svp! " << std::endl;
+                    std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
+                    std::cin >> nouvelleDuree;
+                }
+                elem.second[0] = nouvelleDuree;
+            }
+            break;
+
+        case 'B':
+            for (const auto &elem1 : it->second)
+            {
+                std::map<std::string,std::vector<int>> temp;
+                std::vector<int> temp2;
+                std::cout <<" Parametre : " << i  << " : "<< elem1.first << " duree pour le denivele :" << elem1.second[0] <<std::endl;
+                temp2.push_back(elem1.second[0]);
+                temp[elem1.first] = temp2;
+                mapAssociation [i] = temp;
+                i++;
+            }
+            std::cout << "Choissisez le parametre : " ;
+            std::cin >> parametre;
+            while (i > it->second.size()){
+                std::cout << "Mauvaise saisie !" << std::endl;
+                std::cout << "Choissisez le parametre : " ;
+                std::cin >> parametre;
+            }
+            std::cout << "Vous avez choisi :";
+            std::cout  << " le parametre " << parametre << " de la categorie " << it->first << std::endl;
+
+            for (auto& elem : it2->second) {
+                std::cout << " Vous allez changer cette duree : " << elem.second[0] << std::endl;
+                std::cout << "Vous avez choisi de changer cette valeur : " << elem.second[0] << " veuillez mettre la nouvelle valeur : ";
+                std::cin >> nouvelleDuree;
+                while (nouvelleDuree < 0) {
+                    std::cout << "Veuillez mettre un temps positif svp! " << std::endl;
+                    std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
+                    std::cin >> nouvelleDuree;
+                }
+                elem.second[0] = nouvelleDuree;
+            }
+            break;
+
+        default:
+            std::cout << "Probleme dans la selection des durees" <<std::endl;
+
     }
+
 }
 
 std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){

@@ -117,6 +117,9 @@ void Trajet::setGType(){
         m_gType='B';
 
 }
+void Trajet::setDuree(float _duree) {
+    m_duree = _duree;
+}
 
 char Trajet::getGType() const{
     return m_gType;
@@ -125,3 +128,4 @@ char Trajet::getGType() const{
 float Trajet::getDuree() const {
     return m_duree;
 }
+
