@@ -33,6 +33,11 @@ public:
     void interactionDonneeMenu2(const std::string &donnee, int &menuActu);
 
     void interactionDonneeMenu3(const std::string &donnee, int &menuActu);
+
+    void menu4();
+
+    void interactionDonneeMenu4(const std::string &donnee, int &menuActu);
+
 };
 
 

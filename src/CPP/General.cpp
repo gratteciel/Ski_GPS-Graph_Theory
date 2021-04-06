@@ -87,9 +87,6 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
 
 
-
-
-
     fichier >> temp; // nombre d'arcs dans le graphe
     arcs.setTaille(temp);
 
@@ -114,30 +111,41 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
 void General::boucle(){
     int menuActu=1;
-    arcs.plusCourtChemin(30,36);
-    while(1==1){
-        afficheMenu(menuActu);
 
+    while(menuActu!=0){
+
+        afficheMenu(menuActu);
+        std::cout <<std::endl<< "Menu n'" ;
         std::string donnee;
 
         std::cin >> donnee;
+        std::system("clear || cls");
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         interactionDonnee(donnee,menuActu);
+
     }
 }
 
 void General::interactionDonnee(const std::string &donnee, int &menuActu) {
-    switch(menuActu){
-        case 1:
-            interactionDonneeMenu1(donnee,menuActu);
-            break;
-        case 2:
-            interactionDonneeMenu2(donnee,menuActu);
-            break;
-        case 3:
-            interactionDonneeMenu3(donnee,menuActu);
-            break;
+    if(donnee=="q")
+        menuActu=0;
+    else{
+        switch(menuActu){
+            case 1:
+                interactionDonneeMenu1(donnee,menuActu);
+                break;
+            case 2:
+                interactionDonneeMenu2(donnee,menuActu);
+                break;
+            case 3:
+                interactionDonneeMenu3(donnee,menuActu);
+                break;
+            case 4:
+                interactionDonneeMenu4(donnee,menuActu);
+                break;
+        }
     }
+
 }
 void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
@@ -147,6 +155,9 @@ void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
                 break;
             case '2':
                 menuActu =3;
+                break;
+            case '3':
+                menuActu=4;
                 break;
         }
     }
@@ -165,9 +176,6 @@ void General::interactionDonneeMenu2(const std::string& donnee, int& menuActu){
             case '2':
 
                 std::string numSommet;
-
-                std::cout << "Nom ou numero du point: ";
-                std::getline (std::cin,numSommet);
 
                 arcs.afficheSommets(numSommet);
                 break;
@@ -209,7 +217,33 @@ void General::interactionDonneeMenu3(const std::string& donnee, int& menuActu){
 
 }
 
+
+void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu){
+    if(donnee.size()==1){
+        switch(donnee[0]){
+            case '0':
+                menuActu=1;
+                break;
+            case '1':{
+                int s = arcs.entreePoint("Nom ou numero du point initial: ");
+                arcs.plusCourtChemin(s);
+                break;
+            }
+
+            case '2':{
+                int s0 = arcs.entreePoint("Nom ou numero du point initial: ");
+                int sF = arcs.entreePoint("Nom ou numero du point final: ");
+                arcs.plusCourtChemin(s0,sF);
+                break;
+            }
+
+        }
+    }
+
+}
+
 void General::afficheMenu(const int& menuActu){
+    std::cout << "q : Quitter le programme" <<std::endl;
     switch(menuActu){
         case 1:
             menu1();
@@ -220,12 +254,15 @@ void General::afficheMenu(const int& menuActu){
         case 3:
             menu3();
             break;
+        case 4:
+            menu4();
     }
 }
 
 void General::menu1(){
-    std::cout << "1 : A propos des points" << std::endl;
-    std::cout << "2 : A propos des trajets" << std::endl;
+    std::cout << "1 : A propos des points (4.3)" << std::endl;
+    std::cout << "2 : A propos des trajets (4.3)" << std::endl;
+    std::cout << "3 : Plus courts chemins (4.4)" << std::endl;
 }
 
 void General::menu2(){
@@ -241,4 +278,10 @@ void General::menu3(){
     std::cout << "3 : Afficher toutes les remontees" << std::endl;
     std::cout << "4 : Afficher toutes les navettes" << std::endl;
     std::cout << "5 : Information sur 1 trajet" << std::endl;
+}
+
+void General::menu4(){
+    std::cout << "0 : Retour en arriere" << std::endl;
+    std::cout << "1 : Tous les plus courts chemin en partant d'un point" << std::endl;
+    std::cout << "2 : Plus court chemin entre 2 points" << std::endl;
 }

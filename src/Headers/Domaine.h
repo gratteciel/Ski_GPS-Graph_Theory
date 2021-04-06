@@ -32,10 +32,11 @@ public:
     void afficheSommets(const std::string& sommetChoisie="n");
     bool estNombre(const std::string &str);
     std::map<int, int> dijkstra(const int &sInit, std::map<int, int> &poids);
-    void plusCourtChemin(int s0, int sF);
-    void affichePlusCourtChemin(const int &s0, const int &sF, const std::map<int, int> &pred, const int &poids);
+    void plusCourtChemin(int s0, int sF=-5);
+    void affichePlusCourtChemin(const int &s0, const int &sF, const std::map<int, int> &pred, const int &poids,const bool& complexe=true);
     void getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints);
     std::string convertSecondeHeuresMinS(const int &seconde);
+    int returnPointId(const std::string &entree);
     //Getters & Setters
     void setOrdre(int _ordre);
     void setTaille(int _taille);
@@ -44,7 +45,7 @@ public:
     t_mapDuree& getMatriceDuree();
 
 
-
+    int entreePoint(const std::string &phrase);
 };
 
 

@@ -30,7 +30,7 @@ std::string Sommet::afficheSimple(){
 }
 
 void Sommet::affichageComplexe(const std::map<int,Trajet*>& _trajets){
-    std::cout << "Information detaille du point: " << getNom() << " (" <<getAltitude() <<"m)" << std::endl<<std::endl;
+    std::cout <<std::endl<< "Information detaille du point: " << getNom() << " (" <<getAltitude() <<"m)" << std::endl<<std::endl;
 
     std::cout << "Les trajets partants de ce point: " << std::endl;
     for(const auto& elem: m_adjacents){
@@ -42,7 +42,7 @@ void Sommet::affichageComplexe(const std::map<int,Trajet*>& _trajets){
        if(elem.second->getSommets().second->getNum()==getNum())
            elem.second->affichageComplexe(false);
     }
-
+    std::cout << std::endl;
 }
 
 void Sommet::setAdjactent(Trajet* _trajet){
