@@ -34,9 +34,9 @@ public:
 
     void interactionDonneeMenu3(const std::string &donnee, int &menuActu);
 
-    void menu4();
+    void menu4(const bool& estDijkstra);
 
-    void interactionDonneeMenu4(const std::string &donnee, int &menuActu);
+    void interactionDonneeMenu4(const std::string &donnee, int &menuActu,const bool& estDijkstra);
 
 
 

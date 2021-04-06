@@ -143,14 +143,21 @@ int Domaine::returnPointId(const std::string& entree){
     return -1;
 }
 
-void Domaine::plusCourtChemin(int s0, int sF){
+void Domaine::plusCourtChemin(const bool& estDijkstra,int s0, int sF){
 
     std::map<int,int> poids;
+    std::map<int,int> pred;
 
-    std::map<int,int> pred=dijkstra(s0,poids);
+    if(estDijkstra)
+        pred=dijkstra(s0,poids);
+    else{
+        pred=parcoursBFS(s0);
+        for(const auto& elem : m_sommets)
+            poids[elem.first]=-5;
+    }
+
     if(sF!=-5)
         affichePlusCourtChemin(s0,sF,pred,poids[sF]);
-
     else{
         std::cout << std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
@@ -217,14 +224,19 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
             }
 
         }
-        if(complexe){
-            std::cout <<std::endl;
-            std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+        if(poids!=-5){
+            if(complexe){
+                std::cout <<std::endl;
+                std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+            }
+            else
+                std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
         }
-        else{
-            std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
+        else
+            std::cout << std::endl;
 
-        }
+
+
     }
     else{
         if(complexe)
@@ -255,15 +267,20 @@ void Domaine::afficheInfo(){
     traj['B']=0;
     for(const auto& t: m_trajets)
         traj[t.second->getGType()]+=1;
-
+    std::cout <<"----------------------------------" << std::endl;
+    std::cout <<  "    Information sur le domaine   " << std::endl;
+    std::cout << "----------------------------------" << std::endl<<std::endl;
     std::cout << "Le domaine skiable possede " << getOrdre() << " points" << std::endl;
     std::cout << "et " << getTaille() << " trajets";
     std::cout << " dont " << traj['D'] << " pistes, " << traj['R']<< " remontees et " << traj['B'] << " navettes" <<std::endl;
 
 }
+
 std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     std::map<int,int> pred;
     std::map<int,bool> marque;
+
+    inititalisationChemin(pred,marque);
 
     //initialisation des distances à "l'infini" (valeur maximum d'un INT)
     for(const auto& elem : m_sommets)
@@ -272,9 +289,7 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     //La distance de sInit à sInit est de 0
     poids[sInit]=0;
 
-    //initialisation des marquages à false (non marqués)
-    for(const auto& elem : m_sommets)
-        marque[elem.first]=false;
+
 
 
     //Initialisation de la queue
@@ -284,9 +299,7 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     std::priority_queue<std::pair<int,int> ,std::vector<std::pair<int,int>> ,comparaisonDijkstra> queue;
     queue.push(std::make_pair(sInit,0));
 
-    //initialisation des preds, de base ils sont tous à -1
-    for(const auto& elem : m_sommets)
-        pred[elem.first]=-1;
+
 
 
     //Tant qu'il reste des sommets dans la queue (veut aussi dire qu'il reste des sommets non marqués)
@@ -315,6 +328,57 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     }
 
     return pred;
+}
+
+void Domaine::inititalisationChemin(std::map<int,int>& pred, std::map<int,bool>& marque){
+    //initialisation des marquages à false (non marqués)
+    //initialisation des preds, de base ils sont tous à -1
+    for(const auto& elem : m_sommets) {
+        pred[elem.first] = -1;
+        marque[elem.first] = false;
+    }
+}
+
+///Sous-programme permettant d'effectuer le parcours BFS
+///Renvoie le vecteur des prédécesseurs des sommets
+std::map<int,int> Domaine::parcoursBFS(const int& _num){
+    //Initialisation des sommets
+    std::map<int,int> pred;
+    std::map<int,bool> marque;
+
+    inititalisationChemin(pred,marque);
+
+    //Création de la file vide
+    std::queue<int> file;
+
+    enfilerSommetBFS(file,marque,_num);//On enfile s0 (_num : le sommet initial)
+
+    while(!file.empty()){
+
+        int sommetActu= file.front();
+        file.pop();//On défile le prochain sommet de la file
+
+        for(auto a : m_sommets[sommetActu]->getAdjacents()){//Pour tous les sommets adjacents
+
+            if(!marque[a->getSommets().second->getNum()]){//Si le sommet adjacent n'est pas marqué
+                enfilerSommetBFS(file,marque,a->getSommets().second->getNum()); //On l'enfile (on le marque et on l'ajoute à la file)
+                pred[a->getSommets().second->getNum()]=sommetActu; //Le prédecesseur du sommet adjacent devient le sommet actuel
+
+            }
+        }
+
+        //s devient exploré (marqué)
+        marque[sommetActu]=true;
+    }
+
+    return pred;
+}
+
+///Sous programme permettant d'enfiler un sommet pour le BFS
+///Marque le sommet et l'ajoute à la file
+void Domaine::enfilerSommetBFS(std::queue<int>& file, std::map<int,bool>& marquageSommet, const int& _num){
+    file.push(_num);
+    marquageSommet[_num]= true;
 }
 
 
