@@ -53,7 +53,7 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
         fichier >> paireDonnee.first;
         fichier >> donnee;
         paireDonnee.second.push_back(donnee);
-        paireDonnee.second.push_back(0);
+       // paireDonnee.second.push_back(0);
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les descentes");
         arcs.getMatriceDuree()["Descente"].push_back(paireDonnee);
@@ -66,7 +66,7 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
         fichier >> paireDonnee.first;
         fichier >> donnee;
         paireDonnee.second.push_back(donnee);
-        paireDonnee.second.push_back(0);
+       // paireDonnee.second.push_back(0);
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les Bus");
         arcs.getMatriceDuree()["Bus"].push_back(paireDonnee);

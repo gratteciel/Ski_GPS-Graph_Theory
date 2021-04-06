@@ -8,12 +8,14 @@
 #include <fstream>
 #include <iostream>
 #include <cmath>
+#include <map>
 
 typedef struct t_chargeSommets{
     int num;
     std::string nom;
     int altitude;
 }t_chargeSommets;
+typedef  std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>> mapDuree;
 
 typedef struct t_chargeTrajet{
     int num;
