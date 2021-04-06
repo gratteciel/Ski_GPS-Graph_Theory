@@ -128,6 +128,75 @@ void Domaine::afficheSommets(const std::string& sommetChoisie){
 
 }
 
+void Domaine::plusCourtChemin(int s0, int sF){
+
+    std::map<int,int> poids;
+
+
+
+    std::map<int,int> pred=dijkstra(s0,poids);
+    affichePlusCourtChemin(s0,sF,pred,poids[sF]);
+
+}
+
+std::string Domaine::convertSecondeHeuresMinS(const int& seconde){
+    int minutes = seconde / 60;
+    int heure = minutes / 60;
+
+    if(heure!=0)
+        return std::to_string(int(heure)) + "h " + std::to_string(int(minutes%60))
+         +  "m " + std::to_string(int(seconde%60)) +"s.";
+    else{
+        if(minutes!=0){
+            return std::to_string(int(minutes%60))
+                   +  "m " + std::to_string(int(seconde%60)) +"s.";
+        }
+        else
+            return std::to_string(int(seconde%60)) +"s.";
+
+    }
+}
+
+void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const int& poids){
+
+
+    std::queue<int> listePoints;
+
+
+
+
+
+    getPlusCourtCheminRecursif(sF,pred,s0,listePoints);
+    listePoints.push(sF);
+
+    std::cout << "Trajets a parcourir dans l'odre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl;
+
+    while(listePoints.size()!=1){
+        int actu = listePoints.front();
+        listePoints.pop();
+        for(const auto& elem: m_sommets[actu]->getAdjacents()){
+            if(elem->getSommets().second->getNum()==listePoints.front()){
+                std::cout << elem->getNom() << " (de "<<  m_sommets[actu]->getNom() << " a " <<m_sommets[listePoints.front()]->getNom() << ")";
+                if(listePoints.size()!=1)
+                    std::cout << " -> ";
+                break;
+            }
+        }
+
+    }
+
+    std::cout << std::endl<< "duree= "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+}
+
+///Sous-programme permmetant d'afficher récursivement les sommets prédécessants pour aller du sommet initial au sommet i
+void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints){
+    if(initial!=i){
+        getPlusCourtCheminRecursif(pred[i], pred,initial,listePoints);
+        listePoints.push(pred[i]); //On ajoute le point à la file
+
+    }
+}
+
 std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     std::map<int,int> pred;
     std::map<int,bool> marque;

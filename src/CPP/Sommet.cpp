@@ -22,6 +22,13 @@ void Sommet::affichage() {
         std::cout << "Point: " <<getNom() << " -> " <<getAltitude() << "m" <<std::endl;
 }
 
+std::string Sommet::afficheSimple(){
+    std::string temp =getNom();
+    if(temp!=std::to_string(getNum()))
+        temp += " (" + std::to_string(getNum()) +  ")";
+   return temp;
+}
+
 void Sommet::affichageComplexe(const std::map<int,Trajet*>& _trajets){
     std::cout << "Information detaille du point: " << getNom() << " (" <<getAltitude() <<"m)" << std::endl<<std::endl;
 

@@ -26,6 +26,8 @@ public:
     //Getters & Setters
     int getAltitude() const;
     std::vector<Trajet *> getAdjacents() const;
+
+    std::string afficheSimple();
 };
 
 

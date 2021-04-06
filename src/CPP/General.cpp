@@ -114,6 +114,7 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
 void General::boucle(){
     int menuActu=1;
+    arcs.plusCourtChemin(30,36);
     while(1==1){
         afficheMenu(menuActu);
 
