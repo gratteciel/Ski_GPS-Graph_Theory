@@ -152,14 +152,13 @@ void Domaine::afficheChangementDuree() {
 
         std::cout << "Dans la categorie : " << it->first << std::endl;
 
-    char parametre = '0';
+    std::string parametre;
     int i=0;
-    std::map <char,std::map<std::string,std::vector<int>>> mapAssociation;
-    auto it2 = mapAssociation.find(parametre);
+
 
 
     switch (it->first) {
-
+        /*
         case 'R' :
             for (const auto &elem1 : it->second)
             {
@@ -201,42 +200,41 @@ void Domaine::afficheChangementDuree() {
                 elem.second[dureeChangement - 1] = nouvelleDuree;
             }
             break;
-
-        case 'D':
+        */
+        case 'D':{
+            std::vector<std::string> typeD;
             for (const auto &elem1 : it->second)
             {
-                std::map<std::string,std::vector<int>> temp;
-                std::vector<int> temp2;
-                std::cout << i << " parametre : " << elem1.first << " durée pour le denivele :" << elem1.second[0];
-                temp2.push_back(elem1.second[0]);
-                temp[elem1.first] = temp2;
-                mapAssociation [i] = temp;
+                typeD.push_back(elem1.first);
+                std::cout << i << " parametre : " << elem1.first << " durée pour le 100m: " << (int)elem1.second[0]/60 << "min" << std::endl;
                 i++;
             }
-            std::cout << "Choissisez le parametre : " ;
-            std::cin >> parametre;
-            while (i > it->second.size()){
-                std::cout << "Mauvaise saisie !" << std::endl;
-                std::cout << "Choissisez le parametre : " ;
-                std::cin >> parametre;
-            }
+            bool fin=true;
+            int paramChoisi=0;
+            do{
+                fin=true;
+                int param = entrerUnNombrePositif("Choississez le parametre: ");
+
+                if(param<0 || param>=it->second.size())
+                    fin=false;
+
+            }while(!fin);
+
             std::cout << "Vous avez choisi :" << std::endl;
-            std::cout  << "Le parametre " << it2->first << " de la categorie " << it->first;
-            for (auto& elem : it2->second) {
-                std::cout << "Vous allez changer cette duree : duree 1 : " << elem.second[0] << std::endl;
+            std::cout  << "de modifier la duree des pistes " << typeD[paramChoisi] << std::endl;
 
-                std::cout << "Vous avez choisi de changer cette valeur" << elem.second[0]
-                          << " veuillez mettre la nouvelle valeur : ";
-                std::cin >> nouvelleDuree;
-                while (nouvelleDuree < 0) {
-                    std::cout << "Veuillez mettre un temps positif svp! " << std::endl;
-                    std::cout << "Veuillez choisir la nouvelle duree pour ce parametre : ";
-                    std::cin >> nouvelleDuree;
-                }
-                elem.second[0] = nouvelleDuree;
-            }
+            std::cout << "Ancienne valeur :" << (int)it->second[typeD[paramChoisi]][0]/60 <<" minutes" << std::endl;
+
+
+
+            int param = entrerUnNombrePositif("Nouvelle valeur: ");
+
+            m_matriceDuree['D'][typeD[paramChoisi]][0] = param*60;
+            std::cout << m_matriceDuree['D'][typeD[paramChoisi]][0] << std::endl;
             break;
+        }
 
+        /*
         case 'B':
             for (const auto &elem1 : it->second)
             {
@@ -273,9 +271,19 @@ void Domaine::afficheChangementDuree() {
 
         default:
             std::cout << "Probleme dans la selection des durees" <<std::endl;
-
+        */
     }
 
+}
+
+int Domaine::entrerUnNombrePositif(const std::string& phrase){
+    std::string parametre;
+    do{
+        std::cout << phrase;
+        std::cin >> parametre;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }while(!estNombre(parametre));
+    return std::stoi(parametre);
 }
 
 std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
