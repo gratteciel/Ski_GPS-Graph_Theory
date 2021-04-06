@@ -16,7 +16,7 @@ typedef struct t_chargeSommets{
     std::string nom;
     int altitude;
 }t_chargeSommets;
-typedef  std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>> mapDuree;
+typedef  std::map<char, std::map<std::string,std::vector<int>>> t_mapDuree;
 
 typedef struct t_chargeTrajet{
     int num;

@@ -55,7 +55,7 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
         paireDonnee.second.push_back(donnee);
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les descentes");
-        arcs.getMatriceDuree()["Descente"].push_back(paireDonnee);
+        arcs.getMatriceDuree()['D'][paireDonnee.first]=paireDonnee.second;
     }
     fichier >> temp;// nombre de Bus
 
@@ -67,10 +67,10 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
         paireDonnee.second.push_back(donnee);
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les Bus");
-        arcs.getMatriceDuree()["Bus"].push_back(paireDonnee);
+        arcs.getMatriceDuree()['B'][paireDonnee.first]=paireDonnee.second;
     }
 
-    fichier >> temp;// nombre de montee
+    fichier >> temp;// nombre de remontee
 
     for (int i = 0; i < temp; ++i) {
         std::pair<std::string,std::vector<int>> paireDonnee;
@@ -82,7 +82,7 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
         paireDonnee.second.push_back(std::stoi(donnee));
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les montees");
-        arcs.getMatriceDuree()["Montee"].push_back(paireDonnee);
+        arcs.getMatriceDuree()['R'][paireDonnee.first]=paireDonnee.second;
     }
 
 

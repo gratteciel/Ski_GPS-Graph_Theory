@@ -6,9 +6,9 @@
 
 //Constructeur & destructeur
 Domaine::Domaine() {
-    m_matriceDuree["Bus"];
-    m_matriceDuree["Montee"];
-    m_matriceDuree["Descente"];
+    m_matriceDuree['B'];
+    m_matriceDuree['R'];
+    m_matriceDuree['D'];
 
 
 }
@@ -38,7 +38,7 @@ void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
         m_trajets[t.num] = new Trajet(t.num,t.nom,t.type,m_sommets[t.depart],m_sommets[t.arrivee],m_matriceDuree);
-        m_trajets[t.num]->setGType();
+
         m_sommets[t.depart]->setAdjactent(m_trajets[t.num]);
 
     }
@@ -144,7 +144,7 @@ int Domaine::getTaille() const {
     return m_taille;
 }
 
-std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>>& Domaine::getMatriceDuree()
+t_mapDuree& Domaine::getMatriceDuree()
 {
     return m_matriceDuree;
 }
