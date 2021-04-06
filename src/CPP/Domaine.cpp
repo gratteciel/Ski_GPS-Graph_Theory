@@ -2,6 +2,7 @@
 // Created by mathis on 05/04/2021.
 //
 
+
 #include "../Headers/Domaine.h"
 
 //Constructeur & destructeur
@@ -115,19 +116,81 @@ void Domaine::afficheSommets(const std::string& sommetChoisie){
                     break;
 
                 }
-
                 i++;
             }
             if(i==m_sommets.size())
                 existe=false;
         }
-
         if(!existe)
             std::cout << "Ce point n'existe pas!" <<std::endl;
     }
     std::cout << std::endl;
 
 }
+
+std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
+    std::map<int,int> pred;
+    std::map<int,bool> marque;
+
+    //initialisation des distances à "l'infini" (valeur maximum d'un INT)
+    for(const auto& elem : m_sommets)
+        poids[elem.first]=INT_MAX;
+
+    //La distance de sInit à sInit est de 0
+    poids[sInit]=0;
+
+    //initialisation des marquages à false (non marqués)
+    for(const auto& elem : m_sommets)
+        marque[elem.first]=false;
+
+
+
+    //Initialisation de la queue
+    //parametre 1 : numéro du sommet
+    //parametre 2 : duree du sommet par rapport à sInit
+    //Comparaison selon le classe Comparaison (selon le parametre 2)
+    std::priority_queue<std::pair<int,int> ,std::vector<std::pair<int,int>> ,comparaisonDijkstra> queue;
+    queue.push(std::make_pair(sInit,0));
+
+    //initialisation des preds, de base ils sont tous à -1
+    for(const auto& elem : m_sommets)
+        pred[elem.first]=-1;
+
+
+    //Tant qu'il reste des sommets dans la queue (veut aussi dire qu'il reste des sommets non marqués)
+    while(!queue.empty()){
+
+
+        int minSom=queue.top().first; //Prend le numéro du sommet avec la plus petite distance de sInit qui est dans la queue
+        int distMinSom=queue.top().second; //Prend la distance du sommet jusqu'au sommet sInit
+
+        queue.pop(); //On supprime de la queue le sommet avec la plus petite distance de sInit (on va ensuite le marqué)
+
+        //On marque le sommet avec la plus petite distance depuis le sommet initial non marqué dans la queue
+        marque[minSom]=true;
+
+        for(const auto& a : m_sommets[minSom]->getAdjacents()){
+            if(!marque[a->getSommets().second->getNum()]){ //Si le sommet adjacent n'est pas marqué
+
+                //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
+                //est inférieur à la distance de l'adjacent à sInit
+                //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
+                if(distMinSom+a->getDuree() < poids[a->getSommets().second->getNum()]){
+                    poids[a->getSommets().second->getNum()]=distMinSom+a->getDuree();
+                    pred[a->getSommets().second->getNum()]=minSom; //Le pred de a est le sommet "minSom"
+                    queue.push(std::make_pair(a->getSommets().second->getNum(),poids[a->getSommets().second->getNum()]));//On ajoute a à la priority_queue
+                }
+            }
+
+        }
+
+
+
+    }
+
+    return pred;
+}
+
 
 //Getters & Setters
 void Domaine::setOrdre(int _ordre) {

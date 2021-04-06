@@ -97,34 +97,6 @@ float Trajet::calculDuree(const t_mapDuree& matriceDuree) {
 
 
 
-
-
-
-
-   //return matriceDuree[getGType()][getType()];
-    /*
-    for (const auto elem : matriceDuree) {
-
-        for (int i = 0; i < elem.second.size(); ++i) {
-            if(elem.first == 'D' && type == elem.second[i].first){
-                return (float)elem.second[i].second[0] * abs(arrivee - depart) / 100;
-
-            }
-
-            else if(elem.first == 'B' && nom == elem.second[i].first) {
-                return (float)elem.second[i].second[0];
-
-            }
-
-            else if(elem.first == 'R' && type == elem.second[i].first) {
-                return (float)elem.second[i].second[0] * abs(arrivee - depart) / 100 + elem.second[i].second[1];
-
-            }
-
-
-        }
-    }
-     */
     return 0;
 
 }

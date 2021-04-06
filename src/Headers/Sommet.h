@@ -22,11 +22,10 @@ public:
     //Méthodes
     void affichage();
     void setAdjactent(Trajet *_trajet);
+    void affichageComplexe(const std::map<int,Trajet*>& _trajet);
     //Getters & Setters
     int getAltitude() const;
-
-
-    void affichageComplexe(const std::map<int,Trajet*>& _trajet);
+    std::vector<Trajet *> getAdjacents() const;
 };
 
 
