@@ -10,14 +10,13 @@
 
 
 
-
 class Domaine {
 private:
     std::map<int, Sommet*> m_sommets;
     std::map<int, Trajet*> m_trajets;
     int m_ordre; // nombre de sommmets
     int m_taille; // nombre d'aretes
-    std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>> m_matriceDuree;
+    t_mapDuree m_matriceDuree;
 
 
 public:
@@ -38,10 +37,12 @@ public:
     void setTaille(int _taille);
     int getOrdre() const;
     int getTaille() const;
-    std::map<std::string, std::vector<std::pair<std::string,std::vector<int>>>>& getMatriceDuree();
+    t_mapDuree& getMatriceDuree();
 
 
     bool estNombre(const std::string &str);
+
+    std::map<int, int> dijkstra(const int &sInit, std::map<int, int> &poids);
 };
 
 

@@ -49,3 +49,6 @@ int Sommet::getAltitude() const {
     return m_altitude;
 }
 
+std::vector<Trajet*> Sommet::getAdjacents() const {
+    return m_adjacents;
+}
