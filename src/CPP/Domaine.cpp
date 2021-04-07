@@ -578,6 +578,17 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
     std::map<int,char> marque;
     std::map<int,bool> aEnlever;/*----------------*/
 
+    /*----------------*/
+    if(!typeAEnlever.empty()){
+        for(const auto& elem: m_trajets){
+            if(std::find(typeAEnlever.begin(),typeAEnlever.end(),elem.second->getType())!=typeAEnlever.end())
+                aEnlever[elem.first]=true;
+            else
+                aEnlever[elem.first]=false;
+        }
+    }
+    /*----------------*/
+
     //initialisation des marquages à false (non marqués)
     //initialisation des preds, de base ils sont tous à -1
     for(const auto& elem : m_sommets) {
@@ -593,18 +604,9 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
     //La distance de sInit à sInit est de 0
     poids[sInit]=0;
 
-    /*----------------*/
-    if(!typeAEnlever.empty()){
-        for(const auto& elem: m_trajets){
-            if(std::find(typeAEnlever.begin(),typeAEnlever.end(),elem.second->getType())!=typeAEnlever.end())
-                aEnlever[elem.first]=true;
-            else
-                aEnlever[elem.first]=false;
-        }
-    }
-    /*----------------*/
 
-    m_trajets[72]->setDuree(m_trajets[72]->getDuree()-100);
+
+
 
     //Initialisation de la queue
     //parametre 1 : numéro du sommet
@@ -626,29 +628,48 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
         //On marque le sommet avec la plus petite distance depuis le sommet initial non marqué dans la queue
         marque[minSom]='N';
 
+
         for(const auto& a : m_sommets[minSom]->getAdjacents()){
 
-            bool nePasParcourir=false;
-            if(aEnlever[a->getNum()] && marque[a->getSommets().second->getNum()]=='G')
-                nePasParcourir=true;
-
-            if(!nePasParcourir){
                 if(marque[a->getSommets().second->getNum()]!='N'){ //Si le sommet adjacent n'est pas marqué
+                    bool nePasParcourir=false;
 
-                    //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
-                    //est inférieur à la distance de l'adjacent à sInit
+                    //Si le trajet fait partie des trajets à éviter
+                    if(aEnlever[a->getNum()])
+                    {
+                        //et que le point adjacent a deja etait marqué
+                        //alors on ne parcourt pas -> il existe un trajet moins court MAIS qui n'est pas à éviter
+                        if(marque[a->getSommets().second->getNum()]=='G')
+                            nePasParcourir=true;
 
-                    //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
-                    if(distMinSom+a->getDuree() < poids[a->getSommets().second->getNum()]
-                    || (aEnlever[pred[a->getSommets().second->getNum()]] && !aEnlever[a->getNum()]) //Ou le predecesseur est "à enlever" et celui la non
-                    ){
-                        marque[a->getSommets().second->getNum()]='G';
-                        poids[a->getSommets().second->getNum()]=distMinSom+a->getDuree();
-                        pred[a->getSommets().second->getNum()]=a->getNum(); //Le pred de a est le trajet entre les 2 points actuels
-                        queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(poids[a->getSommets().second->getNum()],aEnlever[a->getNum()])));//On ajoute a à la priority_queue
+                        //Mais si l'ancien trajet pour aller à ce point est à éviter aussi
+                        //alors on passe quand meme
+                        if(aEnlever[pred[a->getSommets().second->getNum()]])
+                            nePasParcourir=false;
                     }
+
+
+                    if(!nePasParcourir){
+                        //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
+                        //est inférieur à la distance de l'adjacent à sInit
+
+                        //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
+                        if(distMinSom+a->getDuree() < poids[a->getSommets().second->getNum()]
+                           || (aEnlever[pred[a->getSommets().second->getNum()]] && !aEnlever[a->getNum()]) //Ou le predecesseur est "à enlever" et celui la non
+                                ){
+                            marque[a->getSommets().second->getNum()]='G';
+                            poids[a->getSommets().second->getNum()]=distMinSom+a->getDuree();
+                            pred[a->getSommets().second->getNum()]=a->getNum(); //Le pred de a est le trajet entre les 2 points actuels
+                            queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(poids[a->getSommets().second->getNum()],aEnlever[a->getNum()])));//On ajoute a à la priority_queue
+                        }
+
+
+
+
+                    }
+
                 }
-            }
+
 
         }
     }
