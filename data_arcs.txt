@@ -126,7 +126,7 @@ TK 240 60
 69	pre-saint-esprit	TS	8	11
 70	refuge	N	13	14
 71	replat	TS	1	2
-72	reservoir	R	4	6
+72	reservoir	N	4	6
 73	rhonaz	B	3	8
 74	saint-jacques	B	11	9
 75	saint-jacques	TS	9	11

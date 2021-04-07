@@ -145,11 +145,12 @@ int Domaine::returnPointId(const std::string& entree){
 
 void Domaine::plusCourtChemin(const bool& estDijkstra,int s0, int sF){
 
-    std::map<int,int> poids;
+    std::map<int,float> poids;
     std::map<int,int> pred;
-
+    std::vector<std::string> typeAEnlever;
+    typeAEnlever.push_back("N");
     if(estDijkstra)
-        pred=dijkstra(s0,poids);
+        pred=dijkstraOpti(s0,poids,typeAEnlever);
     else{
         pred=parcoursBFS(s0);
         for(const auto& elem : m_sommets)
@@ -171,29 +172,30 @@ void Domaine::plusCourtChemin(const bool& estDijkstra,int s0, int sF){
     }
 }
 
-std::string Domaine::convertSecondeHeuresMinS(const int& seconde){
-    int minutes = seconde / 60;
-    int heure = minutes / 60;
+std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
+
+    float minutes = seconde / 60;
+    float heure = minutes / 60;
 
     if(heure!=0)
-        return std::to_string(int(heure)) + "h " + std::to_string(int(minutes%60))
-         +  "m " + std::to_string(int(seconde%60)) +"s";
+        return std::to_string(int(heure)) + "h " + std::to_string(int(minutes)%60)
+         +  "m " + std::to_string(int(seconde)%60) +"s";
     else{
-        if(minutes%60!=0){
-            if(seconde%60!=0)
-                return std::to_string(int(minutes%60))
-                   +  "m " + std::to_string(int(seconde%60)) +"s";
+        if(int(minutes)%60!=0){
+            if(int(seconde)%60!=0)
+                return std::to_string(int(minutes)%60)
+                   +  "m " + std::to_string(int(seconde)%60) +"s";
             else
-                return std::to_string(int(minutes%60))
+                return std::to_string(int(minutes)%60)
                        +  "m ";
         }
         else
-            return std::to_string(int(seconde%60)) +"s";
+            return std::to_string(int(seconde)%60) +"s";
 
     }
 }
 
-void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const int& poids,const bool& complexe){
+void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const float& poids,const bool& complexe){
     std::queue<int> listePoints;
     bool cheminPossible=true;
     getPlusCourtCheminRecursif(sF,pred,s0,listePoints,cheminPossible);
@@ -228,6 +230,7 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
             }
 
         }
+
         if(poids!=-5){
             if(complexe){
                 std::cout <<std::endl;
@@ -514,7 +517,7 @@ int Domaine::entrerUnNombrePositif(const std::string& phrase){
     return std::stoi(parametre);
 }
 
-std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
+std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,float>& poids){
     std::map<int,int> pred;
     std::map<int,bool> marque;
 
@@ -534,7 +537,7 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     //parametre 1 : numéro du sommet
     //parametre 2 : duree du sommet par rapport à sInit
     //Comparaison selon la struct compaisonDijkstra (selon le parametre 2)
-    std::priority_queue<std::pair<int,int> ,std::vector<std::pair<int,int>> ,comparaisonDijkstra> queue;
+    std::priority_queue<std::pair<int,float> ,std::vector<std::pair<int,float>> ,comparaisonDijkstra> queue;
     queue.push(std::make_pair(sInit,0));
 
 
@@ -544,7 +547,7 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     while(!queue.empty()){
 
         int minSom=queue.top().first; //Prend le numéro du sommet avec la plus petite distance de sInit qui est dans la queue
-        int distMinSom=queue.top().second; //Prend la distance du sommet jusqu'au sommet sInit
+        float distMinSom=queue.top().second; //Prend la distance du sommet jusqu'au sommet sInit
 
         queue.pop(); //On supprime de la queue le sommet avec la plus petite distance de sInit (on va ensuite le marqué)
 
@@ -567,6 +570,93 @@ std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
 
     return pred;
 }
+
+
+std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever) {
+    std::map<int,int> pred;
+
+    std::map<int,char> marque;
+    std::map<int,bool> aEnlever;/*----------------*/
+
+    //initialisation des marquages à false (non marqués)
+    //initialisation des preds, de base ils sont tous à -1
+    for(const auto& elem : m_sommets) {
+        pred[elem.first] = -1;
+        marque[elem.first] = 'B';
+    }
+    //inititalisationChemin(pred,marque);
+
+    //initialisation des distances à "l'infini" (valeur maximum d'un FLOAT)
+    for(const auto& elem : m_sommets)
+        poids[elem.first]=std::numeric_limits<float>::max();;
+
+    //La distance de sInit à sInit est de 0
+    poids[sInit]=0;
+
+    /*----------------*/
+    if(!typeAEnlever.empty()){
+        for(const auto& elem: m_trajets){
+            if(std::find(typeAEnlever.begin(),typeAEnlever.end(),elem.second->getType())!=typeAEnlever.end())
+                aEnlever[elem.first]=true;
+            else
+                aEnlever[elem.first]=false;
+        }
+    }
+    /*----------------*/
+
+    m_trajets[72]->setDuree(m_trajets[72]->getDuree()-100);
+
+    //Initialisation de la queue
+    //parametre 1 : numéro du sommet
+    //parametre 2 : duree du sommet par rapport à sInit
+    //parametre 3 : a eviter ou pas
+    //Comparaison selon la struct compaisonDijkstra (selon le parametre 2)
+    std::priority_queue<std::pair<int,std::pair<float,bool>> ,std::vector<std::pair<int,std::pair<float,bool>>> ,comparaisonDijkstraTest> queue;
+    queue.push(std::make_pair(sInit,std::make_pair(0,false)));
+
+
+    //Tant qu'il reste des sommets dans la queue (veut aussi dire qu'il reste des sommets non marqués)
+    while(!queue.empty()){
+
+        int minSom=queue.top().first; //Prend le numéro du sommet avec la plus petite distance de sInit qui est dans la queue
+        float distMinSom=queue.top().second.first; //Prend la distance du sommet jusqu'au sommet sInit
+        bool aEnleverSommetActu = queue.top().second.second; /*Utile??????*/
+        queue.pop(); //On supprime de la queue le sommet avec la plus petite distance de sInit (on va ensuite le marqué)
+
+        //On marque le sommet avec la plus petite distance depuis le sommet initial non marqué dans la queue
+        marque[minSom]='N';
+
+        for(const auto& a : m_sommets[minSom]->getAdjacents()){
+
+            bool nePasParcourir=false;
+            if(aEnlever[a->getNum()] && marque[a->getSommets().second->getNum()]=='G')
+                nePasParcourir=true;
+
+            if(!nePasParcourir){
+                if(marque[a->getSommets().second->getNum()]!='N'){ //Si le sommet adjacent n'est pas marqué
+
+                    //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
+                    //est inférieur à la distance de l'adjacent à sInit
+
+                    //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
+                    if(distMinSom+a->getDuree() < poids[a->getSommets().second->getNum()]
+                    || (aEnlever[pred[a->getSommets().second->getNum()]] && !aEnlever[a->getNum()]) //Ou le predecesseur est "à enlever" et celui la non
+                    ){
+                        marque[a->getSommets().second->getNum()]='G';
+                        poids[a->getSommets().second->getNum()]=distMinSom+a->getDuree();
+                        pred[a->getSommets().second->getNum()]=a->getNum(); //Le pred de a est le trajet entre les 2 points actuels
+                        queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(poids[a->getSommets().second->getNum()],aEnlever[a->getNum()])));//On ajoute a à la priority_queue
+                    }
+                }
+            }
+
+        }
+    }
+    std::cout << pred[6] << std::endl;
+    return pred;
+}
+
+
 
 void Domaine::inititalisationChemin(std::map<int,int>& pred, std::map<int,bool>& marque){
     //initialisation des marquages à false (non marqués)

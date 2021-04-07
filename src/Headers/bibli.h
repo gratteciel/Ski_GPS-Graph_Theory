@@ -38,9 +38,26 @@ typedef struct t_chargeFichier{
 
 struct comparaisonDijkstra
 {
-    bool operator()(const std::pair<int,int>& a, const std::pair<int,int>& b)
+    bool operator()(const std::pair<int,float>& a, const std::pair<int,float>& b)
     {
         return a.second > b.second;
+    }
+};
+
+
+struct comparaisonDijkstraTest
+{
+    bool operator()(const std::pair<int,std::pair<float,bool>>& a, const std::pair<int,std::pair<float,bool>>& b)
+    {
+        if(a.second.second && b.second.second)
+            return a.second.first > b.second.first;
+
+        if(a.second.second==true)
+            return true;
+        if(b.second.second==true)
+            return false;
+
+        return a.second.first > b.second.first;
     }
 };
 

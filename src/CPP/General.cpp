@@ -111,7 +111,11 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
 void General::boucle(){
     int menuActu=1;
+    std::map<int,float> poids;
+    //std::vector<std::string> typeAEnlever;
+    //typeAEnlever.push_back("N");
 
+    //std::map<int,int> pred = arcs.dijkstraOpti(3,poids,typeAEnlever);
     while(menuActu!=0){
         std::system("clear || cls");
         afficheMenu(menuActu);

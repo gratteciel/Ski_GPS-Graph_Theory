@@ -15,7 +15,7 @@ private:
     std::map<int, Sommet*> m_sommets;
     std::map<int, Trajet*> m_trajets;
     int m_ordre; // nombre de sommmets
-    int m_taille; // nombre d'aretes
+    int m_taille; // nombre d'arcs
     t_mapDuree m_matriceDuree;
 
 
@@ -32,9 +32,9 @@ public:
     void afficheSommets(const std::string& sommetChoisie="n");
     bool estNombre(const std::string &str);
     void plusCourtChemin(const bool& estDijkstra, int s0, int sF=-5);
-    void affichePlusCourtChemin(const int &s0, const int &sF, const std::map<int, int> &pred, const int &poids,const bool& complexe=true);
+    void affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const float& poids,const bool& complexe=true);
     void getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints,bool& cheminPossible);
-    std::string convertSecondeHeuresMinS(const int &seconde);
+    std::string convertSecondeHeuresMinS(const float& seconde);
     int returnPointId(const std::string &entree);
     bool changementDuree();
     int entreePoint(const std::string &phrase);
@@ -42,7 +42,7 @@ public:
     void inititalisationChemin(std::map<int, int> &pred, std::map<int, bool> &marque);
     std::map<int, int> parcoursBFS(const int &_num);
     void enfilerSommetBFS(std::queue<int>& file, std::map<int,bool>& marquageSommet, const int& _num);
-    std::map<int, int> dijkstra(const int &sInit, std::map<int, int> &poids);
+    std::map<int,int> dijkstra(const int& sInit,std::map<int,float>& poids);
     int entrerUnNombrePositif(const std::string &phrase);
 
 
@@ -55,6 +55,8 @@ public:
 
 
     bool modifDureeBD(const std::string &categorie);
+
+    std::map<int,int> dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever);
 };
 
 

@@ -18,9 +18,7 @@ Trajet::Trajet(const int &_num, const std::string &_nom, const std::string &_typ
 Trajet::Trajet( const std::string &_type)
         :AbstractIdentite(-1,"fake"), m_type(_type)
 {
-
     setGType();
-
 }
 
 //Méthodes
@@ -95,20 +93,16 @@ float Trajet::calculDuree(const t_mapDuree& matriceDuree) {
     int depart= m_sommets.first->getAltitude();
     int arrivee= m_sommets.second->getAltitude();
 
-
     if(getGType()=='B')
-            return matriceDuree.find('B')->second.find(getNom())->second[0];
+        return matriceDuree.find('B')->second.find(getNom())->second[0];
     else if(getGType()=='D')
-        return (float)matriceDuree.find('D')->second.find(getType())->second[0] * abs(arrivee-depart) / 100;
+        return (float)(matriceDuree.find('D')->second.find(getType())->second[0] * abs(arrivee-depart)) / 100;
     else if(getGType()=='R')
-        return (float)matriceDuree.find('R')->second.find(getType())->second[0] * abs(arrivee-depart) / 100 + matriceDuree.find('R')->second.find(getType())->second[1];
-
-
+        return (float)(matriceDuree.find('R')->second.find(getType())->second[0] * abs(arrivee-depart)) / 100 + matriceDuree.find('R')->second.find(getType())->second[1];
 
     return 0;
 
 }
-
 
 std::pair<Sommet*,Sommet*> Trajet::getSommets() const{
     return m_sommets;
@@ -125,6 +119,7 @@ void Trajet::setGType(){
         m_gType='B';
 
 }
+
 void Trajet::setDuree(float _duree) {
     m_duree = _duree;
 }
@@ -136,4 +131,3 @@ char Trajet::getGType() const{
 float Trajet::getDuree() const {
     return m_duree;
 }
-
