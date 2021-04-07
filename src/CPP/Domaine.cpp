@@ -276,6 +276,167 @@ void Domaine::afficheInfo(){
 
 }
 
+void Domaine::afficheChangementDuree() {
+    std::string choix;
+    std::cout << "Voici la liste des temps :" << std::endl;
+    std::cout << "Tous les temps sont en secondes" << std::endl;
+    //affichage de tous les types
+
+    char categorie;
+    std::cout << "Voici les categories " <<std::endl;
+    for (const auto &elem : getMatriceDuree()) {
+        std::cout << elem.first << std::endl;
+    }
+    std::cout << "Veuillez choisir la categorie : ";
+    std::cin >> categorie;
+    while (categorie != 'R' && categorie != 'B' && categorie != 'D') {
+        std::cout << "Mauvaise saisie " << std::endl;
+        std::cout << "Veuillez choisir la categorie : ";
+        std::cin >> categorie;
+    }
+    auto it = getMatriceDuree().find(categorie);
+
+        std::cout << "Dans la categorie : " << it->first << std::endl;
+
+    std::string parametre;
+    int i=0;
+
+
+
+    switch (it->first) {
+
+        case 'R' : {
+            std::vector<std::string> typeR;
+            for (const auto &elem1 : it->second) {
+                typeR.push_back(elem1.first);
+                std::cout << "Parametre  " << i << " : "<< elem1.first << " une duree de base " << (int) elem1.second[0] / 60
+                          << "min et une duree sur 100m: " << (int) elem1.second[1] / 60 << "min" << std::endl;
+                i++;
+            }
+            bool fin = true;
+            int paramChoisi = 0;
+            do {
+                fin = true;
+                int param = entrerUnNombrePositif("Choississez le parametre: ");
+
+                if (param < 0 || param >= it->second.size())
+                    fin = false;
+
+            } while (!fin);
+
+            std::cout << "Vous avez choisi de modifier la duree de la piste " << typeR[paramChoisi] << std::endl;
+
+            for (int j = 0; j < it->second[typeR[paramChoisi]].size(); ++j) {
+                std::cout << "Valeur (" << j + 1 << ") : "<< (int) it->second[typeR[paramChoisi]][j] / 60 << " minutes    ";
+            }
+            std::cout << std::endl;
+            int param;
+            do {
+                fin = true;
+                param = entrerUnNombrePositif("Choississez la valeur qui est en () pour la modifier: ");
+
+                if(param<0 || param>=it->second.size()-1)
+                    fin = false;
+
+                paramChoisi = param;
+            } while (!fin);
+
+            std::cout << "Ancienne valeur :" << (int) it->second[typeR[paramChoisi]][param-1] / 60 << " minutes   "<< std::endl;
+            int valeurNouvelle = entrerUnNombrePositif("Nouvelle valeur (en minutes) :");
+            m_matriceDuree['R'][typeR[paramChoisi]][param-1] = valeurNouvelle * 60;
+            break;
+        }
+        case 'D':{
+            std::vector<std::string> typeD;
+            for (const auto &elem1 : it->second)
+            {
+                typeD.push_back(elem1.first);
+                std::cout <<"Parametre " << i << " :"<< elem1.first << " duree pour le 100m: " << (int)elem1.second[0]/60 << "min" << std::endl;
+                i++;
+            }
+            bool fin=true;
+            int paramChoisi=0;
+            do{
+                fin=true;
+                int param = entrerUnNombrePositif("Choississez le parametre: ");
+
+                if(param<0 || param>=it->second.size())
+                    fin=false;
+
+                paramChoisi = param;
+            }while(!fin);
+
+
+            std::cout << "Vous avez choisi " ;
+            std::cout  << "de modifier la duree de la piste " << typeD[paramChoisi] << std::endl;
+
+            std::cout << "Ancienne valeur : " << (int)it->second[typeD[paramChoisi]][0]/60 <<" minutes  " << std::endl;
+
+
+
+            int param = entrerUnNombrePositif("Nouvelle valeur (en minutes) :");
+
+            m_matriceDuree['D'][typeD[paramChoisi]][0] = param*60;
+            break;
+        }
+
+        case 'B':
+        {
+            std::vector<std::string> typeB;
+            for (const auto &elem1 : it->second)
+            {
+                typeB.push_back(elem1.first);
+                std::cout <<"Parametre " << i << " :"<< elem1.first << " duree pour le 100m: " << (int)elem1.second[0]/60 << "min" << std::endl;
+                i++;
+            }
+
+            bool fin=true;
+            int paramChoisi=0;
+            do{
+                fin=true;
+                int param = entrerUnNombrePositif("Choississez le parametre: ");
+
+                if(param<0 || param>=it->second.size())
+                    fin=false;
+
+                paramChoisi = param;
+            }while(!fin);
+            std::cout << "Vous avez choisi " ;
+            std::cout  << "de modifier la navette " << typeB[paramChoisi] << std::endl;
+
+            std::cout << "Ancienne valeur : " << (int)it->second[typeB[paramChoisi]][0]/60 <<" minutes  " << std::endl;
+            int param = entrerUnNombrePositif("Nouvelle valeur (en minutes) : ");
+
+            m_matriceDuree['B'][typeB[paramChoisi]][0] = param*60;
+
+            }
+            break;
+
+        default:
+            std::cout << "Probleme dans la selection des durees" <<std::endl;
+    }
+    for (auto& t: m_trajets)
+    {
+        t.second->setDuree(t.second->calculDuree(m_matriceDuree));
+        std::cout << t.second->getDuree() <<std::endl;
+
+    }
+
+
+
+
+}
+
+int Domaine::entrerUnNombrePositif(const std::string& phrase){
+    std::string parametre;
+    do{
+        std::cout << phrase;
+        std::cin >> parametre;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }while(!estNombre(parametre));
+    return std::stoi(parametre);
+}
+
 std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
     std::map<int,int> pred;
     std::map<int,bool> marque;
@@ -401,4 +562,5 @@ t_mapDuree& Domaine::getMatriceDuree()
 {
     return m_matriceDuree;
 }
+
 

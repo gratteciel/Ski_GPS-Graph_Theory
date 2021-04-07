@@ -28,6 +28,7 @@ public:
     float calculDuree(const t_mapDuree& matriceDuree);
     std::string getType() const;
     float getDuree() const;
+    void setDuree(float _duree);
     std::pair<Sommet*,Sommet*> getSommets() const;
     void setGType();
     char getGType() const;

@@ -31,12 +31,21 @@ public:
     void afficheTrajets(const char& type='N',std::string sommetChoisie="n");
     void afficheSommets(const std::string& sommetChoisie="n");
     bool estNombre(const std::string &str);
-    std::map<int, int> dijkstra(const int &sInit, std::map<int, int> &poids);
     void plusCourtChemin(const bool& estDijkstra, int s0, int sF=-5);
     void affichePlusCourtChemin(const int &s0, const int &sF, const std::map<int, int> &pred, const int &poids,const bool& complexe=true);
     void getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints,bool& cheminPossible);
     std::string convertSecondeHeuresMinS(const int &seconde);
     int returnPointId(const std::string &entree);
+    void afficheChangementDuree();
+    int entreePoint(const std::string &phrase);
+    void afficheInfo();
+    void inititalisationChemin(std::map<int, int> &pred, std::map<int, bool> &marque);
+    std::map<int, int> parcoursBFS(const int &_num);
+    void enfilerSommetBFS(std::queue<int>& file, std::map<int,bool>& marquageSommet, const int& _num);
+    std::map<int, int> dijkstra(const int &sInit, std::map<int, int> &poids);
+    int entrerUnNombrePositif(const std::string &phrase);
+
+
     //Getters & Setters
     void setOrdre(int _ordre);
     void setTaille(int _taille);
@@ -45,15 +54,7 @@ public:
     t_mapDuree& getMatriceDuree();
 
 
-    int entreePoint(const std::string &phrase);
 
-    void afficheInfo();
-
-    void inititalisationChemin(std::map<int, int> &pred, std::map<int, bool> &marque);
-
-    std::map<int, int> parcoursBFS(const int &_num);
-
-    void enfilerSommetBFS(std::queue<int>& file, std::map<int,bool>& marquageSommet, const int& _num);
 };
 
 
