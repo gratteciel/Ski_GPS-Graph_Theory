@@ -267,6 +267,15 @@ void Domaine::afficheChangementDuree() {
         default:
             std::cout << "Probleme dans la selection des durees" <<std::endl;
     }
+    for (auto& t: m_trajets)
+    {
+        t.second->setDuree(t.second->calculDuree(m_matriceDuree));
+        std::cout << t.second->getDuree() <<std::endl;
+
+    }
+
+
+
 
 }
 
