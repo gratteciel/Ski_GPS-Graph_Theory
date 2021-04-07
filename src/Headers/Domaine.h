@@ -36,7 +36,7 @@ public:
     void getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints,bool& cheminPossible);
     std::string convertSecondeHeuresMinS(const int &seconde);
     int returnPointId(const std::string &entree);
-    void afficheChangementDuree();
+    bool changementDuree();
     int entreePoint(const std::string &phrase);
     void afficheInfo();
     void inititalisationChemin(std::map<int, int> &pred, std::map<int, bool> &marque);
@@ -54,7 +54,7 @@ public:
     t_mapDuree& getMatriceDuree();
 
 
-
+    bool modifDureeBD(const std::string &categorie);
 };
 
 

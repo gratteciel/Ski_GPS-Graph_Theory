@@ -15,6 +15,14 @@ Trajet::Trajet(const int &_num, const std::string &_nom, const std::string &_typ
     m_duree = calculDuree(matriceDuree);
 }
 
+Trajet::Trajet( const std::string &_type)
+        :AbstractIdentite(-1,"fake"), m_type(_type)
+{
+
+    setGType();
+
+}
+
 //Méthodes
 
 void Trajet::affichage(){

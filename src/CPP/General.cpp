@@ -161,12 +161,16 @@ void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
                 finProgrammeActu();
                 break;
             case '2':
-                menuActu=2;
+                if(arcs.changementDuree())
+                    finProgrammeActu();
                 break;
             case '3':
-                menuActu =3;
+                menuActu=2;
                 break;
             case '4':
+                menuActu =3;
+                break;
+            case '5':
                 menuActu=6;
                 break;
         }
@@ -314,9 +318,10 @@ void General::menu1(){
     std::cout <<  "     Domaine skiable des arcs   " << std::endl;
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : A propos du domaine skiable des Arcs" << std::endl;
-    std::cout << "2 : A propos des points (4.3)" << std::endl;
-    std::cout << "3 : A propos des trajets (4.3)" << std::endl;
-    std::cout << "4 : Plus courts chemins (4.4)" << std::endl;
+    std::cout << "2 : Afficher/Modifier les temps par default des trajets (4.1)" << std::endl;
+    std::cout << "3 : A propos des points (4.3)" << std::endl;
+    std::cout << "4 : A propos des trajets (4.3)" << std::endl;
+    std::cout << "5 : Plus courts chemins (4.4)" << std::endl;
 }
 
 void General::menu2(){
