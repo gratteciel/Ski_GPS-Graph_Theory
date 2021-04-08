@@ -74,12 +74,12 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
     for (int i = 0; i < temp; ++i) {
         std::pair<std::string,std::vector<int>> paireDonnee;
-        std::string donnee=" ";
+        int donnee;
         fichier >> paireDonnee.first;
         fichier >> donnee;
-        paireDonnee.second.push_back(std::stoi(donnee));
+        paireDonnee.second.push_back(donnee);
         fichier >> donnee;
-        paireDonnee.second.push_back(std::stoi(donnee));
+        paireDonnee.second.push_back(donnee);
         if(fichier.fail())
             throw std::runtime_error("Probleme lecture pour les montees");
         arcs.getMatriceDuree()['R'][paireDonnee.first]=paireDonnee.second;
@@ -111,7 +111,6 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
 void General::boucle(){
     int menuActu=1;
-
     while(menuActu!=0){
         std::system("clear || cls");
         afficheMenu(menuActu);
@@ -149,6 +148,11 @@ void General::interactionDonnee(const std::string &donnee, int &menuActu) {
             case 6:
                 interactionDonneeMenu6(donnee,menuActu);
                 break;
+            case 7:
+                interactionDonneeMenu7(donnee,menuActu);
+            case 8:
+                interactionDonneeMenu6(donnee,menuActu);
+
         }
     }
 
@@ -169,6 +173,10 @@ void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
             case '4':
                 menuActu=6;
                 break;
+            case '5':
+                menuActu=7;
+                break;
+
         }
     }
 
@@ -260,8 +268,6 @@ void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu,co
 
 }
 
-
-
 void General::interactionDonneeMenu6(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
         switch(donnee[0]){
@@ -282,8 +288,6 @@ void General::interactionDonneeMenu6(const std::string& donnee, int& menuActu){
     }
 
 }
-
-
 
 void General::afficheMenu(const int& menuActu){
     std::cout << "q : Quitter le programme" <<std::endl;
@@ -306,6 +310,15 @@ void General::afficheMenu(const int& menuActu){
         case 6:
             menu6();
             break;
+        case 7://Menu affcihage capacité
+            menu7();
+            break;
+        case 8://menu changement capacite Admin
+            menu8();
+            break;
+        case 9://menu calcul de flot
+            menu9();
+            break;
     }
 }
 
@@ -317,6 +330,7 @@ void General::menu1(){
     std::cout << "2 : A propos des points (4.3)" << std::endl;
     std::cout << "3 : A propos des trajets (4.3)" << std::endl;
     std::cout << "4 : Plus courts chemins (4.4)" << std::endl;
+    std::cout << "5 : Afficher et modifier les capacites avec les flots (4.5)" << std::endl;
 }
 
 void General::menu2(){
@@ -359,4 +373,114 @@ void General::menu6(){
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : Plus court chemin en temps" << std::endl;
     std::cout << "2 : Plus court chemin en nombre de trajets" << std::endl;
+}
+
+void General::menu7() {
+    lectureFichierCapacite();
+    int donnee;
+    int menuActu = 7;
+    for(int i =0; i < arcs.getVecteurCapacite().size(); i ++)
+    {
+        std::cout << i+1 << " type : " <<  arcs.getVecteurCapacite()[i].first << " avec comme debit associe : " << arcs.getVecteurCapacite()[i].second << std::endl;
+    }
+    do{
+        std::cout << " Tapez 1 pour changer les valeurs ou 2 pour les garder :" ;
+        std::cin >> donnee;
+    }while(!(donnee == 1 || donnee == 2));
+
+    interactionDonnee(std::to_string(donnee),menuActu);
+
+
+
+
+}
+
+void General::interactionDonneeMenu7(const std::string& donnee,int& menuActu) {
+    if(std::stoi(donnee) == 1)
+    {
+        menuActu = 8;
+        interactionDonnee(donnee,menuActu);
+    }
+    else
+    {
+        menuActu = 9;
+        interactionDonnee(donnee,menuActu);
+    }
+
+
+
+}
+
+void General::menu8() {//menu utilisateur changement de débit
+    int choixType;
+    int nouvelleValeur;
+    std::vector<std::pair<std::string,int>> &temp = arcs.getVecteurCapacite();
+
+    std::cout << "Vous avez choisi de changer les valeurs des capacites" <<std::endl;
+    std::cout << "Veuillez choisir le type (numero) de la capacite que vous voulez changer" <<std::endl;
+    for(int i =0; i < arcs.getVecteurCapacite().size(); i ++)
+    {
+        std::cout << i+1 << " type : " <<  arcs.getVecteurCapacite()[i].first << " avec comme debit associe : " << arcs.getVecteurCapacite()[i].second << std::endl;
+    }
+    do{
+        std::cout << "Type : " ;
+        std::cin >> choixType;
+    }while(choixType-1<0 || choixType-1 > arcs.getVecteurCapacite().size());
+    std::cout << "Vous avez decide de changer cette valeur : " << arcs.getVecteurCapacite()[choixType-1].second << " du type : " << arcs.getVecteurCapacite()[choixType-1].first << std::endl;
+    std::cout << "Veuillez modifier cette valeur : " << std::endl;
+    std::cout  << "Ancienne valeur :" << arcs.getVecteurCapacite()[choixType-1].second <<std::endl;
+    std::cout << "Nouvelle valeur :" ;
+    std::cin >> nouvelleValeur;
+    arcs.getVecteurCapacite()[choixType-1].second = nouvelleValeur;
+    changementValeurFichierCapacite("capacite");
+
+
+
+
+}
+
+void General::menu9() {
+
+}
+
+void General::changementValeurFichierCapacite(const std::string nomFichier) {
+
+    //ouverture en mode écriture afin d'éffacer le contenu
+    // on réecrit le vecteur dans le fichier
+
+    std::ofstream fichier (nomFichier+".txt");
+    if(!fichier)
+        throw std::runtime_error( "Impossible d'ouvrir en ecriture ");
+
+    fichier << arcs.getVecteurCapacite().size();
+  for(const auto& elem : arcs.getVecteurCapacite())
+      fichier << elem.first << elem.second;
+}
+
+void General::interactionDonneeMenu8(const std::string& donnee,int& menuActu) {
+
+
+
+
+
+}
+
+
+void General::lectureFichierCapacite() {
+    std::ifstream fichier ("capacite.txt");
+    int taille;
+
+    if(!fichier)
+        throw std::runtime_error( "Impossible d'ouvrir en lecture ");
+
+    fichier >> taille;
+
+    for(int i = 0 ; i< taille ; i++)
+    {
+        std::pair <std::string, int> temp;
+        fichier >> temp.first;
+        fichier >> temp.second;
+        arcs.setVecteurCapacite(temp);
+    }
+
 }

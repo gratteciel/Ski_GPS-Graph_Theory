@@ -44,6 +44,17 @@ public:
 
     void menu6();
 
+    void lectureFichierCapacite ();
+    void changementValeurFichierCapacite(const std::string nomFichier);
+    void menu7();//menu concernant les flots avec lecture du fichier et écriture
+    void interactionDonneeMenu7(const std::string& donnee,int& menuActu);
+    void interactionDonneeMenu8(const std::string& donnee,int& menuActu);
+    void interactionDonneeMenu9(const std::string& donnee,int& menuActu);
+
+
+    void menu8();
+    void menu9();
+
     void finProgrammeActu();
 };
 

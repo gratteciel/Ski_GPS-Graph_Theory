@@ -150,10 +150,3 @@ TK 240 60
 93	villaroger1	B	8	2
 94	villaroger2	B	2	1
 95	vitesse	KL	12	6
-6
-TPH 1200
-TC 2200
-TSD 2500
-TS 1800
-TK 800
-BUS 300

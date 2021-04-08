@@ -321,6 +321,7 @@ void Domaine::afficheChangementDuree() {
 
                 if (param < 0 || param >= it->second.size())
                     fin = false;
+                paramChoisi = param;
 
             } while (!fin);
 
@@ -337,8 +338,6 @@ void Domaine::afficheChangementDuree() {
 
                 if(param<0 || param>=it->second.size()-1)
                     fin = false;
-
-                paramChoisi = param;
             } while (!fin);
 
             std::cout << "Ancienne valeur :" << (int) it->second[typeR[paramChoisi]][param-1] / 60 << " minutes   "<< std::endl;
@@ -562,5 +561,13 @@ t_mapDuree& Domaine::getMatriceDuree()
 {
     return m_matriceDuree;
 }
+std::vector<std::pair<std::string,int>>& Domaine::getVecteurCapacite(){
+    return m_vecteurCapacite;
+}
 
+void Domaine::setVecteurCapacite(const std::pair<std::string,int> _pairCapacite)
+{
+
+    getVecteurCapacite().push_back(_pairCapacite);
+}
 

@@ -17,6 +17,7 @@ private:
     int m_ordre; // nombre de sommmets
     int m_taille; // nombre d'aretes
     t_mapDuree m_matriceDuree;
+    std::vector<std::pair<std::string,int>> m_vecteurCapacite;
 
 
 public:
@@ -52,6 +53,8 @@ public:
     int getOrdre() const;
     int getTaille() const;
     t_mapDuree& getMatriceDuree();
+    std::vector<std::pair<std::string, int>>& getVecteurCapacite();
+    void setVecteurCapacite(const std::pair<std::string,int> _vecteurCapacite);
 
 
 
