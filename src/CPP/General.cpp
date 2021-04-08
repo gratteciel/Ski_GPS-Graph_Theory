@@ -379,13 +379,18 @@ void General::menu7() {
     lectureFichierCapacite();
     int donnee;
     int menuActu = 7;
+    std::cout << "Type \t || \t Debit " <<std::endl;
+    std::cout << std::endl <<"----------------------------------" << std::endl;
     for(int i =0; i < arcs.getVecteurCapacite().size(); i ++)
     {
-        std::cout << i+1 << " type : " <<  arcs.getVecteurCapacite()[i].first << " avec comme debit associe : " << arcs.getVecteurCapacite()[i].second << std::endl;
+        std::cout << arcs.getVecteurCapacite()[i].first << "\t || \t" << arcs.getVecteurCapacite()[i].second << std::endl;
+        std::cout <<"----------------------------------" << std::endl;
     }
     do{
         std::cout << " Tapez 1 pour changer les valeurs ou 2 pour les garder :" ;
         std::cin >> donnee;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
     }while(!(donnee == 1 || donnee == 2));
 
     interactionDonnee(std::to_string(donnee),menuActu);
@@ -399,12 +404,12 @@ void General::interactionDonneeMenu7(const std::string& donnee,int& menuActu) {
     if(std::stoi(donnee) == 1)
     {
         menuActu = 8;
-        interactionDonnee(donnee,menuActu);
+        afficheMenu(menuActu);
     }
     else
     {
         menuActu = 9;
-        interactionDonnee(donnee,menuActu);
+        afficheMenu(menuActu);
     }
 
 
@@ -416,23 +421,34 @@ void General::menu8() {//menu utilisateur changement de débit
     int nouvelleValeur;
     std::vector<std::pair<std::string,int>> &temp = arcs.getVecteurCapacite();
 
+    std::cout << std::endl <<"----------------------------------" << std::endl;
     std::cout << "Vous avez choisi de changer les valeurs des capacites" <<std::endl;
     std::cout << "Veuillez choisir le type (numero) de la capacite que vous voulez changer" <<std::endl;
+    std::cout << std::endl <<"----------------------------------" << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "Parametre \t || \t Type \t || \t Debit " <<std::endl;
+    std::cout << std::endl <<"----------------------------------" << std::endl;
     for(int i =0; i < arcs.getVecteurCapacite().size(); i ++)
     {
-        std::cout << i+1 << " type : " <<  arcs.getVecteurCapacite()[i].first << " avec comme debit associe : " << arcs.getVecteurCapacite()[i].second << std::endl;
+        std::cout << i+1<<"\t || \t" <<  arcs.getVecteurCapacite()[i].first << "\t || \t" << arcs.getVecteurCapacite()[i].second << std::endl;
+        std::cout  <<"----------------------------------" << std::endl;
     }
     do{
         std::cout << "Type : " ;
         std::cin >> choixType;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }while(choixType-1<0 || choixType-1 > arcs.getVecteurCapacite().size());
     std::cout << "Vous avez decide de changer cette valeur : " << arcs.getVecteurCapacite()[choixType-1].second << " du type : " << arcs.getVecteurCapacite()[choixType-1].first << std::endl;
-    std::cout << "Veuillez modifier cette valeur : " << std::endl;
+    std::cout << "Veuillez modifier cette valeur " << std::endl;
     std::cout  << "Ancienne valeur :" << arcs.getVecteurCapacite()[choixType-1].second <<std::endl;
     std::cout << "Nouvelle valeur :" ;
     std::cin >> nouvelleValeur;
     arcs.getVecteurCapacite()[choixType-1].second = nouvelleValeur;
     changementValeurFichierCapacite("capacite");
+    int menuActu = 1;
+    afficheMenu(menuActu);
 
 
 
@@ -448,13 +464,13 @@ void General::changementValeurFichierCapacite(const std::string nomFichier) {
     //ouverture en mode écriture afin d'éffacer le contenu
     // on réecrit le vecteur dans le fichier
 
-    std::ofstream fichier (nomFichier+".txt");
+    std::ofstream fichier ("../"+nomFichier+".txt");
     if(!fichier)
         throw std::runtime_error( "Impossible d'ouvrir en ecriture ");
 
-    fichier << arcs.getVecteurCapacite().size();
+    fichier << arcs.getVecteurCapacite().size() <<std::endl;
   for(const auto& elem : arcs.getVecteurCapacite())
-      fichier << elem.first << elem.second;
+      fichier << elem.first << " " << elem.second << std::endl;
 }
 
 void General::interactionDonneeMenu8(const std::string& donnee,int& menuActu) {
@@ -467,7 +483,7 @@ void General::interactionDonneeMenu8(const std::string& donnee,int& menuActu) {
 
 
 void General::lectureFichierCapacite() {
-    std::ifstream fichier ("capacite.txt");
+    std::ifstream fichier ("../capacite.txt");
     int taille;
 
     if(!fichier)
