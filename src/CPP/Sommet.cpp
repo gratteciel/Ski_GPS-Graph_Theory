@@ -4,6 +4,10 @@
 
 #include "../Headers/Sommet.h"
 
+bool trierAdjacentsSelonNumSecondSommet (Trajet* i,Trajet* j) {
+    return (i->getSommets().second->getNum()<j->getSommets().second->getNum());
+}
+
 //Constructeur
 
 Sommet::Sommet(const int& _num, const std::string& _nom, const int& _altitude)
@@ -20,6 +24,10 @@ void Sommet::affichage() {
         std::cout << "Point: "  << getNom() << " (" <<getNum() << ") -> " <<getAltitude() <<"m" << std::endl;
     else
         std::cout << "Point: " <<getNom() << " -> " <<getAltitude() << "m" <<std::endl;
+}
+
+void Sommet::trierAdjacents(){
+    std::sort(m_adjacents.begin(),m_adjacents.end(),trierAdjacentsSelonNumSecondSommet);
 }
 
 std::string Sommet::afficheSimple(){

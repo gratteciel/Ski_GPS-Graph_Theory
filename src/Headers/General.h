@@ -11,7 +11,8 @@
 class General {
 private:
     Domaine arcs;
-
+    bool m_estOptiChemin;
+    std::vector<std::pair<std::string,bool>> m_optiTrajets;
 public:
     //Constructeur et destructeur
     General(const std::string &nomfichier);
@@ -36,8 +37,7 @@ public:
 
     void menu4(const bool& estDijkstra);
 
-    void interactionDonneeMenu4(const std::string &donnee, int &menuActu,const bool& estDijkstra);
-
+    void interactionDonneeMenu4(const std::string& donnee, int& menuActu,const bool& estDijkstra);
 
 
     void interactionDonneeMenu6(const std::string &donnee, int &menuActu);
@@ -45,6 +45,21 @@ public:
     void menu6();
 
     void finProgrammeActu();
+
+    void menu7();
+
+    void interactionDonneeMenu7(const std::string &donnee, int &menuActu);
+
+    bool getEstOptiChemin() const;
+    void setEstOptiChemin(const bool& _valeur);
+
+
+
+    void afficherOptiTrajets();
+
+    void modifierOptiTrajets();
+
+    std::vector<std::pair<std::string, bool>> getOptiTrajets() const;
 };
 
 

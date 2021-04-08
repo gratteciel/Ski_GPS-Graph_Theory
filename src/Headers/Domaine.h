@@ -31,18 +31,16 @@ public:
     void afficheTrajets(const char& type='N',std::string sommetChoisie="n");
     void afficheSommets(const std::string& sommetChoisie="n");
     bool estNombre(const std::string &str);
-    void plusCourtChemin(const bool& estDijkstra, int s0, int sF=-5);
-    void affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const float& poids,const bool& complexe=true);
-    void getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints,bool& cheminPossible);
+    void plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets, int s0, int sF=-5);
+
+    void affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe=true);
+    void getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::vector<int>& listePoints,bool& cheminPossible);
     std::string convertSecondeHeuresMinS(const float& seconde);
     int returnPointId(const std::string &entree);
     bool changementDuree();
     int entreePoint(const std::string &phrase);
     void afficheInfo();
-    void inititalisationChemin(std::map<int, int> &pred, std::map<int, bool> &marque);
-    std::map<int, int> parcoursBFS(const int &_num);
-    void enfilerSommetBFS(std::queue<int>& file, std::map<int,bool>& marquageSommet, const int& _num);
-    std::map<int,int> dijkstra(const int& sInit,std::map<int,float>& poids);
+
     int entrerUnNombrePositif(const std::string &phrase);
 
 
@@ -56,7 +54,9 @@ public:
 
     bool modifDureeBD(const std::string &categorie);
 
-    std::map<int,int> dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever);
+    std::map<int,int> dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever = std::vector<std::string>());
+
+    std::map<int,int> parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever= std::vector<std::string>());
 };
 
 

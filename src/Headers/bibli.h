@@ -45,10 +45,11 @@ struct comparaisonDijkstra
 };
 
 
-struct comparaisonDijkstraTest
+struct comparaisonDijkstraOpti
 {
     bool operator()(const std::pair<int,std::pair<float,bool>>& a, const std::pair<int,std::pair<float,bool>>& b)
     {
+
         if(a.second.second && b.second.second)
             return a.second.first > b.second.first;
 
@@ -56,6 +57,14 @@ struct comparaisonDijkstraTest
             return true;
         if(b.second.second==true)
             return false;
+
+        return a.second.first > b.second.first;
+    }
+};
+struct comparaisonBFSOpti
+{
+    bool operator()(const std::pair<int,std::pair<int,bool>>& a, const std::pair<int,std::pair<int,bool>>& b)
+    {
 
         return a.second.first > b.second.first;
     }

@@ -37,10 +37,13 @@ void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
         m_trajets[t.num] = new Trajet(t.num,t.nom,t.type,m_sommets[t.depart],m_sommets[t.arrivee],m_matriceDuree);
-
         m_sommets[t.depart]->setAdjactent(m_trajets[t.num]);
-
     }
+
+    for(auto& elem: m_sommets){
+        elem.second->trierAdjacents();
+    }
+
 }
 
 bool Domaine::estNombre(const std::string& str)
@@ -143,31 +146,38 @@ int Domaine::returnPointId(const std::string& entree){
     return -1;
 }
 
-void Domaine::plusCourtChemin(const bool& estDijkstra,int s0, int sF){
-
+void Domaine::plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets, int s0, int sF){
     std::map<int,float> poids;
     std::map<int,int> pred;
     std::vector<std::string> typeAEnlever;
-    typeAEnlever.push_back("N");
+
+    if(estOpti){
+        for(const auto& e : optiTrajets){
+            if(e.second)
+                typeAEnlever.push_back(e.first);
+        }
+    }
+
+
     if(estDijkstra)
         pred=dijkstraOpti(s0,poids,typeAEnlever);
     else{
-        pred=parcoursBFS(s0);
+        pred=parcoursBFSOpti(s0,typeAEnlever);
         for(const auto& elem : m_sommets)
             poids[elem.first]=-5;
     }
 
     if(sF!=-5)
-        affichePlusCourtChemin(s0,sF,pred,poids[sF]);
+        affichePlusCourtChemin(s0,sF,pred,poids[sF],estOpti,optiTrajets);
     else{
         std::cout << std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
         std::cout << " Point |  Chemin (liste de trajets)"<<std::endl;
-        std::cout << " final |  de forme \"nomTrajet\" (allant du \"sommet intial\" au  \"sommet final\" )"<<std::endl;
+        std::cout << " final |  de forme \"nomTrajet\" (\"point intial\"-\"point final\"|\"type\" )"<<std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
         for(const auto& e : m_sommets){
             if(e.first!=s0)
-                affichePlusCourtChemin(s0,e.first,pred,poids[e.first],false);
+                affichePlusCourtChemin(s0,e.first,pred,poids[e.first],estOpti,optiTrajets,false);
         }
     }
 }
@@ -195,10 +205,11 @@ std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
     }
 }
 
-void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const float& poids,const bool& complexe){
-    std::queue<int> listePoints;
+void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe){
+    std::vector<int> listeTrajets;
     bool cheminPossible=true;
-    getPlusCourtCheminRecursif(sF,pred,s0,listePoints,cheminPossible);
+
+    getPlusCourtCheminRecursif(pred[sF],pred,s0,listeTrajets,cheminPossible);
 
     if(!complexe)
     {
@@ -211,24 +222,47 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
 
     if(cheminPossible){
         if(complexe)
-            std::cout << std::endl << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl << "   ";
+            std::cout << std::endl
+                      << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl
+                      << "   ";
 
 
+        std::set<std::string> chosesAEviterImpo;
+        for(int i=(int)listeTrajets.size()-1; i<listeTrajets.size(); i--){
+            //Vérifie si on est pas passé quand meme par un trajet qui est à éviter
+            if(estOpti) {
+                for(const auto& elem: optiTrajets){
 
-        listePoints.push(sF);
-
-        while(listePoints.size()!=1){
-            int actu = listePoints.front();
-            listePoints.pop();
-            for(const auto& elem: m_sommets[actu]->getAdjacents()){
-                if(elem->getSommets().second->getNum()==listePoints.front()){
-                    std::cout << elem->getNom() << " ("<<  actu << "-" <<listePoints.front() << ")";
-                    if(listePoints.size()!=1)
-                        std::cout << " -> ";
-                    break;
+                    if(elem.second && elem.first==m_trajets[listeTrajets[i]]->getType()){//Si on est pas passé sur un trajet a eviter
+                        chosesAEviterImpo.insert(m_trajets[listeTrajets[i]]->returnNomType());
+                    }
                 }
             }
 
+
+            std::cout << m_trajets[listeTrajets[i]]->getNom()
+                      << " ("<<  m_trajets[listeTrajets[i]]->getSommets().first->getNum()
+                      << "-" <<m_trajets[listeTrajets[i]]->getSommets().second->getNum()
+                      << "|"<<m_trajets[listeTrajets[i]]->getType()
+                      << ")";
+            if(i!=0)
+                std::cout << " -> ";
+
+        }
+        if(!chosesAEviterImpo.empty()){ //Si on est passé sur un ou plusieurs trajets a eviter
+            std::string phrase;
+
+            int i=0;
+            for(const auto& elem : chosesAEviterImpo){
+                phrase+=elem;
+                if(i!=chosesAEviterImpo.size()-1)
+                    phrase+=", ";
+                i++;
+            }
+            if(complexe)
+                std::cout << std::endl<<std::endl<<"   Aucun chemin reliant les 2 points ne passant pas par: " << phrase ;
+            else
+                std::cout << std::endl<<"       |  Aucun chemin reliant les 2 points ne passant pas par: " << phrase ;
         }
 
         if(poids!=-5){
@@ -257,12 +291,18 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
 }
 
 ///Sous-programme permmetant d'afficher récursivement les sommets prédécessants pour aller du sommet initial au sommet i
-void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints,bool& cheminPossible){
+void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::vector<int>& listeTrajets,bool& cheminPossible){
+
     if(i==-1)
         cheminPossible=false;
-    else if(initial!=i){
-        getPlusCourtCheminRecursif(pred[i], pred,initial,listePoints,cheminPossible);
-        listePoints.push(pred[i]); //On ajoute le point à la file
+
+    else
+    {
+        listeTrajets.push_back(pred[m_trajets[i]->getSommets().second->getNum()]); //On ajoute le trajet à la file
+        if(initial!=m_trajets[i]->getSommets().first->getNum()){
+            getPlusCourtCheminRecursif(pred[m_trajets[i]->getSommets().first->getNum()], pred,initial,listeTrajets,cheminPossible);
+
+        }
     }
 }
 
@@ -517,61 +557,6 @@ int Domaine::entrerUnNombrePositif(const std::string& phrase){
     return std::stoi(parametre);
 }
 
-std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,float>& poids){
-    std::map<int,int> pred;
-    std::map<int,bool> marque;
-
-    inititalisationChemin(pred,marque);
-
-    //initialisation des distances à "l'infini" (valeur maximum d'un INT)
-    for(const auto& elem : m_sommets)
-        poids[elem.first]=INT_MAX;
-
-    //La distance de sInit à sInit est de 0
-    poids[sInit]=0;
-
-
-
-
-    //Initialisation de la queue
-    //parametre 1 : numéro du sommet
-    //parametre 2 : duree du sommet par rapport à sInit
-    //Comparaison selon la struct compaisonDijkstra (selon le parametre 2)
-    std::priority_queue<std::pair<int,float> ,std::vector<std::pair<int,float>> ,comparaisonDijkstra> queue;
-    queue.push(std::make_pair(sInit,0));
-
-
-
-
-    //Tant qu'il reste des sommets dans la queue (veut aussi dire qu'il reste des sommets non marqués)
-    while(!queue.empty()){
-
-        int minSom=queue.top().first; //Prend le numéro du sommet avec la plus petite distance de sInit qui est dans la queue
-        float distMinSom=queue.top().second; //Prend la distance du sommet jusqu'au sommet sInit
-
-        queue.pop(); //On supprime de la queue le sommet avec la plus petite distance de sInit (on va ensuite le marqué)
-
-        //On marque le sommet avec la plus petite distance depuis le sommet initial non marqué dans la queue
-        marque[minSom]=true;
-
-        for(const auto& a : m_sommets[minSom]->getAdjacents()){
-            if(!marque[a->getSommets().second->getNum()]){ //Si le sommet adjacent n'est pas marqué
-                //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
-                //est inférieur à la distance de l'adjacent à sInit
-                //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
-                if(distMinSom+a->getDuree() < poids[a->getSommets().second->getNum()]){
-                    poids[a->getSommets().second->getNum()]=distMinSom+a->getDuree();
-                    pred[a->getSommets().second->getNum()]=minSom; //Le pred de a est le sommet "minSom"
-                    queue.push(std::make_pair(a->getSommets().second->getNum(),poids[a->getSommets().second->getNum()]));//On ajoute a à la priority_queue
-                }
-            }
-        }
-    }
-
-    return pred;
-}
-
-
 std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever) {
     std::map<int,int> pred;
 
@@ -605,15 +590,12 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
     poids[sInit]=0;
 
 
-
-
-
     //Initialisation de la queue
     //parametre 1 : numéro du sommet
     //parametre 2 : duree du sommet par rapport à sInit
     //parametre 3 : a eviter ou pas
     //Comparaison selon la struct compaisonDijkstra (selon le parametre 2)
-    std::priority_queue<std::pair<int,std::pair<float,bool>> ,std::vector<std::pair<int,std::pair<float,bool>>> ,comparaisonDijkstraTest> queue;
+    std::priority_queue<std::pair<int,std::pair<float,bool>> ,std::vector<std::pair<int,std::pair<float,bool>>> ,comparaisonDijkstraOpti> queue;
     queue.push(std::make_pair(sInit,std::make_pair(0,false)));
 
 
@@ -634,20 +616,20 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
                 if(marque[a->getSommets().second->getNum()]!='N'){ //Si le sommet adjacent n'est pas marqué
                     bool nePasParcourir=false;
 
-                    //Si le trajet fait partie des trajets à éviter
-                    if(aEnlever[a->getNum()])
-                    {
-                        //et que le point adjacent a deja etait marqué
-                        //alors on ne parcourt pas -> il existe un trajet moins court MAIS qui n'est pas à éviter
-                        if(marque[a->getSommets().second->getNum()]=='G')
-                            nePasParcourir=true;
+                    if(!typeAEnlever.empty()) {
+                        //Si le trajet fait partie des trajets à éviter
+                        if (aEnlever[a->getNum()]) {
+                            //et que le point adjacent a deja etait marqué
+                            //alors on ne parcourt pas -> il existe un trajet moins court MAIS qui n'est pas à éviter
+                            if (marque[a->getSommets().second->getNum()] == 'G')
+                                nePasParcourir = true;
 
-                        //Mais si l'ancien trajet pour aller à ce point est à éviter aussi
-                        //alors on passe quand meme
-                        if(aEnlever[pred[a->getSommets().second->getNum()]])
-                            nePasParcourir=false;
+                            //Mais si l'ancien trajet pour aller à ce point est à éviter aussi
+                            //alors on passe quand meme
+                            if (aEnlever[pred[a->getSommets().second->getNum()]])
+                                nePasParcourir = false;
+                        }
                     }
-
 
                     if(!nePasParcourir){
                         //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
@@ -663,9 +645,6 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
                             queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(poids[a->getSommets().second->getNum()],aEnlever[a->getNum()])));//On ajoute a à la priority_queue
                         }
 
-
-
-
                     }
 
                 }
@@ -673,46 +652,73 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
 
         }
     }
-    std::cout << pred[6] << std::endl;
+
+
     return pred;
-}
-
-
-
-void Domaine::inititalisationChemin(std::map<int,int>& pred, std::map<int,bool>& marque){
-    //initialisation des marquages à false (non marqués)
-    //initialisation des preds, de base ils sont tous à -1
-    for(const auto& elem : m_sommets) {
-        pred[elem.first] = -1;
-        marque[elem.first] = false;
-    }
 }
 
 ///Sous-programme permettant d'effectuer le parcours BFS
 ///Renvoie le vecteur des prédécesseurs des sommets
-std::map<int,int> Domaine::parcoursBFS(const int& _num){
+std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever){
     //Initialisation des sommets
     std::map<int,int> pred;
-    std::map<int,bool> marque;
+    std::map<int,float> ordreDecouverte;
+    std::map<int,char> marque;
 
-    inititalisationChemin(pred,marque);
+    //inititalisationChemin(pred,marque);
+    for(const auto& elem : m_sommets) {
+        pred[elem.first] = -1;
+        ordreDecouverte[elem.first] = 0;
+        marque[elem.first] = 'B';
+    }
+
+
+    std::map<int,bool> aEnlever;/*----------------*/
+    /*----------------*/
+
+    for(const auto& elem: m_trajets){
+        if(std::find(typeAEnlever.begin(),typeAEnlever.end(),elem.second->getType())!=typeAEnlever.end())
+            aEnlever[elem.first]=true;
+        else
+            aEnlever[elem.first]=false;
+    }
+
+    /*----------------*/
+
+   int decouverte=0;
 
     //Création de la file vide
-    std::queue<int> file;
+    std::priority_queue<std::pair<int,std::pair<float,bool>> ,std::vector<std::pair<int,std::pair<float,bool>>> ,comparaisonDijkstraOpti> queue;
 
-    enfilerSommetBFS(file,marque,_num);//On enfile s0 (_num : le sommet initial)
 
-    while(!file.empty()){
+    //enfilerSommetBFS(file,marque,_num);//On enfile s0 (_num : le sommet initial)
+    //Création de la file vide
 
-        int sommetActu= file.front();
-        file.pop();//On défile le prochain sommet de la file
+    marque[_num]= 'N';
+    queue.push(std::make_pair(_num,std::make_pair(-1,false)));
 
+    while(!queue.empty()){
+
+        int sommetActu= queue.top().first;
+
+        queue.pop();//On défile le prochain sommet de la file
         for(auto a : m_sommets[sommetActu]->getAdjacents()){//Pour tous les sommets adjacents
 
-            if(!marque[a->getSommets().second->getNum()]){//Si le sommet adjacent n'est pas marqué
-                enfilerSommetBFS(file,marque,a->getSommets().second->getNum()); //On l'enfile (on le marque et on l'ajoute à la file)
-                pred[a->getSommets().second->getNum()]=sommetActu; //Le prédecesseur du sommet adjacent devient le sommet actuel
 
+            if(marque[a->getSommets().second->getNum()]=='B'||marque[a->getSommets().second->getNum()]=='G'){//Si le sommet adjacent n'est pas marqué 'N'
+
+
+                if(aEnlever[a->getNum()])
+                    marque[a->getSommets().second->getNum()]= 'G';
+                else
+                    marque[a->getSommets().second->getNum()]= 'N';
+
+
+
+                pred[a->getSommets().second->getNum()]=a->getNum(); //Le prédecesseur du sommet adjacent devient le trajet allant du sommet actu à ce sommet adjacent
+                queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(decouverte,aEnlever[a->getNum()])));
+                ordreDecouverte[a->getSommets().second->getNum()]=decouverte;
+                decouverte++;
             }
         }
 
@@ -723,12 +729,7 @@ std::map<int,int> Domaine::parcoursBFS(const int& _num){
     return pred;
 }
 
-///Sous programme permettant d'enfiler un sommet pour le BFS
-///Marque le sommet et l'ajoute à la file
-void Domaine::enfilerSommetBFS(std::queue<int>& file, std::map<int,bool>& marquageSommet, const int& _num){
-    file.push(_num);
-    marquageSommet[_num]= true;
-}
+
 
 
 //Getters & Setters
