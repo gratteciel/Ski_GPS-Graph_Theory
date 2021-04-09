@@ -26,8 +26,8 @@ void Sommet::affichage() {
         std::cout << "Point: " <<getNom() << " -> " <<getAltitude() << "m" <<std::endl;
 }
 
-void Sommet::trierAdjacents(){
-    std::sort(m_adjacents.begin(),m_adjacents.end(),trierAdjacentsSelonNumSecondSommet);
+void Sommet::trierSortants(){
+    std::sort(m_sortants.begin(),m_sortants.end(),trierAdjacentsSelonNumSecondSommet);
 }
 
 std::string Sommet::afficheSimple(){
@@ -41,22 +41,24 @@ void Sommet::affichageComplexe(const std::map<int,Trajet*>& _trajets){
     std::cout <<std::endl<< "Information detaille du point: " << getNom() << " (" <<getAltitude() <<"m)" << std::endl<<std::endl;
 
     std::cout << "Les trajets partants de ce point: " << std::endl;
-    for(const auto& elem: m_adjacents){
+    for(const auto& elem: m_sortants){
         elem->affichageComplexe(true);
     }
 
     std::cout <<std::endl<< "Les trajets allant a ce point: " << std::endl;
-    for(const auto& elem: _trajets){
-       if(elem.second->getSommets().second->getNum()==getNum())
-           elem.second->affichageComplexe(false);
+    for(const auto& elem: m_entrants){
+        elem->affichageComplexe(true);
     }
     std::cout << std::endl;
 }
 
-void Sommet::setAdjactent(Trajet* _trajet){
-    m_adjacents.push_back(_trajet);
+void Sommet::setSortant(Trajet* _trajet){
+    m_sortants.push_back(_trajet);
 }
 
+void Sommet::setEntrant(Trajet* _trajet){
+    m_entrants.push_back(_trajet);
+}
 
 //Getters & Setters
 
@@ -64,6 +66,10 @@ int Sommet::getAltitude() const {
     return m_altitude;
 }
 
-std::vector<Trajet*> Sommet::getAdjacents() const {
-    return m_adjacents;
+std::vector<Trajet*> Sommet::getSortants() const {
+    return m_sortants;
+}
+
+std::vector<Trajet*> Sommet::getEntrants() const {
+    return m_entrants;
 }

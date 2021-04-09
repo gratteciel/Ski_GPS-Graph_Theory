@@ -166,6 +166,7 @@ void General::connection(){
 
 void General::boucle(){
     int menuActu=1;
+    arcs.calculFlotMaximal(6,5);
 
     while(menuActu!=0){
         std::system("clear || cls");

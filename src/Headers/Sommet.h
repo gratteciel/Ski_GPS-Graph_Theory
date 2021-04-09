@@ -14,22 +14,27 @@ class Trajet;
 class Sommet : public AbstractIdentite{
 private:
     int m_altitude;
-    std::vector<Trajet*> m_adjacents;
+    std::vector<Trajet*> m_sortants;
+    std::vector<Trajet*> m_entrants;
 public:
     //Constructeur et destructeur
     Sommet(const int& _num, const std::string& _nom, const int& _altitude);
     ~Sommet() = default;
     //Méthodes
     void affichage();
-    void setAdjactent(Trajet *_trajet);
+
     void affichageComplexe(const std::map<int,Trajet*>& _trajet);
+    void trierSortants();
     //Getters & Setters
     int getAltitude() const;
-    std::vector<Trajet *> getAdjacents() const;
+    void setSortant(Trajet *_trajet);
+    void setEntrant(Trajet* _trajet);
+    std::vector<Trajet *> getSortants() const;
+    std::vector<Trajet *> getEntrants() const;
 
     std::string afficheSimple();
 
-    void trierAdjacents();
+
 };
 
 
