@@ -125,6 +125,8 @@ void General::boucle(){
     }
 }
 
+/// Interaction menu ///
+
 void General::interactionDonnee(const std::string &donnee, int &menuActu) {
     if(donnee=="q")
         menuActu=0;
@@ -157,6 +159,7 @@ void General::interactionDonnee(const std::string &donnee, int &menuActu) {
     }
 
 }
+
 void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
         switch(donnee[0]){
@@ -289,6 +292,33 @@ void General::interactionDonneeMenu6(const std::string& donnee, int& menuActu){
 
 }
 
+void General::interactionDonneeMenu7(const std::string& donnee,int& menuActu) {
+    if(std::stoi(donnee) == 1)
+    {
+        menuActu = 8;
+        afficheMenu(menuActu);
+    }
+    else
+    {
+        menuActu = 9;
+        afficheMenu(menuActu);
+    }
+
+
+
+}
+
+void General::interactionDonneeMenu8(const std::string& donnee,int& menuActu) {
+
+
+
+
+
+}
+
+
+/// Affichage Menu ///
+
 void General::afficheMenu(const int& menuActu){
     std::cout << "q : Quitter le programme" <<std::endl;
     switch(menuActu){
@@ -400,22 +430,6 @@ void General::menu7() {
 
 }
 
-void General::interactionDonneeMenu7(const std::string& donnee,int& menuActu) {
-    if(std::stoi(donnee) == 1)
-    {
-        menuActu = 8;
-        afficheMenu(menuActu);
-    }
-    else
-    {
-        menuActu = 9;
-        afficheMenu(menuActu);
-    }
-
-
-
-}
-
 void General::menu8() {//menu utilisateur changement de débit
     int choixType;
     int nouvelleValeur;
@@ -450,14 +464,37 @@ void General::menu8() {//menu utilisateur changement de débit
     int menuActu = 1;
     afficheMenu(menuActu);
 
-
-
-
 }
 
 void General::menu9() {
 
 }
+
+void General::menu10() {
+    std::cout << " \t Bonjour voici le menu d'interface " <<std::endl;
+    std::cout << std::endl <<"----------------------------------" << std::endl;
+    std::cout << "----------------------------------" << std::endl;
+    std::cout << "Affichage de tous les profils " <<std::endl;
+    std::cout << "----------------------------------" << std::endl << std::endl;
+    std::cout << "Utilisateur n° \t || \t Pseudo" << std::endl;
+    std::cout << "----------------------------------" << std::endl << std::endl;
+
+
+    for (int i = 0; i < baseUtilisateur.getVecteurProfil().size(); ++i) {
+        std::cout << i+1 << "\t || \t " << baseUtilisateur.getVecteurProfil()[i].getProfil().first << std::endl;
+        std::cout << "----------------------------------" << std::endl;
+
+
+    }
+    std::cout << "Veuillez choisir le profil (numero)" <<std::endl;
+    system("cls");
+}
+
+
+
+
+
+/// Fonction Fichier concernant la capacités ///
 
 void General::changementValeurFichierCapacite(const std::string nomFichier) {
 
@@ -472,15 +509,6 @@ void General::changementValeurFichierCapacite(const std::string nomFichier) {
   for(const auto& elem : arcs.getVecteurCapacite())
       fichier << elem.first << " " << elem.second << std::endl;
 }
-
-void General::interactionDonneeMenu8(const std::string& donnee,int& menuActu) {
-
-
-
-
-
-}
-
 
 void General::lectureFichierCapacite() {
     std::ifstream fichier ("../capacite.txt");

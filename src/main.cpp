@@ -2,8 +2,10 @@
 
 int main() {
     try{
+
         General projet("../data_arcs.txt");
         projet.boucle();
+
 
     }
     catch (const std::exception& e)

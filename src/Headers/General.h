@@ -5,12 +5,16 @@
 #ifndef SKIPISCINE_GENERAL_H
 #define SKIPISCINE_GENERAL_H
 #include "Domaine.h"
+#include "Profil.h"
+#include "DonneePseudo.h"
 
 
 
 class General {
 private:
     Domaine arcs;
+    Profil profilActif;
+    DonneePseudo baseUtilisateur;
 
 public:
     //Constructeur et destructeur
@@ -54,6 +58,11 @@ public:
 
     void menu8();
     void menu9();
+
+    //menu utilisateur
+    void menu10();
+    void interactionDonneeMenu10();
+
 
     void finProgrammeActu();
 };
