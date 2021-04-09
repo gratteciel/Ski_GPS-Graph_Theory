@@ -42,6 +42,14 @@ public:
     int entreePoint(const std::string &phrase);
     void afficheInfo();
 
+    /***************/
+
+    //Gestion des flots algo Ford
+    std::vector<Sommet> bfsFord(const Sommet& _source,std::vector<Sommet>& vecteurPredecesseur);
+    std::vector<bool> initialisationMarquage();
+
+
+    /*************/
     int entrerUnNombrePositif(const std::string &phrase);
 
 

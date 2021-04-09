@@ -728,7 +728,19 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
     return pred;
 }
 
+std::vector <Sommet> Domaine::bfsFord(const Sommet &_source, std::vector<Sommet> &vecteurPredecesseur) {
+    std::vecteur<bool> marquageSommet = initialisationMarquage();
+    //Ajout du sommet source
+    vecteurPredecesseur.push_back(_source);
 
+    std::queue<Sommet> file;
+}
+std::vector<bool> Domaine::initialisationMarquage(){
+    std::vector<bool> marquageSommet;
+    for(const auto& elem : m_sommets)
+        marquageSommet.push_back(false);
+    return marquageSommet;
+}
 
 
 //Getters & Setters
