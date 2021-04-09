@@ -9,15 +9,23 @@
 
 class DonneePseudo {
 private:
-    std::vector<Profil> m_vecteurProfil;
+    std::vector<Profil*> m_vecteurProfil;
 
 public:
     DonneePseudo();
+    ~DonneePseudo();
     void lectureFichierProfil();
-    void ajoutProfil(const std::string& pseudo);
+    Profil* ajoutProfil(const std::string& pseudo);
 
-    std::vector<Profil> getVecteurProfil() const;
+    std::vector<Profil*> getVecteurProfil() const;
 
+    bool pseudoExiste(const std::string& pseudoInput);
+
+    std::string pseudoLowerCase(const std::string &donnee);
+
+    Profil *getProfil(const std::string &pseudo);
+
+    void reecrireFichierProfil();
 };
 
 

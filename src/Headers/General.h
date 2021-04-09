@@ -13,15 +13,15 @@
 class General {
 private:
     Domaine arcs;
-    Profil profilActif;
-    DonneePseudo baseUtilisateur;
+    Profil* m_profilActif;
+    DonneePseudo m_baseUtilisateur;
 
     bool m_estOptiChemin;
     std::vector<std::pair<std::string,bool>> m_optiTrajets;
 public:
     //Constructeur et destructeur
     General(const std::string &nomfichier);
-    ~General() = default;
+    ~General() =default;
     //Méthodes
     void lecturefichier(const std::string &nomfichier,t_chargeFichier& fCharge);
     void interactionDonnee(const std::string& donnee, int& menuActu);
@@ -61,11 +61,9 @@ public:
     void menu9();
 
     //menu utilisateur
-    void menu10();
-    void interactionDonneeMenu10();
 
 
-    void finProgrammeActu();
+    void finProgrammeActu(const std::string& phrase = "Appuyez sur entree pour revenir au menu...........");
 
     void menu7();
 
@@ -81,6 +79,14 @@ public:
     void modifierOptiTrajets();
 
     std::vector<std::pair<std::string, bool>> getOptiTrajets() const;
+
+    void connection();
+
+    void menuAdminAffichage();
+
+    void interactionDonneeAdmin(const std::string &donnee, int &menuActu);
+
+
 };
 
 

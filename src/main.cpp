@@ -4,6 +4,7 @@ int main() {
     try{
 
         General projet("../data_arcs.txt");
+        projet.connection();
         projet.boucle();
 
 

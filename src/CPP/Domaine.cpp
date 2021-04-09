@@ -729,6 +729,118 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
 }
 
 
+void Domaine::interactionCapaciteFlot(const bool& estAdmin){
+
+
+    std::string parametre;
+    bool fin=false;
+    do{
+        fin =false;
+        std::system("cls || clear");
+        afficherCapaciteFlot(estAdmin);
+
+        std::cin >> parametre;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        if(parametre=="s")
+            fin=true;
+
+        else if(estAdmin)
+            if(parametre=="m")
+                fin=true;
+
+    }while(!fin);
+
+    if(parametre=="m" && estAdmin)
+        modifCapaciteAdmin();
+}
+void Domaine::afficherCapaciteFlot(const bool& estAdmin){
+
+
+    std::cout << "Type                                 Capacite (en skieur/heure) " <<std::endl;
+    for(int i =0; i < getVecteurCapacite().size(); i ++)
+    {
+        Trajet temp=Trajet(getVecteurCapacite()[i].first);
+        std::cout << temp.returnNomType() << "                              " << getVecteurCapacite()[i].second << std::endl;
+    }
+
+    std::cout << std::endl<< "Appuyez sur \"s\" pour revenir au menu " << std::endl;
+    if(estAdmin)
+        std::cout << "Appuyez sur \"m\" pour modifier ces valeurs " << std::endl;
+    std::cout << "Votre choix: ";
+
+
+}
+void Domaine::modifCapaciteAdmin() {
+
+
+    std::string parametre;
+    bool fin=false;
+
+    do{
+        fin=false;
+        std::system("cls || clear");
+        std::cout <<"-------------------------------------------------------------------------------------------" << std::endl;
+        std::cout << "Vous avez choisi de changer les valeurs des capacites" <<std::endl;
+        std::cout << "Veuillez choisir le type (numero) de la capacite que vous voulez changer" <<std::endl;
+        std::cout <<"-------------------------------------------------------------------------------------------" << std::endl;
+
+        std::cout << " Parametre \t        Type \t   \t Capacite (en skieur/heure) " <<std::endl;
+        std::cout <<"-------------------------------------------------------------------------------------------" << std::endl;
+
+        for(int i =0; i < getVecteurCapacite().size(); i ++)
+        {
+            Trajet temp=Trajet(getVecteurCapacite()[i].first);
+            std::cout << " " << i<< "                  "  << temp.returnNomType() << "                              " << getVecteurCapacite()[i].second << std::endl;
+        }
+
+
+
+        std::cout << std::endl << "Parametre : " ;
+        std::cin >> parametre;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+
+        if(!estNombre(parametre))
+            fin =false;
+        else
+        {
+            if(std::stoi(parametre)>=0 && std::stoi(parametre)<getVecteurCapacite().size())
+                fin=true;
+            else
+                fin=false;
+        }
+
+    }while(!fin);
+
+    int choixType=std::stoi(parametre);
+    std::system("cls || clear");
+    do{
+
+        Trajet temp=Trajet(getVecteurCapacite()[choixType].first);
+        std::cout << "Vous avez decide de modifer la capacite de: " << temp.returnNomType() << std::endl<<std::endl;
+
+        std::cout  << "Ancienne valeur :" << getVecteurCapacite()[choixType].second << " skieurs/heure" << std::endl;
+        std::cout << "Nouvelle valeur :" ;
+        std::cin >> parametre;
+
+    }while(!estNombre(parametre));
+
+    m_vecteurCapacite[choixType].second = std::stoi(parametre);
+    reecrireFichierCapacite();
+
+
+}
+void Domaine::reecrireFichierCapacite(){
+    std::ofstream fichier ("../capacite.txt");
+    fichier << 12 << std::endl;
+    for( auto& elem: m_vecteurCapacite)
+    {
+        fichier << elem.first << " " << elem.second;
+
+        fichier << std::endl;
+    }
+}
 
 
 //Getters & Setters

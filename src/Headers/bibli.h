@@ -36,13 +36,7 @@ typedef struct t_chargeFichier{
     std::vector<t_chargeTrajet> trajets;
 }t_chargeFichier;
 
-struct comparaisonDijkstra
-{
-    bool operator()(const std::pair<int,float>& a, const std::pair<int,float>& b)
-    {
-        return a.second > b.second;
-    }
-};
+
 
 
 struct comparaisonDijkstraOpti
@@ -61,14 +55,7 @@ struct comparaisonDijkstraOpti
         return a.second.first > b.second.first;
     }
 };
-struct comparaisonBFSOpti
-{
-    bool operator()(const std::pair<int,std::pair<int,bool>>& a, const std::pair<int,std::pair<int,bool>>& b)
-    {
 
-        return a.second.first > b.second.first;
-    }
-};
 
 #endif //SKIPISCINE_BIBLI_H
 

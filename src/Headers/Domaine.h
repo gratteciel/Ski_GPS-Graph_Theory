@@ -41,9 +41,10 @@ public:
     bool changementDuree();
     int entreePoint(const std::string &phrase);
     void afficheInfo();
-
+    void afficherCapaciteFlot(const bool& estAdmin);
+    void interactionCapaciteFlot(const bool& estAdmin);
     int entrerUnNombrePositif(const std::string &phrase);
-
+    void reecrireFichierCapacite();
 
     //Getters & Setters
     void setOrdre(int _ordre);
@@ -60,6 +61,8 @@ public:
     std::map<int,int> dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever = std::vector<std::string>());
 
     std::map<int,int> parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever= std::vector<std::string>());
+
+    void modifCapaciteAdmin();
 };
 
 

@@ -14,7 +14,7 @@ General::General(const std::string &nomfichier)
     t_chargeFichier fCharge;
     lecturefichier(nomfichier,fCharge);
     arcs.initialisation(fCharge);
-
+    lectureFichierCapacite();
 }
 
 
@@ -115,6 +115,55 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
 }
 
+void General::connection(){
+    std::string pseudoInput;
+
+
+    std::cout << "Bonjour!"
+              <<std::endl
+              <<std::endl
+              <<"Veuillez renseigner votre pseudo (pas d'espace): ";
+    std::cin >> pseudoInput;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    bool dejaInscript = m_baseUtilisateur.pseudoExiste(pseudoInput);
+    if(!dejaInscript){
+        m_profilActif = m_baseUtilisateur.ajoutProfil(pseudoInput);
+
+    }
+    else
+        m_profilActif= m_baseUtilisateur.getProfil(pseudoInput);
+
+    //Changer les préférences des trajets optis
+    for(auto& elem : m_optiTrajets){
+        bool aEviter=false;
+        for(auto& elem2 : m_profilActif->getPrefTrajets()){
+            if(elem2 == elem.first)
+                aEviter=true;
+        }
+
+        elem.second=aEviter;
+
+    }
+
+    std::system("cls || clear");
+    std::cout << "Bonjour " << m_profilActif->getProfil().first << "!" << std::endl;
+
+    if(dejaInscript){
+        std::cout << "Votre compte a bien ete charge avec vos preferences! " << std::endl;
+        if(m_profilActif->getProfil().second)
+            std::cout << "Vous etes administrateur de cette borne" << std::endl;
+    }
+
+    else
+        std::cout << "Votre compte a bien ete cree! " << std::endl;
+
+    finProgrammeActu("Appuyez sur entree.............");
+
+}
+
+
+
 void General::boucle(){
     int menuActu=1;
 
@@ -135,8 +184,8 @@ void General::boucle(){
 
 
 /// Interaction menu ///
-void General::finProgrammeActu(){
-    std::cout <<std::endl<< "Appuyez sur entree pour revenir au menu...........";
+void General::finProgrammeActu(const std::string& phrase){
+    std::cout <<std::endl<< phrase;
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -173,6 +222,9 @@ void General::interactionDonnee(const std::string &donnee, int &menuActu) {
             case 11:
                 interactionDonneeMenu11(donnee,menuActu);
                 break;
+            case 20 :
+                interactionDonneeAdmin(donnee,menuActu);
+                break;
 
         }
     }
@@ -208,8 +260,14 @@ void General::interactionDonneeMenu1(const std::string& donnee, int& menuActu){
                 menuActu=11;
                 break;
 
+
         }
     }
+
+    if((donnee=="a"  || donnee=="A" ) && m_profilActif->getProfil().second){ //si admin
+        menuActu=20;
+    }
+
 
 }
 
@@ -326,10 +384,10 @@ void General::interactionDonneeMenu11(const std::string& donnee,int& menuActu) {
     if(donnee.size()==1){
         switch(donnee[0]){
             case '0':
-                menuActu=7;
+                menuActu=1;
                 break;
             case '1':
-                menuActu=8;
+                arcs.interactionCapaciteFlot(m_profilActif->getProfil().second);
                 break;
             case '2':
                 menuActu=9;
@@ -366,6 +424,24 @@ void General::interactionDonneeMenu8(const std::string& donnee,int& menuActu) {
 
 }
 
+void General::interactionDonneeMenu9(const std::string& donnee,int& menuActu){
+
+}
+
+void General::interactionDonneeAdmin(const std::string& donnee,int& menuActu){
+    if(donnee.size()==1){
+        switch(donnee[0]){
+            case '0':
+                menuActu=1;
+                break;
+            case '1':
+                arcs.modifCapaciteAdmin();
+                break;
+        }
+    }
+}
+
+
 
 /// Affichage Menu ///
 
@@ -393,14 +469,15 @@ void General::afficheMenu(const int& menuActu){
         case 7:
             menu7();
             break;
-        case 8://menu changement capacite Admin
-            menu8();
-            break;
+
         case 9://menu calcul de flot
             menu9();
             break;
         case 11://Menu affcihage capacité
             menu11();
+            break;
+        case 20:
+            menuAdminAffichage();
             break;
 
 
@@ -417,7 +494,11 @@ void General::menu1(){
     std::cout << "4 : A propos des trajets (4.3)" << std::endl;
     std::cout << "5 : Plus courts chemins (4.4)" << std::endl;
     std::cout << "6 : Optimisation des vacances -> Plus courts chemin avec selection (4.5)" << std::endl;
-    std::cout << "7 : Afficher et modifier les capacites avec les flots (4.6)" << std::endl;
+    std::cout << "7 : A propos des flots (4.6)" << std::endl;
+
+    if(m_profilActif->getProfil().second){//Si est admin
+        std::cout << std::endl<< "A : Pannel admin" << std::endl;
+    }
 }
 
 void General::menu2(){
@@ -475,91 +556,42 @@ void General::menu6(){
 
 
 void General::menu11() {
-    lectureFichierCapacite();
-
-    std::cout << "Type \t || \t Debit " <<std::endl;
+    std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    for(int i =0; i < arcs.getVecteurCapacite().size(); i ++)
-    {
-        std::cout << arcs.getVecteurCapacite()[i].first << "\t || \t" << arcs.getVecteurCapacite()[i].second << std::endl;
-        std::cout <<"----------------------------------" << std::endl;
-    }
+    std::cout <<  "  Etudes des flots des skieurs   " << std::endl;
+    std::cout << "----------------------------------" << std::endl;
 
-    std::cout << " Tapez 1 pour changer les valeurs ou 2 pour les garder :" ;
-
-
-
-
+    std::cout << std::endl <<"1 : Afficher les capacites des trajets" << std::endl;
+    std::cout << "2 : Faire l'algorithme de Ford-Fulkerson" << std::endl;
 
 
 }
 
-void General::menu8() {//menu utilisateur changement de débit
-    int choixType;
-    int nouvelleValeur;
-    std::vector<std::pair<std::string,int>> &temp = arcs.getVecteurCapacite();
-
-    std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout << "Vous avez choisi de changer les valeurs des capacites" <<std::endl;
-    std::cout << "Veuillez choisir le type (numero) de la capacite que vous voulez changer" <<std::endl;
-    std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "Parametre \t || \t Type \t || \t Debit " <<std::endl;
-    std::cout << std::endl <<"----------------------------------" << std::endl;
-    for(int i =0; i < arcs.getVecteurCapacite().size(); i ++)
-    {
-        std::cout << i+1<<"\t || \t" <<  arcs.getVecteurCapacite()[i].first << "\t || \t" << arcs.getVecteurCapacite()[i].second << std::endl;
-        std::cout  <<"----------------------------------" << std::endl;
-    }
-    do{
-        std::cout << "Type : " ;
-        std::cin >> choixType;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }while(choixType-1<0 || choixType-1 > arcs.getVecteurCapacite().size());
-    std::cout << "Vous avez decide de changer cette valeur : " << arcs.getVecteurCapacite()[choixType-1].second << " du type : " << arcs.getVecteurCapacite()[choixType-1].first << std::endl;
-    std::cout << "Veuillez modifier cette valeur " << std::endl;
-    std::cout  << "Ancienne valeur :" << arcs.getVecteurCapacite()[choixType-1].second <<std::endl;
-    std::cout << "Nouvelle valeur :" ;
-    std::cin >> nouvelleValeur;
-    arcs.getVecteurCapacite()[choixType-1].second = nouvelleValeur;
-    changementValeurFichierCapacite("capacite");
 
 
+
+void General::menuAdminAffichage(){
+    std::cout << "0 : Retour en arriere" << std::endl;
+    std::cout << std::endl <<"----------------------------------" << std::endl;
+    std::cout <<  "       Pannel admin   " << std::endl;
+    std::cout << "----------------------------------" << std::endl;
+
+    std::cout << "1 : Modifier les capacites" << std::endl;
 
 }
+
+
 
 void General::menu9() {
 
 }
 
-void General::menu10() {
-    std::cout << " \t Bonjour voici le menu d'interface " <<std::endl;
-    std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout << "----------------------------------" << std::endl;
-    std::cout << "Affichage de tous les profils " <<std::endl;
-    std::cout << "----------------------------------" << std::endl << std::endl;
-    std::cout << "Utilisateur n° \t || \t Pseudo" << std::endl;
-    std::cout << "----------------------------------" << std::endl << std::endl;
-
-
-    for (int i = 0; i < baseUtilisateur.getVecteurProfil().size(); ++i) {
-        std::cout << i+1 << "\t || \t " << baseUtilisateur.getVecteurProfil()[i].getProfil().first << std::endl;
-        std::cout << "----------------------------------" << std::endl;
-
-
-    }
-    std::cout << "Veuillez choisir le profil (numero)" <<std::endl;
-    system("cls");
-}
 
 
 
 
 
-/// Fonction Fichier concernant la capacités ///
-
+/// Fonction Fichier concernant la capacite ///
 void General::changementValeurFichierCapacite(const std::string nomFichier) {
 
     //ouverture en mode écriture afin d'éffacer le contenu
@@ -597,7 +629,7 @@ void General::menu7(){
     std::cout << std::endl <<"----------------------------------" << std::endl;
     std::cout <<  " Plus court chemin optimisé (4.5)   " << std::endl;
     std::cout << "----------------------------------" << std::endl;
-    std::cout << std::endl <<"1 : Afficher/Modifier l'interet des trajets" << std::endl;
+    std::cout << std::endl <<"1 : Afficher/Modifier vos preferences a l'interet des trajets" << std::endl;
     std::cout << "2 : Faire les plus courts chemins les parametres du \"1\"" << std::endl;
 
 }
@@ -692,16 +724,15 @@ void General::modifierOptiTrajets(){
 
                 break;
         }
+
+        m_profilActif->prefTrajetsModification(m_optiTrajets);
+
+        m_baseUtilisateur.reecrireFichierProfil();
         std::system("cls || clear");
         std::cout << "Toutes vos modifications ont ete pris en compte!" << std::endl;
+
         finProgrammeActu();
     }
-
-
-
-
-
-
 }
 
 bool General::getEstOptiChemin() const {
@@ -715,3 +746,5 @@ std::vector<std::pair<std::string,bool>> General::getOptiTrajets() const {
 void General::setEstOptiChemin(const bool& _valeur) {
     m_estOptiChemin=_valeur;
 }
+
+
