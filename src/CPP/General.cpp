@@ -322,17 +322,21 @@ void General::interactionDonneeMenu6(const std::string& donnee, int& menuActu){
 }
 
 void General::interactionDonneeMenu11(const std::string& donnee,int& menuActu) {
-    if(std::stoi(donnee) == 1)
-    {
-        menuActu = 8;
-        afficheMenu(menuActu);
-    }
-    else
-    {
-        menuActu = 9;
-        afficheMenu(menuActu);
-    }
 
+    if(donnee.size()==1){
+        switch(donnee[0]){
+            case '0':
+                menuActu=7;
+                break;
+            case '1':
+                menuActu=8;
+                break;
+            case '2':
+                menuActu=9;
+                break;
+
+        }
+    }
 
 
 }
@@ -472,8 +476,7 @@ void General::menu6(){
 
 void General::menu11() {
     lectureFichierCapacite();
-    int donnee;
-    int menuActu = 7;
+
     std::cout << "Type \t || \t Debit " <<std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
     for(int i =0; i < arcs.getVecteurCapacite().size(); i ++)
@@ -481,14 +484,10 @@ void General::menu11() {
         std::cout << arcs.getVecteurCapacite()[i].first << "\t || \t" << arcs.getVecteurCapacite()[i].second << std::endl;
         std::cout <<"----------------------------------" << std::endl;
     }
-    do{
-        std::cout << " Tapez 1 pour changer les valeurs ou 2 pour les garder :" ;
-        std::cin >> donnee;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    }while(!(donnee == 1 || donnee == 2));
+    std::cout << " Tapez 1 pour changer les valeurs ou 2 pour les garder :" ;
 
-    interactionDonnee(std::to_string(donnee),menuActu);
+
 
 
 
@@ -526,8 +525,8 @@ void General::menu8() {//menu utilisateur changement de débit
     std::cin >> nouvelleValeur;
     arcs.getVecteurCapacite()[choixType-1].second = nouvelleValeur;
     changementValeurFichierCapacite("capacite");
-    int menuActu = 1;
-    afficheMenu(menuActu);
+
+
 
 }
 
@@ -632,8 +631,6 @@ void General::afficherOptiTrajets(){
 void General::modifierOptiTrajets(){
 
     std::string donnee;
-
-
 
     std::string parametre;
 
