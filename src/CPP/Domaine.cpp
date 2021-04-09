@@ -604,7 +604,6 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
 
         int minSom=queue.top().first; //Prend le numéro du sommet avec la plus petite distance de sInit qui est dans la queue
         float distMinSom=queue.top().second.first; //Prend la distance du sommet jusqu'au sommet sInit
-        bool aEnleverSommetActu = queue.top().second.second; /*Utile??????*/
         queue.pop(); //On supprime de la queue le sommet avec la plus petite distance de sInit (on va ensuite le marqué)
 
         //On marque le sommet avec la plus petite distance depuis le sommet initial non marqué dans la queue
