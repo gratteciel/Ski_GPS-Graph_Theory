@@ -16,6 +16,8 @@ private:
     Profil profilActif;
     DonneePseudo baseUtilisateur;
 
+    bool m_estOptiChemin;
+    std::vector<std::pair<std::string,bool>> m_optiTrajets;
 public:
     //Constructeur et destructeur
     General(const std::string &nomfichier);
@@ -40,8 +42,7 @@ public:
 
     void menu4(const bool& estDijkstra);
 
-    void interactionDonneeMenu4(const std::string &donnee, int &menuActu,const bool& estDijkstra);
-
+    void interactionDonneeMenu4(const std::string& donnee, int& menuActu,const bool& estDijkstra);
 
 
     void interactionDonneeMenu6(const std::string &donnee, int &menuActu);
@@ -50,8 +51,8 @@ public:
 
     void lectureFichierCapacite ();
     void changementValeurFichierCapacite(const std::string nomFichier);
-    void menu7();//menu concernant les flots avec lecture du fichier et écriture
-    void interactionDonneeMenu7(const std::string& donnee,int& menuActu);
+    void menu11();//menu concernant les flots avec lecture du fichier et écriture
+    void interactionDonneeMenu11(const std::string& donnee,int& menuActu);
     void interactionDonneeMenu8(const std::string& donnee,int& menuActu);
     void interactionDonneeMenu9(const std::string& donnee,int& menuActu);
 
@@ -65,6 +66,21 @@ public:
 
 
     void finProgrammeActu();
+
+    void menu7();
+
+    void interactionDonneeMenu7(const std::string &donnee, int &menuActu);
+
+    bool getEstOptiChemin() const;
+    void setEstOptiChemin(const bool& _valeur);
+
+
+
+    void afficherOptiTrajets();
+
+    void modifierOptiTrajets();
+
+    std::vector<std::pair<std::string, bool>> getOptiTrajets() const;
 };
 
 

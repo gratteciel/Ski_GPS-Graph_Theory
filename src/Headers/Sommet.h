@@ -28,6 +28,8 @@ public:
     std::vector<Trajet *> getAdjacents() const;
 
     std::string afficheSimple();
+
+    void trierAdjacents();
 };
 
 

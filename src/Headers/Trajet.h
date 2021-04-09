@@ -19,6 +19,7 @@ private:
 public:
     //Constructeur et destructeur
     Trajet(const int& _num, const std::string& _nom, const std::string& _type,  Sommet* depart,  Sommet* arrivee, const t_mapDuree& matriceDuree);
+    Trajet( const std::string &_type);
     ~Trajet() = default;
     //Méthodes
     void affichage();

@@ -37,10 +37,13 @@ void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
         m_trajets[t.num] = new Trajet(t.num,t.nom,t.type,m_sommets[t.depart],m_sommets[t.arrivee],m_matriceDuree);
-
         m_sommets[t.depart]->setAdjactent(m_trajets[t.num]);
-
     }
+
+    for(auto& elem: m_sommets){
+        elem.second->trierAdjacents();
+    }
+
 }
 
 bool Domaine::estNombre(const std::string& str)
@@ -143,56 +146,70 @@ int Domaine::returnPointId(const std::string& entree){
     return -1;
 }
 
-void Domaine::plusCourtChemin(const bool& estDijkstra,int s0, int sF){
-
-    std::map<int,int> poids;
+void Domaine::plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets, int s0, int sF){
+    std::map<int,float> poids;
     std::map<int,int> pred;
+    std::vector<std::string> typeAEnlever;
+
+    if(estOpti){
+        for(const auto& e : optiTrajets){
+            if(e.second)
+                typeAEnlever.push_back(e.first);
+        }
+    }
+
 
     if(estDijkstra)
-        pred=dijkstra(s0,poids);
+        pred=dijkstraOpti(s0,poids,typeAEnlever);
     else{
-        pred=parcoursBFS(s0);
+        pred=parcoursBFSOpti(s0,typeAEnlever);
         for(const auto& elem : m_sommets)
             poids[elem.first]=-5;
     }
 
     if(sF!=-5)
-        affichePlusCourtChemin(s0,sF,pred,poids[sF]);
+        affichePlusCourtChemin(s0,sF,pred,poids[sF],estOpti,optiTrajets);
     else{
         std::cout << std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
         std::cout << " Point |  Chemin (liste de trajets)"<<std::endl;
-        std::cout << " final |  de forme \"nomTrajet\" (allant du \"sommet intial\" au  \"sommet final\" )"<<std::endl;
+        std::cout << " final |  de forme \"nomTrajet\" (\"point intial\"-\"point final\"|\"type\" )"<<std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
         for(const auto& e : m_sommets){
             if(e.first!=s0)
-                affichePlusCourtChemin(s0,e.first,pred,poids[e.first],false);
+                affichePlusCourtChemin(s0,e.first,pred,poids[e.first],estOpti,optiTrajets,false);
         }
     }
 }
 
-std::string Domaine::convertSecondeHeuresMinS(const int& seconde){
-    int minutes = seconde / 60;
-    int heure = minutes / 60;
+std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
+
+    float minutes = seconde / 60;
+    float heure = minutes / 60;
 
     if(heure!=0)
-        return std::to_string(int(heure)) + "h " + std::to_string(int(minutes%60))
-         +  "m " + std::to_string(int(seconde%60)) +"s";
+        return std::to_string(int(heure)) + "h " + std::to_string(int(minutes)%60)
+         +  "m " + std::to_string(int(seconde)%60) +"s";
     else{
-        if(minutes!=0){
-            return std::to_string(int(minutes%60))
-                   +  "m " + std::to_string(int(seconde%60)) +"s";
+        if(int(minutes)%60!=0){
+            if(int(seconde)%60!=0)
+                return std::to_string(int(minutes)%60)
+                   +  "m " + std::to_string(int(seconde)%60) +"s";
+            else
+                return std::to_string(int(minutes)%60)
+                       +  "m ";
         }
         else
-            return std::to_string(int(seconde%60)) +"s";
+            return std::to_string(int(seconde)%60) +"s";
 
     }
 }
 
-void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map<int,int>& pred,const int& poids,const bool& complexe){
-    std::queue<int> listePoints;
+void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe){
+    std::vector<int> listeTrajets;
     bool cheminPossible=true;
-    getPlusCourtCheminRecursif(sF,pred,s0,listePoints,cheminPossible);
+
+    getPlusCourtCheminRecursif(pred[sF],pred,s0,listeTrajets,cheminPossible);
 
     if(!complexe)
     {
@@ -205,25 +222,49 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
 
     if(cheminPossible){
         if(complexe)
-            std::cout << std::endl << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl << "   ";
+            std::cout << std::endl
+                      << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl
+                      << "   ";
 
 
+        std::set<std::string> chosesAEviterImpo;
+        for(int i=(int)listeTrajets.size()-1; i<listeTrajets.size(); i--){
+            //Vérifie si on est pas passé quand meme par un trajet qui est à éviter
+            if(estOpti) {
+                for(const auto& elem: optiTrajets){
 
-        listePoints.push(sF);
-
-        while(listePoints.size()!=1){
-            int actu = listePoints.front();
-            listePoints.pop();
-            for(const auto& elem: m_sommets[actu]->getAdjacents()){
-                if(elem->getSommets().second->getNum()==listePoints.front()){
-                    std::cout << elem->getNom() << " ("<<  actu << "-" <<listePoints.front() << ")";
-                    if(listePoints.size()!=1)
-                        std::cout << " -> ";
-                    break;
+                    if(elem.second && elem.first==m_trajets[listeTrajets[i]]->getType()){//Si on est pas passé sur un trajet a eviter
+                        chosesAEviterImpo.insert(m_trajets[listeTrajets[i]]->returnNomType());
+                    }
                 }
             }
 
+
+            std::cout << m_trajets[listeTrajets[i]]->getNom()
+                      << " ("<<  m_trajets[listeTrajets[i]]->getSommets().first->getNum()
+                      << "-" <<m_trajets[listeTrajets[i]]->getSommets().second->getNum()
+                      << "|"<<m_trajets[listeTrajets[i]]->getType()
+                      << ")";
+            if(i!=0)
+                std::cout << " -> ";
+
         }
+        if(!chosesAEviterImpo.empty()){ //Si on est passé sur un ou plusieurs trajets a eviter
+            std::string phrase;
+
+            int i=0;
+            for(const auto& elem : chosesAEviterImpo){
+                phrase+=elem;
+                if(i!=chosesAEviterImpo.size()-1)
+                    phrase+=", ";
+                i++;
+            }
+            if(complexe)
+                std::cout << std::endl<<std::endl<<"   Aucun chemin reliant les 2 points ne passant pas par: " << phrase ;
+            else
+                std::cout << std::endl<<"       |  Aucun chemin reliant les 2 points ne passant pas par: " << phrase ;
+        }
+
         if(poids!=-5){
             if(complexe){
                 std::cout <<std::endl;
@@ -250,12 +291,18 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF, const std::map
 }
 
 ///Sous-programme permmetant d'afficher récursivement les sommets prédécessants pour aller du sommet initial au sommet i
-void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::queue<int>& listePoints,bool& cheminPossible){
+void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const int& initial,std::vector<int>& listeTrajets,bool& cheminPossible){
+
     if(i==-1)
         cheminPossible=false;
-    else if(initial!=i){
-        getPlusCourtCheminRecursif(pred[i], pred,initial,listePoints,cheminPossible);
-        listePoints.push(pred[i]); //On ajoute le point à la file
+
+    else
+    {
+        listeTrajets.push_back(pred[m_trajets[i]->getSommets().second->getNum()]); //On ajoute le trajet à la file
+        if(initial!=m_trajets[i]->getSommets().first->getNum()){
+            getPlusCourtCheminRecursif(pred[m_trajets[i]->getSommets().first->getNum()], pred,initial,listeTrajets,cheminPossible);
+
+        }
     }
 }
 
@@ -276,159 +323,233 @@ void Domaine::afficheInfo(){
 
 }
 
-void Domaine::afficheChangementDuree() {
+
+bool Domaine::changementDuree() {
     std::string choix;
-    std::cout << "Voici la liste des temps :" << std::endl;
-    std::cout << "Tous les temps sont en secondes" << std::endl;
-    //affichage de tous les types
+    std::string categorie;
+    do{
+        std::system("clear || cls");
+        std::cout << "Choississez une categorie pour afficher ses valeurs: " << std::endl;
+        //affichage de tous les types
 
-    char categorie;
-    std::cout << "Voici les categories " <<std::endl;
-    for (const auto &elem : getMatriceDuree()) {
-        std::cout << elem.first << std::endl;
-    }
-    std::cout << "Veuillez choisir la categorie : ";
-    std::cin >> categorie;
-    while (categorie != 'R' && categorie != 'B' && categorie != 'D') {
-        std::cout << "Mauvaise saisie " << std::endl;
-        std::cout << "Veuillez choisir la categorie : ";
+
+
+        std::cout << "D : Descentes (pistes)" <<std::endl;
+        std::cout << "R : Remontee" <<std::endl;
+        std::cout << "B : Navette" <<std::endl;
+        std::cout << std::endl << "Entrez une des trois lettres: ";
         std::cin >> categorie;
-    }
-    auto it = getMatriceDuree().find(categorie);
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }while (categorie != "R" && categorie != "B" && categorie != "D");
+    auto it = getMatriceDuree().find(categorie[0]);
 
-        std::cout << "Dans la categorie : " << it->first << std::endl;
+
 
     std::string parametre;
     int i=0;
 
-
-
-    switch (it->first) {
-
-        case 'R' : {
-            std::vector<std::string> typeR;
-            for (const auto &elem1 : it->second) {
-                typeR.push_back(elem1.first);
-                std::cout << "Parametre  " << i << " : "<< elem1.first << " une duree de base " << (int) elem1.second[0] / 60
-                          << "min et une duree sur 100m: " << (int) elem1.second[1] / 60 << "min" << std::endl;
-                i++;
-            }
-            bool fin = true;
-            int paramChoisi = 0;
-            do {
-                fin = true;
-                int param = entrerUnNombrePositif("Choississez le parametre: ");
-
-                if (param < 0 || param >= it->second.size())
-                    fin = false;
-                paramChoisi = param;
-
-            } while (!fin);
-
-            std::cout << "Vous avez choisi de modifier la duree de la piste " << typeR[paramChoisi] << std::endl;
-
-            for (int j = 0; j < it->second[typeR[paramChoisi]].size(); ++j) {
-                std::cout << "Valeur (" << j + 1 << ") : "<< (int) it->second[typeR[paramChoisi]][j] / 60 << " minutes    ";
-            }
-            std::cout << std::endl;
-            int param;
-            do {
-                fin = true;
-                param = entrerUnNombrePositif("Choississez la valeur qui est en () pour la modifier: ");
-
-                if(param<0 || param>=it->second.size()-1)
-                    fin = false;
-            } while (!fin);
-
-            std::cout << "Ancienne valeur :" << (int) it->second[typeR[paramChoisi]][param-1] / 60 << " minutes   "<< std::endl;
-            int valeurNouvelle = entrerUnNombrePositif("Nouvelle valeur (en minutes) :");
-            m_matriceDuree['R'][typeR[paramChoisi]][param-1] = valeurNouvelle * 60;
-            break;
-        }
-        case 'D':{
-            std::vector<std::string> typeD;
-            for (const auto &elem1 : it->second)
-            {
-                typeD.push_back(elem1.first);
-                std::cout <<"Parametre " << i << " :"<< elem1.first << " duree pour le 100m: " << (int)elem1.second[0]/60 << "min" << std::endl;
-                i++;
-            }
-            bool fin=true;
-            int paramChoisi=0;
-            do{
-                fin=true;
-                int param = entrerUnNombrePositif("Choississez le parametre: ");
-
-                if(param<0 || param>=it->second.size())
-                    fin=false;
-
-                paramChoisi = param;
-            }while(!fin);
-
-
-            std::cout << "Vous avez choisi " ;
-            std::cout  << "de modifier la duree de la piste " << typeD[paramChoisi] << std::endl;
-
-            std::cout << "Ancienne valeur : " << (int)it->second[typeD[paramChoisi]][0]/60 <<" minutes  " << std::endl;
+    std::system("clear || cls");
 
 
 
-            int param = entrerUnNombrePositif("Nouvelle valeur (en minutes) :");
 
-            m_matriceDuree['D'][typeD[paramChoisi]][0] = param*60;
-            break;
-        }
 
-        case 'B':
-        {
-            std::vector<std::string> typeB;
-            for (const auto &elem1 : it->second)
-            {
-                typeB.push_back(elem1.first);
-                std::cout <<"Parametre " << i << " :"<< elem1.first << " duree pour le 100m: " << (int)elem1.second[0]/60 << "min" << std::endl;
-                i++;
-            }
+    if(it->first=='D' || it->first=='B'){
+        if(!modifDureeBD(categorie))
+            return false;
 
-            bool fin=true;
-            int paramChoisi=0;
-            do{
-                fin=true;
-                int param = entrerUnNombrePositif("Choississez le parametre: ");
-
-                if(param<0 || param>=it->second.size())
-                    fin=false;
-
-                paramChoisi = param;
-            }while(!fin);
-            std::cout << "Vous avez choisi " ;
-            std::cout  << "de modifier la navette " << typeB[paramChoisi] << std::endl;
-
-            std::cout << "Ancienne valeur : " << (int)it->second[typeB[paramChoisi]][0]/60 <<" minutes  " << std::endl;
-            int param = entrerUnNombrePositif("Nouvelle valeur (en minutes) : ");
-
-            m_matriceDuree['B'][typeB[paramChoisi]][0] = param*60;
-
-            }
-            break;
-
-        default:
-            std::cout << "Probleme dans la selection des durees" <<std::endl;
     }
+
+
+    else if (it->first=='R'){
+        std::vector<std::string> typeR;
+        std::vector<Trajet> tempTrajets;
+        for (const auto &elem1 : it->second) {
+            typeR.push_back(elem1.first);
+            tempTrajets.push_back(Trajet(elem1.first));
+            std::cout <<  i << " : "<< elem1.first << " une duree de base " << (int) elem1.second[0] / 60
+                      << "min et une duree sur 100m: " << (int) elem1.second[1] / 60 << "min" << std::endl;
+            i++;
+        }
+        bool fin = true;
+        int paramChoisi = 0;
+
+
+
+
+        std::string parametre;
+        do{
+            std::system("cls || clear");
+            std::cout << "--------------------------------------------------------------------------------------"<<std::endl;
+            std::cout << "| Parametre  |  Nom de la remontee    -> Temps de base    -> Duree  sur 100m"<<std::endl;
+
+            std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
+            i=0;
+            for (const auto &elem1 : it->second)
+            {
+
+                std::cout <<"|     " << i << "      |  "<< tempTrajets[i].returnNomType() << " -> " << convertSecondeHeuresMinS(elem1.second[1]) << " -> " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
+                i++;
+            }
+
+            std::cout << "---------------------------------------------------------------------------------------"<<std::endl<<std::endl;
+            fin=true;
+            std::cout << "Appuyez sur \"s\" pour revenir au menu ou choississez un parametre pour modifier une valeur: ";
+            std::cin >> parametre;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+
+
+            if(parametre!="s"){
+                if(!estNombre(parametre))
+                    fin=false;
+                else{
+                    if(std::stoi(parametre)<0 || std::stoi(parametre)>=it->second.size())
+                        fin=false;
+                }
+
+            }
+            else
+                return false;
+
+
+        }while(!fin);
+
+        paramChoisi=std::stoi(parametre);
+
+
+        int param;
+        do {
+            fin = true;
+            std::string phrase2="Vous avez choisi de modifier la duree de: " +  tempTrajets[paramChoisi].returnNomType() +" \n \n"+ "0 : Temps de base = " +convertSecondeHeuresMinS(it->second[typeR[paramChoisi]][1]) + " \n" + "1 : Temps pour 100 metres = " + convertSecondeHeuresMinS(it->second[typeR[paramChoisi]][0]) + "\n" + "Choisissez la valeur que vous voulez modifier: ";
+
+
+
+            param = entrerUnNombrePositif(phrase2);
+
+            if(param<0 || param>1)
+                fin = false;
+
+
+        } while (!fin);
+        std::string mot;
+        if(param==0)
+            mot="temps de base";
+        else if(param==1)
+            mot="temps pour 100 metres";
+
+        std::string phrase = "Vous avez choisi de modifier le " + mot + " de: "+ tempTrajets[paramChoisi].returnNomType() +"\n" + "Ancienne valeur: " + std::to_string((int)it->second[typeR[paramChoisi]][1-param]) + " secondes \n" + "Nouvelle valeur (en secondes): ";
+
+
+        int nouvelleValeur = entrerUnNombrePositif(phrase);
+
+        m_matriceDuree[categorie[0]][typeR[paramChoisi]][1-param] = nouvelleValeur;
+        std::cout << std::endl << "Votre modification a ete pris en compte!" << std::endl;
+        std::cout << mot + " de: " << tempTrajets[paramChoisi].returnNomType() <<" : " << convertSecondeHeuresMinS(m_matriceDuree[categorie[0]][typeR[paramChoisi]][1-param])<< std::endl;
+
+
+    }
+    else
+        std::cout << "Probleme dans la selection des durees" <<std::endl;
+
+    //Modifie la duree des trajets en fonction de la nouvelle matrice
     for (auto& t: m_trajets)
     {
         t.second->setDuree(t.second->calculDuree(m_matriceDuree));
-        std::cout << t.second->getDuree() <<std::endl;
-
     }
 
 
-
+    return true;
 
 }
+
+
+bool Domaine::modifDureeBD(const std::string& categorie){
+    std::vector<std::string> typeD;
+    std::vector<Trajet> tempTrajets;
+    std::string mot;
+
+    if(categorie[0]=='D')
+        mot="descente";
+    else if (categorie[0]=='B')
+        mot = "navette";
+
+    int i=0;
+    auto it = getMatriceDuree().find(categorie[0]);
+    for (const auto &elem1 : it->second)
+    {
+        typeD.push_back(elem1.first);
+        tempTrajets.push_back(Trajet(elem1.first));
+        i++;
+    }
+
+    bool fin=true;
+    int paramChoisi=0;
+
+    std::string parametre;
+    do{
+        std::system("cls || clear");
+        std::cout << "--------------------------------------------------------------------------------------"<<std::endl;
+        std::cout << "| Parametre  |  Nom de la "<<mot <<"    -> Duree par default"<<std::endl;
+
+        std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
+        i=0;
+        for (const auto &elem1 : it->second)
+        {
+            if(categorie[0]=='B')
+                std::cout <<"|     " << i << "      |  "<< elem1.first << "    ->    " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
+            else
+                std::cout <<"|     " << i << "      |  "<< tempTrajets[i].returnNomType() << "    ->    " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
+            i++;
+        }
+
+        std::cout << "---------------------------------------------------------------------------------------"<<std::endl<<std::endl;
+        fin=true;
+        std::cout << "Appuyez sur \"s\" pour revenir au menu ou choississez un parametre pour modifier une valeur: ";
+        std::cin >> parametre;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+
+
+        if(parametre!="s"){
+            if(!estNombre(parametre))
+                fin=false;
+            else{
+                if(std::stoi(parametre)<0 || std::stoi(parametre)>=it->second.size())
+                    fin=false;
+            }
+
+        }
+        else
+            return false;
+
+
+    }while(!fin);
+
+    paramChoisi=std::stoi(parametre);
+
+
+    std::system("clear || cls");
+    std::string phrase = "Vous avez choisi de modifier la duree de: " + tempTrajets[paramChoisi].returnNomType() +"\n" + "Ancienne valeur: " + std::to_string((int)it->second[typeD[paramChoisi]][0]) + " secondes \n" + "Nouvelle valeur (en secondes): ";
+
+
+
+    int param = entrerUnNombrePositif(phrase);
+
+    m_matriceDuree[categorie[0]][typeD[paramChoisi]][0] = param;
+    std::cout << std::endl << "Votre modification a ete pris en compte!" << std::endl;
+    if(categorie[0]=='B')
+        std::cout << "Duree de " <<  typeD[paramChoisi] <<" : " << convertSecondeHeuresMinS(m_matriceDuree[categorie[0]][typeD[paramChoisi]][0])<< std::endl;
+    else
+        std::cout << "Duree de " << tempTrajets[paramChoisi].returnNomType() <<" : " << convertSecondeHeuresMinS(m_matriceDuree[categorie[0]][typeD[paramChoisi]][0])<< std::endl;
+    return true;
+}
+
 
 int Domaine::entrerUnNombrePositif(const std::string& phrase){
     std::string parametre;
     do{
+        std::system("clear || cls");
         std::cout << phrase;
         std::cin >> parametre;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -436,94 +557,167 @@ int Domaine::entrerUnNombrePositif(const std::string& phrase){
     return std::stoi(parametre);
 }
 
-std::map<int,int> Domaine::dijkstra(const int& sInit,std::map<int,int>& poids){
+std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever) {
     std::map<int,int> pred;
-    std::map<int,bool> marque;
 
-    inititalisationChemin(pred,marque);
+    std::map<int,char> marque;
+    std::map<int,bool> aEnlever;/*----------------*/
 
-    //initialisation des distances à "l'infini" (valeur maximum d'un INT)
+    /*----------------*/
+    if(!typeAEnlever.empty()){
+        for(const auto& elem: m_trajets){
+            if(std::find(typeAEnlever.begin(),typeAEnlever.end(),elem.second->getType())!=typeAEnlever.end())
+                aEnlever[elem.first]=true;
+            else
+                aEnlever[elem.first]=false;
+        }
+    }
+    /*----------------*/
+
+    //initialisation des marquages à false (non marqués)
+    //initialisation des preds, de base ils sont tous à -1
+    for(const auto& elem : m_sommets) {
+        pred[elem.first] = -1;
+        marque[elem.first] = 'B';
+    }
+    //inititalisationChemin(pred,marque);
+
+    //initialisation des distances à "l'infini" (valeur maximum d'un FLOAT)
     for(const auto& elem : m_sommets)
-        poids[elem.first]=INT_MAX;
+        poids[elem.first]=std::numeric_limits<float>::max();;
 
     //La distance de sInit à sInit est de 0
     poids[sInit]=0;
 
 
-
-
     //Initialisation de la queue
     //parametre 1 : numéro du sommet
     //parametre 2 : duree du sommet par rapport à sInit
+    //parametre 3 : a eviter ou pas
     //Comparaison selon la struct compaisonDijkstra (selon le parametre 2)
-    std::priority_queue<std::pair<int,int> ,std::vector<std::pair<int,int>> ,comparaisonDijkstra> queue;
-    queue.push(std::make_pair(sInit,0));
-
-
+    std::priority_queue<std::pair<int,std::pair<float,bool>> ,std::vector<std::pair<int,std::pair<float,bool>>> ,comparaisonDijkstraOpti> queue;
+    queue.push(std::make_pair(sInit,std::make_pair(0,false)));
 
 
     //Tant qu'il reste des sommets dans la queue (veut aussi dire qu'il reste des sommets non marqués)
     while(!queue.empty()){
 
         int minSom=queue.top().first; //Prend le numéro du sommet avec la plus petite distance de sInit qui est dans la queue
-        int distMinSom=queue.top().second; //Prend la distance du sommet jusqu'au sommet sInit
-
+        float distMinSom=queue.top().second.first; //Prend la distance du sommet jusqu'au sommet sInit
         queue.pop(); //On supprime de la queue le sommet avec la plus petite distance de sInit (on va ensuite le marqué)
 
         //On marque le sommet avec la plus petite distance depuis le sommet initial non marqué dans la queue
-        marque[minSom]=true;
+        marque[minSom]='N';
+
 
         for(const auto& a : m_sommets[minSom]->getAdjacents()){
-            if(!marque[a->getSommets().second->getNum()]){ //Si le sommet adjacent n'est pas marqué
-                //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
-                //est inférieur à la distance de l'adjacent à sInit
-                //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
-                if(distMinSom+a->getDuree() < poids[a->getSommets().second->getNum()]){
-                    poids[a->getSommets().second->getNum()]=distMinSom+a->getDuree();
-                    pred[a->getSommets().second->getNum()]=minSom; //Le pred de a est le sommet "minSom"
-                    queue.push(std::make_pair(a->getSommets().second->getNum(),poids[a->getSommets().second->getNum()]));//On ajoute a à la priority_queue
+
+                if(marque[a->getSommets().second->getNum()]!='N'){ //Si le sommet adjacent n'est pas marqué
+                    bool nePasParcourir=false;
+
+                    if(!typeAEnlever.empty()) {
+                        //Si le trajet fait partie des trajets à éviter
+                        if (aEnlever[a->getNum()]) {
+                            //et que le point adjacent a deja etait marqué
+                            //alors on ne parcourt pas -> il existe un trajet moins court MAIS qui n'est pas à éviter
+                            if (marque[a->getSommets().second->getNum()] == 'G')
+                                nePasParcourir = true;
+
+                            //Mais si l'ancien trajet pour aller à ce point est à éviter aussi
+                            //alors on passe quand meme
+                            if (aEnlever[pred[a->getSommets().second->getNum()]])
+                                nePasParcourir = false;
+                        }
+                    }
+
+                    if(!nePasParcourir){
+                        //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
+                        //est inférieur à la distance de l'adjacent à sInit
+
+                        //Alors la distance de l'adjacent à sInit devient "la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent"
+                        if(distMinSom+a->getDuree() < poids[a->getSommets().second->getNum()]
+                           || (aEnlever[pred[a->getSommets().second->getNum()]] && !aEnlever[a->getNum()]) //Ou le predecesseur est "à enlever" et celui la non
+                                ){
+                            marque[a->getSommets().second->getNum()]='G';
+                            poids[a->getSommets().second->getNum()]=distMinSom+a->getDuree();
+                            pred[a->getSommets().second->getNum()]=a->getNum(); //Le pred de a est le trajet entre les 2 points actuels
+                            queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(poids[a->getSommets().second->getNum()],aEnlever[a->getNum()])));//On ajoute a à la priority_queue
+                        }
+
+                    }
+
                 }
-            }
+
+
         }
     }
+
 
     return pred;
 }
 
-void Domaine::inititalisationChemin(std::map<int,int>& pred, std::map<int,bool>& marque){
-    //initialisation des marquages à false (non marqués)
-    //initialisation des preds, de base ils sont tous à -1
-    for(const auto& elem : m_sommets) {
-        pred[elem.first] = -1;
-        marque[elem.first] = false;
-    }
-}
-
 ///Sous-programme permettant d'effectuer le parcours BFS
 ///Renvoie le vecteur des prédécesseurs des sommets
-std::map<int,int> Domaine::parcoursBFS(const int& _num){
+std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever){
     //Initialisation des sommets
     std::map<int,int> pred;
-    std::map<int,bool> marque;
+    std::map<int,float> ordreDecouverte;
+    std::map<int,char> marque;
 
-    inititalisationChemin(pred,marque);
+    //inititalisationChemin(pred,marque);
+    for(const auto& elem : m_sommets) {
+        pred[elem.first] = -1;
+        ordreDecouverte[elem.first] = 0;
+        marque[elem.first] = 'B';
+    }
+
+
+    std::map<int,bool> aEnlever;/*----------------*/
+    /*----------------*/
+
+    for(const auto& elem: m_trajets){
+        if(std::find(typeAEnlever.begin(),typeAEnlever.end(),elem.second->getType())!=typeAEnlever.end())
+            aEnlever[elem.first]=true;
+        else
+            aEnlever[elem.first]=false;
+    }
+
+    /*----------------*/
+
+   int decouverte=0;
 
     //Création de la file vide
-    std::queue<int> file;
+    std::priority_queue<std::pair<int,std::pair<float,bool>> ,std::vector<std::pair<int,std::pair<float,bool>>> ,comparaisonDijkstraOpti> queue;
 
-    enfilerSommetBFS(file,marque,_num);//On enfile s0 (_num : le sommet initial)
 
-    while(!file.empty()){
+    //enfilerSommetBFS(file,marque,_num);//On enfile s0 (_num : le sommet initial)
+    //Création de la file vide
 
-        int sommetActu= file.front();
-        file.pop();//On défile le prochain sommet de la file
+    marque[_num]= 'N';
+    queue.push(std::make_pair(_num,std::make_pair(-1,false)));
 
+    while(!queue.empty()){
+
+        int sommetActu= queue.top().first;
+
+        queue.pop();//On défile le prochain sommet de la file
         for(auto a : m_sommets[sommetActu]->getAdjacents()){//Pour tous les sommets adjacents
 
-            if(!marque[a->getSommets().second->getNum()]){//Si le sommet adjacent n'est pas marqué
-                enfilerSommetBFS(file,marque,a->getSommets().second->getNum()); //On l'enfile (on le marque et on l'ajoute à la file)
-                pred[a->getSommets().second->getNum()]=sommetActu; //Le prédecesseur du sommet adjacent devient le sommet actuel
 
+            if(marque[a->getSommets().second->getNum()]=='B'||marque[a->getSommets().second->getNum()]=='G'){//Si le sommet adjacent n'est pas marqué 'N'
+
+
+                if(aEnlever[a->getNum()])
+                    marque[a->getSommets().second->getNum()]= 'G';
+                else
+                    marque[a->getSommets().second->getNum()]= 'N';
+
+
+
+                pred[a->getSommets().second->getNum()]=a->getNum(); //Le prédecesseur du sommet adjacent devient le trajet allant du sommet actu à ce sommet adjacent
+                queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(decouverte,aEnlever[a->getNum()])));
+                ordreDecouverte[a->getSommets().second->getNum()]=decouverte;
+                decouverte++;
             }
         }
 
@@ -534,12 +728,7 @@ std::map<int,int> Domaine::parcoursBFS(const int& _num){
     return pred;
 }
 
-///Sous programme permettant d'enfiler un sommet pour le BFS
-///Marque le sommet et l'ajoute à la file
-void Domaine::enfilerSommetBFS(std::queue<int>& file, std::map<int,bool>& marquageSommet, const int& _num){
-    file.push(_num);
-    marquageSommet[_num]= true;
-}
+
 
 
 //Getters & Setters
