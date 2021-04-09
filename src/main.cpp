@@ -3,8 +3,13 @@
 int main() {
     try{
 
+        int x = 8;
+        int y =10;
+        Domaine test;
+        test.flotMaximal(x,y);
         General projet("../data_arcs.txt");
         projet.boucle();
+
 
 
     }

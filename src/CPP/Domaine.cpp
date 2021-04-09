@@ -27,12 +27,10 @@ void Domaine::initialisation(const t_chargeFichier& fCharge){
     creationTrajets(fCharge.trajets);
 }
 
-
 void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
     for(const auto s: _som)
         m_sommets[s.num] = new Sommet(s.num,s.nom,s.altitude);
 }
-
 
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
@@ -96,7 +94,6 @@ void Domaine::afficheTrajets(const char& type, std::string trajetChoisie){
 
     std::cout << std::endl;
 }
-
 
 void Domaine::afficheSommets(const std::string& sommetChoisie){
     if(sommetChoisie=="n")
@@ -323,7 +320,6 @@ void Domaine::afficheInfo(){
 
 }
 
-
 bool Domaine::changementDuree() {
     std::string choix;
     std::string categorie;
@@ -463,7 +459,6 @@ bool Domaine::changementDuree() {
 
 }
 
-
 bool Domaine::modifDureeBD(const std::string& categorie){
     std::vector<std::string> typeD;
     std::vector<Trajet> tempTrajets;
@@ -544,7 +539,6 @@ bool Domaine::modifDureeBD(const std::string& categorie){
         std::cout << "Duree de " << tempTrajets[paramChoisi].returnNomType() <<" : " << convertSecondeHeuresMinS(m_matriceDuree[categorie[0]][typeD[paramChoisi]][0])<< std::endl;
     return true;
 }
-
 
 int Domaine::entrerUnNombrePositif(const std::string& phrase){
     std::string parametre;
@@ -728,18 +722,185 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
     return pred;
 }
 
-std::vector <Sommet> Domaine::bfsFord(const Sommet &_source, std::vector<Sommet> &vecteurPredecesseur) {
-    std::vecteur<bool> marquageSommet = initialisationMarquage();
+/*
+std::vector <int> Domaine::bfsFord(const int &_source, std::vector<int> &vecteurDecouverte) {
+    std::vector<bool> marquageSommet = initialisationMarquage();
     //Ajout du sommet source
-    vecteurPredecesseur.push_back(_source);
+    vecteurDecouverte.push_back(_source);
 
-    std::queue<Sommet> file;
+    std::vector<int> l_preds(getOrdre(),-1);
+    std::queue<int> file;
+
+    enfilerSommet(file,marquageSommet,_source);
+
+    while(!file.empty())
+    {
+        int sommetActu = file.front();
+        file.pop();
+
+        for(auto elem: m_sommets[sommetActu]->getAdjacents()){
+            if(!marquageSommet[elem->getNum()]){
+                enfilerSommet(file,marquageSommet,elem->getNum());
+                l_preds[elem->getNum()] = sommetActu;
+                vecteurDecouverte.push_back(elem->getNum());
+                std::cout << l_preds[elem->getNum()] << std::endl;
+            }
+        }
+        marquageSommet[sommetActu]= true;
+    }
+
+    return l_preds;
 }
+*/
+/*
 std::vector<bool> Domaine::initialisationMarquage(){
     std::vector<bool> marquageSommet;
     for(const auto& elem : m_sommets)
         marquageSommet.push_back(false);
     return marquageSommet;
+}
+*/
+//premier parametre la liste des sommets le deuxieme la valeur du flot maximal
+/*
+bool Domaine::bfs(const int& source, const int& puit, std::vector<int>& vecteurDecouverte){
+
+    return false;
+}*/
+
+std::vector<std::pair<int,std::pair<int,int>>> Domaine::flotMaximal(const int& source, const int& puit){
+
+    int a;
+    int k = 0;
+    //P1 : numéro du flot || P2 : valeur flot || P3 : valeur capacité
+    std::vector<std::pair<int,std::pair<int,int>>> flotTrajet;
+    for(auto& elem: m_trajets)
+    {
+        std::pair<int,std::pair<int,int>> temp;
+        temp.first = elem.first;
+        //initialisation de chaque flot a 0
+        temp.second.first = 0;
+        // initialise de chaque trajet à sa capacite en fonction du type
+        temp.second.second = valeurCapacite(elem.second->getType());
+        flotTrajet.push_back(temp);
+    }
+    std::cout << "yo";
+    while(chaineAugmentante(source,puit))
+    {
+        int m=INT_MAX;
+        for(auto& elem: m_trajets)
+        {
+
+            if(!entrant(elem.second->getSommets().first,elem.second->getSommets().second))
+            {
+                a = (valeurCapacite(elem.second->getType()) - flotTrajet[k].second.first);
+
+            }
+            if(a < m){
+                m=a;
+            }
+            k++;
+        }
+        k = 0;
+        for(auto& elem: m_trajets) {
+            if(!entrant(elem.second->getSommets().first,elem.second->getSommets().second))
+            {
+                flotTrajet[k].second.first = flotTrajet[k].second.first + m;
+            }
+            else
+                flotTrajet[k].second.first = flotTrajet[k].second.first - m;
+        }
+    }
+    return flotTrajet;
+}
+
+bool Domaine::entrant(const Sommet* sommet1, const Sommet* sommet2) {
+    for (int i = 0; i < sommet1->getAdjacents().size(); ++i) {
+        if(sommet1->getAdjacents()[i]->getNum() == sommet2->getNum())
+            return false;
+    }
+    return true;
+
+
+}
+
+bool Domaine::chaineAugmentante(const int &source, const int &puit) {
+    std::vector<std::pair<int,bool>> vecteur;
+    std::vector<int> flotCourant = {0};
+    int x,y;
+    std::vector<int> chemin;
+    chemin.push_back(source);
+    chemin.push_back(x);
+    chemin.push_back(y);
+    for (auto &elem: m_sommets){
+        if (!accessible(source, elem.first)) {
+            int z = 0;
+                 z = pred(elem.first);
+
+        }
+    }
+    // on marque le sommet source
+    std::pair<int,bool> temp;
+    temp.first = source;
+    temp.second = true;
+    vecteur.push_back(temp);
+    while(!chemin.empty() && !accessible(source,puit))
+    {
+        int i=0;
+        for (int j = 0; j < chemin.size(); ++j) {
+            if(chemin[j]==x)
+                i=j;
+
+        }
+        chemin.erase(chemin.begin()+i);
+        for (int j = 0; j < m_trajets.size(); ++j) {
+           if(m_trajets[j]->getSommets().first->getNum() == x && m_trajets[j]->getSommets().second->getNum() == y){
+               if(!accessible(source,y) && flotCourant[j] < valeurCapacite(m_trajets[j]->getType()))
+               {
+                   // X' <- X' || {y}
+                   x = pred(y);
+                   return accessible(source,y);
+               }
+           }
+        }
+
+        for (int j = 0; j < m_trajets.size(); ++j) {
+            if(m_trajets[j]->getSommets().first->getNum() == y && m_trajets[j]->getSommets().second->getNum() == x) {
+                if(!accessible(source,y) && flotCourant[j] > 0){
+                    // X' <- X' || {y}
+                    x = pred(y);
+                    return accessible(source,y);
+                }
+
+            }
+        }
+
+
+    }
+    return false;
+}
+//permet de trouver le predecesseur
+
+int Domaine::pred(const int& noeud){
+    auto it=m_trajets.find(noeud);
+
+    // return int predecesseur.
+
+}
+
+//un sommet est - il accessible depuis le sommet source
+
+//Vrai si il a un chemin entre ces deux points
+bool Domaine::accessible(const int &source, const int &noeud) {
+
+}
+/// GOOD ///
+int Domaine::valeurCapacite(std::basic_string<char> type) {
+    for(const auto& elem :getVecteurCapacite())
+    {
+        if(elem.first==type)
+            return elem.second;
+    }
+    return 0;
 }
 
 

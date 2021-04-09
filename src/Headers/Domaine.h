@@ -43,15 +43,21 @@ public:
     void afficheInfo();
 
     /***************/
-
+/*
     //Gestion des flots algo Ford
-    std::vector<Sommet> bfsFord(const Sommet& _source,std::vector<Sommet>& vecteurPredecesseur);
+    std::vector<int> bfsFord(const int& _source,std::vector<int>& vecteurDecouverte);
     std::vector<bool> initialisationMarquage();
-
-
+    void enfilerSommet(std::queue<int>& file, std::vector<bool>& marquageSommet,const int& _num);
+*/
+    std::vector <std::pair<int,std::pair<int,int>>> flotMaximal(const int& source,const int& puit);
+    bool bfs(const int& source, const int& puit, std::vector<int>& vecteurDecouverte);
     /*************/
     int entrerUnNombrePositif(const std::string &phrase);
-
+    int valeurCapacite(std::basic_string<char> type);
+    bool chaineAugmentante(const int& source, const int& puit);
+    bool accessible(const int& source, const int& noeud);
+    int pred(const int& noeud);
+    bool entrant(const Sommet* sommet1, const Sommet* sommet2);
 
     //Getters & Setters
     void setOrdre(int _ordre);
