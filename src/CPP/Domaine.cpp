@@ -59,11 +59,12 @@ void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
         m_trajets[t.num] = new Trajet(t.num,t.nom,t.type,m_sommets[t.depart],m_sommets[t.arrivee],m_matriceDuree);
-        m_sommets[t.depart]->setAdjactent(m_trajets[t.num]);
+        m_sommets[t.depart]->setSortant(m_trajets[t.num]);
+        m_sommets[t.arrivee]->setEntrant(m_trajets[t.num]);
     }
 
     for(auto& elem: m_sommets){
-        elem.second->trierAdjacents();
+        elem.second->trierSortants();
     }
 
 }
@@ -632,7 +633,7 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
         marque[minSom]='N';
 
 
-        for(const auto& a : m_sommets[minSom]->getAdjacents()){
+        for(const auto& a : m_sommets[minSom]->getSortants()){
 
                 if(marque[a->getSommets().second->getNum()]!='N'){ //Si le sommet adjacent n'est pas marqué
                     bool nePasParcourir=false;
@@ -723,7 +724,7 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
         int sommetActu= queue.top().first;
 
         queue.pop();//On défile le prochain sommet de la file
-        for(auto a : m_sommets[sommetActu]->getAdjacents()){//Pour tous les sommets adjacents
+        for(auto a : m_sommets[sommetActu]->getSortants()){//Pour tous les sommets adjacents
 
 
             if(marque[a->getSommets().second->getNum()]=='B'||marque[a->getSommets().second->getNum()]=='G'){//Si le sommet adjacent n'est pas marqué 'N'
@@ -749,6 +750,148 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
 
     return pred;
 }
+
+std::map<int,std::pair<int,bool>> Domaine::BFSFord(std::map<int, int>& flot,const int& initial,std::map<int,int>& sigma){
+    //Initialisation des sommets
+    std::map<int,std::pair<int,bool>> pred;
+    std::map<int,bool> marque;
+    //int capacite[] = {11,12,1,12,11,4,19,7}; capacite[t->getNum()-1]
+
+    //Initialisation des sommets (predecesseurs & marquage)
+    for(const auto& elem : m_sommets) {
+        pred[elem.first].first = -1;
+        pred[elem.first].second =true;
+        marque[elem.first] = false;
+
+    }
+
+    for(const auto& elem : m_trajets) {
+        sigma[elem.first] = INT_MAX;
+    }
+
+    //Création de la file vide
+    std::queue<int> file;
+    file.push(initial); //On enfile le sommet initial
+    marque[initial]=true; //On marque le sommet initial
+
+    while(!file.empty()){ ///Ajoute ou pred[Final] !=-1
+
+        int sommetActu= file.front();
+        file.pop();//On défile le prochain sommet de la file
+
+        for(auto t : m_sommets[sommetActu]->getSortants()){//Pour tous les sommets sortants
+
+
+            if(!marque[t->getSommets().second->getNum()]){//Si le sommet adjacent n'est pas marqué
+                if(flot[t->getNum()] < m_vecteurCapacite[t->getType()]){ ///m_vecteurCapacite[t->getType()]
+                    file.push(t->getSommets().second->getNum());
+                    marque[t->getSommets().second->getNum()]=true;
+
+                    pred[t->getSommets().second->getNum()].first=t->getNum(); //Le prédecesseur du sommet adjacent devient le sommet actuel
+                    pred[t->getSommets().second->getNum()].second=true; //Le prédecesseur du sommet adjacent devient le sommet actuel
+
+                    sigma[t->getNum()] =m_vecteurCapacite[t->getType()]- flot[t->getNum()];
+                }
+            }
+        }
+
+        for(auto t : m_sommets[sommetActu]->getEntrants()){//Pour tous les sommets entrants
+
+            if(!marque[t->getSommets().first->getNum()]){//Si le sommet adjacent n'est pas marqué
+                if(flot[t->getNum()] > 0){
+                    file.push(t->getSommets().first->getNum());
+                    marque[t->getSommets().first->getNum()]=true;
+                    pred[t->getSommets().first->getNum()].first=t->getNum(); //Le prédecesseur du sommet adjacent devient le sommet actuel
+                    pred[t->getSommets().first->getNum()].second=false; //Le prédecesseur du sommet adjacent devient le sommet actuel
+                    sigma[t->getNum()] = flot[t->getNum()];
+                }
+            }
+        }
+
+        //s devient exploré (marqué)
+        marque[sommetActu]=true;
+    }
+
+    return pred;
+}
+
+
+
+
+std::map<int, int> Domaine::fordFulkerson(const int& initial,const int& final){
+    std::map<int, int> flot;
+
+    for(auto& s : m_trajets){
+        flot[s.first] = 0;
+    }
+
+    std::map<int,std::pair<int,bool>> pred;
+    std::map<int,int> sigma;
+    while(chaineAugmentante(flot,initial,final,pred,sigma)){
+        std::vector<std::pair<int,bool>> listeTrajets;
+
+        bool cheminPossible=true;
+        getPlusCourtCheminBFSFord(pred[final].first,pred,initial,listeTrajets,cheminPossible);
+        int augmentationFlotActu=INT_MAX;
+
+
+        //On trouve le minimum pour l'augmentation des flots des trajets de la chaine augmentante
+        for(const auto& trajet : listeTrajets){
+            if(abs(sigma[trajet.first]) < augmentationFlotActu)
+                augmentationFlotActu = abs(sigma[trajet.first]);
+        }
+
+        for(const auto& trajet : listeTrajets){
+            if(trajet.second)
+                flot[trajet.first]+=augmentationFlotActu;
+            else
+                flot[trajet.first]-=augmentationFlotActu;
+        }
+    }
+    return flot;
+}
+
+void Domaine::calculFlotMaximal(const int& initial,const int& final){
+    std::map<int, int> flot = fordFulkerson(initial,final);
+
+    int flotMaximal=0;
+
+    for(const auto& elem : m_sommets[final]->getEntrants()){ //Pour tous les trajets entrant au sommet final
+        //On augmente le flot maximal par le flot du trajet
+        flotMaximal+= flot[elem->getNum()];
+    }
+
+    std::cout << flotMaximal << std::endl;
+
+}
+void Domaine::getPlusCourtCheminBFSFord(int i,  std::map<int,std::pair<int,bool>>& pred, const int& initial,std::vector<std::pair<int,bool>>& listeTrajets,bool& cheminPossible){
+
+    if(i==-1)
+        cheminPossible=false;
+
+    else
+    {
+        listeTrajets.push_back(std::make_pair(pred[m_trajets[i]->getSommets().second->getNum()].first,pred[m_trajets[i]->getSommets().second->getNum()].second)); //On ajoute le trajet à la file
+        if(initial!=m_trajets[i]->getSommets().first->getNum()){
+            getPlusCourtCheminBFSFord(pred[m_trajets[i]->getSommets().first->getNum()].first, pred,initial,listeTrajets,cheminPossible);
+
+        }
+    }
+}
+
+
+bool Domaine::chaineAugmentante(std::map<int, int>& flot,const int& initial,const int& final,std::map<int,std::pair<int,bool>>& pred,std::map<int,int>& sigma){
+    sigma.clear();
+    pred= BFSFord(flot,initial,sigma);
+
+    if(pred[final].first!=-1) //Si le sommet final est marque
+    {
+
+        return true;
+    }
+    return false;
+}
+
 
 
 void Domaine::interactionCapaciteFlot(const bool& estAdmin){
@@ -780,10 +923,12 @@ void Domaine::afficherCapaciteFlot(const bool& estAdmin){
 
 
     std::cout << "Type                                 Capacite (en skieur/heure) " <<std::endl;
-    for(int i =0; i < getVecteurCapacite().size(); i ++)
+
+    for(const auto& elem : m_vecteurCapacite)
     {
-        Trajet temp=Trajet(getVecteurCapacite()[i].first);
-        std::cout << temp.returnNomType() << "                              " << getVecteurCapacite()[i].second << std::endl;
+        Trajet temp=Trajet(elem.first);
+        std::cout << temp.returnNomType() << "                              " << elem.second << std::endl;
+
     }
 
     std::cout << std::endl<< "Appuyez sur \"s\" pour revenir au menu " << std::endl;
@@ -809,11 +954,12 @@ void Domaine::modifCapaciteAdmin() {
 
         std::cout << " Parametre \t        Type \t   \t Capacite (en skieur/heure) " <<std::endl;
         std::cout <<"-------------------------------------------------------------------------------------------" << std::endl;
-
-        for(int i =0; i < getVecteurCapacite().size(); i ++)
+        int i=0;
+        for(const auto& elem : m_vecteurCapacite)
         {
-            Trajet temp=Trajet(getVecteurCapacite()[i].first);
-            std::cout << " " << i<< "                  "  << temp.returnNomType() << "                              " << getVecteurCapacite()[i].second << std::endl;
+            Trajet temp=Trajet(elem.first);
+            std::cout << " " << i<< "                  "  << temp.returnNomType() << "                              " << elem.second << std::endl;
+            i++;
         }
 
 
@@ -836,19 +982,25 @@ void Domaine::modifCapaciteAdmin() {
     }while(!fin);
 
     int choixType=std::stoi(parametre);
+
+
+    std::vector<std::string> typesOrdre;
+    for(const auto& elem : m_vecteurCapacite){
+        typesOrdre.push_back(elem.first);
+    }
     std::system("cls || clear");
     do{
 
-        Trajet temp=Trajet(getVecteurCapacite()[choixType].first);
+        Trajet temp=Trajet(typesOrdre[choixType]);
         std::cout << "Vous avez decide de modifer la capacite de: " << temp.returnNomType() << std::endl<<std::endl;
 
-        std::cout  << "Ancienne valeur :" << getVecteurCapacite()[choixType].second << " skieurs/heure" << std::endl;
+        std::cout  << "Ancienne valeur :" << getVecteurCapacite()[typesOrdre[choixType]] << " skieurs/heure" << std::endl;
         std::cout << "Nouvelle valeur :" ;
         std::cin >> parametre;
 
     }while(!estNombre(parametre));
 
-    m_vecteurCapacite[choixType].second = std::stoi(parametre);
+    m_vecteurCapacite[typesOrdre[choixType]] = std::stoi(parametre);
     reecrireFichierCapacite();
 
 
@@ -884,14 +1036,14 @@ t_mapDuree& Domaine::getMatriceDuree()
 {
     return m_matriceDuree;
 }
-std::vector<std::pair<std::string,int>>& Domaine::getVecteurCapacite(){
+std::map<std::string,int>& Domaine::getVecteurCapacite(){
     return m_vecteurCapacite;
 }
 
 void Domaine::setVecteurCapacite(const std::pair<std::string,int> _pairCapacite)
 {
+    m_vecteurCapacite[_pairCapacite.first] = _pairCapacite.second;
 
-    getVecteurCapacite().push_back(_pairCapacite);
 }
 float Domaine::getHoraire() {
     return m_horaire;

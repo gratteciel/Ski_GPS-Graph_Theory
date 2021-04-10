@@ -17,8 +17,8 @@ private:
     int m_ordre; // nombre de sommmets
     int m_taille; // nombre d'arcs
     t_mapDuree m_matriceDuree;
-    std::vector<std::pair<std::string,int>> m_vecteurCapacite;
     float m_horaire;
+    std::map<std::string,int> m_vecteurCapacite;
 
 
 public:
@@ -46,30 +46,35 @@ public:
     void interactionCapaciteFlot(const bool& estAdmin);
     int entrerUnNombrePositif(const std::string &phrase);
     void reecrireFichierCapacite();
-
+    std::map<int,std::pair<int,bool>> BFSFord(std::map<int, int>& flot,const int& initial,std::map<int,int>& sigma);
+    bool modifDureeBD(const std::string &categorie);
+    std::map<int,int> dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever = std::vector<std::string>());
+    std::map<int,int> parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever= std::vector<std::string>());
+    void modifCapaciteAdmin();
+    std::map<int, int> fordFulkerson(const int& initial,const int& final);
     //Getters & Setters
     void setOrdre(int _ordre);
     void setTaille(int _taille);
     int getOrdre() const;
     int getTaille() const;
     t_mapDuree& getMatriceDuree();
-    std::vector<std::pair<std::string, int>>& getVecteurCapacite();
+    std::map<std::string,int>& getVecteurCapacite();
     void setVecteurCapacite(const std::pair<std::string,int> _vecteurCapacite);
 
 
-    bool modifDureeBD(const std::string &categorie);
+    int minimum(const int &a, const int &b);
 
-    std::map<int,int> dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever = std::vector<std::string>());
+    bool chaineAugmentante(std::map<int, int>& flot,const int& initial,const int& final,std::map<int,std::pair<int,bool>>& pred,std::map<int,int>& sigma);
 
-    std::map<int,int> parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever= std::vector<std::string>());
-
-    void modifCapaciteAdmin();
+    void getPlusCourtCheminBFSFord(int i,std::map<int, std::pair<int, bool>>& pred, const int &initial,
+                                   std::vector<std::pair<int,bool>>& listeTrajets, bool &cheminPossible);
 
     /// Concernant les horaires ///
     void horaire();
     float initialisationHoraire();
     float getHoraire();
 
+    void calculFlotMaximal(const int &initial, const int &final);
 };
 
 
