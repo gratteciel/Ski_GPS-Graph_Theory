@@ -18,6 +18,7 @@ private:
     int m_taille; // nombre d'arcs
     t_mapDuree m_matriceDuree;
     std::vector<std::pair<std::string,int>> m_vecteurCapacite;
+    float m_horaire;
 
 
 public:
@@ -63,6 +64,12 @@ public:
     std::map<int,int> parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever= std::vector<std::string>());
 
     void modifCapaciteAdmin();
+
+    /// Concernant les horaires ///
+    void horaire();
+    float initialisationHoraire();
+    float getHoraire();
+
 };
 
 

@@ -10,6 +10,7 @@ Domaine::Domaine() {
     m_matriceDuree['B'];
     m_matriceDuree['R'];
     m_matriceDuree['D'];
+    m_horaire = initialisationHoraire();
 }
 
 Domaine::~Domaine(){
@@ -27,6 +28,27 @@ void Domaine::initialisation(const t_chargeFichier& fCharge){
     creationTrajets(fCharge.trajets);
 }
 
+float Domaine::initialisationHoraire() {
+    int heure = 0;
+    int minute = 0;
+    int seconde = 0;
+    int horaire;
+    srand(time(NULL));
+    heure = rand()%(16-7+1)+9;
+    minute = rand()%(59-0+1)+0;
+    seconde = rand()%(59-0+1)+0;
+    horaire = heure * 3600;
+    horaire += minute * 60;
+    horaire += seconde;
+    return horaire;
+
+}
+
+void Domaine::horaire() { //programme qui affiche l'heure au début du programme
+
+    std::cout << "Il est :" << convertSecondeHeuresMinS(getHoraire()) << std::endl;
+
+}
 
 void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
     for(const auto s: _som)
@@ -96,7 +118,6 @@ void Domaine::afficheTrajets(const char& type, std::string trajetChoisie){
 
     std::cout << std::endl;
 }
-
 
 void Domaine::afficheSommets(const std::string& sommetChoisie){
     if(sommetChoisie=="n")
@@ -269,9 +290,13 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
             if(complexe){
                 std::cout <<std::endl;
                 std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+                std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
             }
             else
+            {
                 std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
+                std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+            }
         }
         else
             std::cout << std::endl;
@@ -322,7 +347,6 @@ void Domaine::afficheInfo(){
     std::cout << " dont " << traj['D'] << " pistes, " << traj['R']<< " remontees et " << traj['B'] << " navettes" <<std::endl;
 
 }
-
 
 bool Domaine::changementDuree() {
     std::string choix;
@@ -463,7 +487,6 @@ bool Domaine::changementDuree() {
 
 }
 
-
 bool Domaine::modifDureeBD(const std::string& categorie){
     std::vector<std::string> typeD;
     std::vector<Trajet> tempTrajets;
@@ -544,7 +567,6 @@ bool Domaine::modifDureeBD(const std::string& categorie){
         std::cout << "Duree de " << tempTrajets[paramChoisi].returnNomType() <<" : " << convertSecondeHeuresMinS(m_matriceDuree[categorie[0]][typeD[paramChoisi]][0])<< std::endl;
     return true;
 }
-
 
 int Domaine::entrerUnNombrePositif(const std::string& phrase){
     std::string parametre;
@@ -870,5 +892,8 @@ void Domaine::setVecteurCapacite(const std::pair<std::string,int> _pairCapacite)
 {
 
     getVecteurCapacite().push_back(_pairCapacite);
+}
+float Domaine::getHoraire() {
+    return m_horaire;
 }
 
