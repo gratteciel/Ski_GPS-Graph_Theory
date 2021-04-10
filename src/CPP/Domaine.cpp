@@ -34,9 +34,9 @@ float Domaine::initialisationHoraire() {
     int seconde = 0;
     int horaire;
     srand(time(NULL));
-    heure = rand()%(16-7+1)+9;
-    minute = rand()%(59-0+1)+0;
-    seconde = rand()%(59-0+1)+0;
+    heure = rand()%(19-7+1);
+    minute = rand()%(59-0+1);
+    seconde = rand()%(59-0+1);
     horaire = heure * 3600;
     horaire += minute * 60;
     horaire += seconde;
@@ -54,7 +54,6 @@ void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
     for(const auto s: _som)
         m_sommets[s.num] = new Sommet(s.num,s.nom,s.altitude);
 }
-
 
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
@@ -230,6 +229,7 @@ std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
 void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe){
     std::vector<int> listeTrajets;
     bool cheminPossible=true;
+    float heureMax = 68400; // = 19h
 
     getPlusCourtCheminRecursif(pred[sF],pred,s0,listeTrajets,cheminPossible);
 
@@ -291,12 +291,29 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
             if(complexe){
                 std::cout <<std::endl;
                 std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
-                std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+                if(getHoraire()+poids > heureMax)
+                {
+                    std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
+                }
+                else
+                {
+                    std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+
+                }
+
             }
             else
             {
                 std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
-                std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+                if(getHoraire()+poids > heureMax)
+                {
+                    std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
+                }
+                else
+                {
+                    std::cout << "\tArrivee a :" << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+
+                }
             }
         }
         else
@@ -815,9 +832,6 @@ std::map<int,std::pair<int,bool>> Domaine::BFSFord(std::map<int, int>& flot,cons
     return pred;
 }
 
-
-
-
 std::map<int, int> Domaine::fordFulkerson(const int& initial,const int& final){
     std::map<int, int> flot;
 
@@ -864,6 +878,7 @@ void Domaine::calculFlotMaximal(const int& initial,const int& final){
     std::cout << flotMaximal << std::endl;
 
 }
+
 void Domaine::getPlusCourtCheminBFSFord(int i,  std::map<int,std::pair<int,bool>>& pred, const int& initial,std::vector<std::pair<int,bool>>& listeTrajets,bool& cheminPossible){
 
     if(i==-1)
@@ -892,10 +907,7 @@ bool Domaine::chaineAugmentante(std::map<int, int>& flot,const int& initial,cons
     return false;
 }
 
-
-
 void Domaine::interactionCapaciteFlot(const bool& estAdmin){
-
 
     std::string parametre;
     bool fin=false;
@@ -919,6 +931,7 @@ void Domaine::interactionCapaciteFlot(const bool& estAdmin){
     if(parametre=="m" && estAdmin)
         modifCapaciteAdmin();
 }
+
 void Domaine::afficherCapaciteFlot(const bool& estAdmin){
 
 
@@ -938,6 +951,7 @@ void Domaine::afficherCapaciteFlot(const bool& estAdmin){
 
 
 }
+
 void Domaine::modifCapaciteAdmin() {
 
 
@@ -1005,6 +1019,7 @@ void Domaine::modifCapaciteAdmin() {
 
 
 }
+
 void Domaine::reecrireFichierCapacite(){
     std::ofstream fichier ("../capacite.txt");
     fichier << 12 << std::endl;
