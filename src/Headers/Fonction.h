@@ -2,6 +2,10 @@
 // Created by mathis on 11/04/2021.
 //
 
+/*
+ * Source pour les couleurs : https://stackoverflow.com/questions/20608058/c-colour-console-text
+ */
+
 #ifndef SKIPISCINE_FONCTION_H
 #define SKIPISCINE_FONCTION_H
 #include <iostream>

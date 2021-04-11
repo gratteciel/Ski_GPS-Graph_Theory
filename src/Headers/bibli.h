@@ -11,10 +11,6 @@
 
 
 
-
-
-
-
 #include "Fonction.h"
 #include <vector>
 #include <map>

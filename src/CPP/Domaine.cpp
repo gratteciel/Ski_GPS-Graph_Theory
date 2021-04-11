@@ -5,7 +5,8 @@
 
 #include "../Headers/Domaine.h"
 
-//Constructeur & destructeur
+//Constructeurs & destructeur
+///Contrustructeur de base du domaine
 Domaine::Domaine() {
     m_matriceDuree['B'];
     m_matriceDuree['R'];
@@ -13,14 +14,17 @@ Domaine::Domaine() {
     m_horaire = initialisationHoraire();
 }
 
+///Contrustructeur pour les graphes d'écarts
 Domaine::Domaine(const t_mapDuree& _matriceDuree, const std::map<std::string,int>& _vecteurCapacite,const float& _horaire)
         :m_matriceDuree(_matriceDuree),m_vecteurCapacite(_vecteurCapacite),m_horaire(_horaire)
 {
 
 }
 
-
+///Destructeur du domaine
 Domaine::~Domaine(){
+    //On libère la mémoire des sommets & des trajets
+
     for(auto s : m_sommets)
         delete s.second;
 
@@ -29,22 +33,24 @@ Domaine::~Domaine(){
 }
 
 //Méthodes
-
+///Méthode permettant d'initialiser un domaine
 void Domaine::initialisation(const t_chargeFichier& fCharge){
-    creationSommets(fCharge.sommets);
-    creationTrajets(fCharge.trajets);
+    creationSommets(fCharge.sommets);//Creer les sommets
+    creationTrajets(fCharge.trajets);//Creer les Trajets (arcs)
 }
 
+///Méthode permettant de definier l'heure du programme
 float Domaine::initialisationHoraire() {
     int heure = 0;
     int minute = 0;
     int seconde = 0;
     int horaire;
 
+    //Le domaine est ouvert entre 7h et 19h
     heure = 7 + rand()%(18
-            -7+1);
-    minute = rand()%(59-0+1);
-    seconde = rand()%(59-0+1);
+            -7+1); //Heure aléatoire entre 7 et 18h
+    minute = rand()%(59-0+1);  //Minute aléatoire entre 0 et 59 minutes
+    seconde = rand()%(59-0+1); //Seconde aléatoire entre 0 et 59 minutes
     horaire = heure * 3600;
     horaire += minute * 60;
     horaire += seconde;
@@ -52,41 +58,44 @@ float Domaine::initialisationHoraire() {
 
 }
 
-void Domaine::horaire() { //programme qui affiche l'heure au début du programme
-
+///Méthode permettant d'afficher l'heure au début du programme
+void Domaine::horaire() {
     std::cout << "Il est: " << convertSecondeHeuresMinS(getHoraire()) << std::endl;
-
 }
 
+///Méthode permettant de creer les sommets
 void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
     for(const auto s: _som)
         m_sommets[s.num] = new Sommet(s.num,s.nom,s.altitude);
 }
 
+///Méthode permettant de creer les trajets (arcs)
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
         m_trajets[t.num] = new Trajet(t.num,t.nom,t.type,m_sommets[t.depart],m_sommets[t.arrivee],m_matriceDuree);
-        m_sommets[t.depart]->setSortant(m_trajets[t.num]);
-        m_sommets[t.arrivee]->setEntrant(m_trajets[t.num]);
+        m_sommets[t.depart]->setSortant(m_trajets[t.num]); //Le trajet t est un trajet sortant au sommet de depart de t
+        m_sommets[t.arrivee]->setEntrant(m_trajets[t.num]);//Le trajet t est un trajet entrant au sommet d'arrivee de t
     }
 
-    for(auto& elem: m_sommets){
+    for(auto& elem: m_sommets){ //On trie les trajets sortant dans les sommets selon leurs numéro (pour + de cohérence lors d'un BFS)
         elem.second->trierSortants();
     }
 
 }
 
+///Méthode prenant en parametre un string et retourne si le string peut etre considérer comme un nombre
 bool Domaine::estNombre(const std::string& str)
 {
-    for (char const &c : str) {
-        if (std::isdigit(c) == 0)
+    for (char const &c : str) {//Pour tous les caracteres du string
+        if (std::isdigit(c) == 0) //si le caractere c du string est entre '0' et '9'
             return false;
     }
     return true;
 }
 
+///Méthode permettant d'afficher tous les trajets ou que les trajets choisies selon le parametre
 void Domaine::afficheTrajets(const char& type, std::string trajetChoisie){
-    if(type=='T'){
+    if(type=='T'){ //Permet d'afficher un seul trajet selon le parametre trajet choisie
 
         bool existe=true;
         if(estNombre(trajetChoisie)){
@@ -118,7 +127,7 @@ void Domaine::afficheTrajets(const char& type, std::string trajetChoisie){
         for(const auto t : m_trajets)
             t.second->affichage();
     }
-    else
+    else //Si on veut afficher tous les trajets
         for(const auto t : m_trajets){
             if(t.second->getGType() == type)
                 t.second->affichage();
@@ -127,11 +136,12 @@ void Domaine::afficheTrajets(const char& type, std::string trajetChoisie){
     std::cout << std::endl;
 }
 
+///méthode permettant d'afficher les sommets
 void Domaine::afficheSommets(const std::string& sommetChoisie){
-    if(sommetChoisie=="n")
+    if(sommetChoisie=="n") //Si on veut afficher tous les sommets
         for(const auto s : m_sommets)
             s.second->affichage();
-    else{
+    else{ //Si on veut afficher un somme ten particulier
 
         int point = entreePoint("Nom ou numero du point: ");
         m_sommets[point]->affichageComplexe(m_trajets);
@@ -140,6 +150,7 @@ void Domaine::afficheSommets(const std::string& sommetChoisie){
 
 }
 
+///Méthode permettant d'entrer un point
 int Domaine::entreePoint(const std::string& phrase){
     int s0Int=-2;
     std::string s0;
@@ -156,6 +167,7 @@ int Domaine::entreePoint(const std::string& phrase){
     return s0Int;
 }
 
+///Méthode permettant de retourner l'ID d'un point selon le string entree (rechercher par numéro et par nom)
 int Domaine::returnPointId(const std::string& entree){
 
     if(estNombre(entree)){
@@ -175,30 +187,31 @@ int Domaine::returnPointId(const std::string& entree){
     return -1;
 }
 
+///Méthode permettant d'effectuer le plus court chemin entre 2 points s0 et sF (peut etre BFS, dijkstra optimisés ou pas)
 void Domaine::plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets, int s0, int sF, const bool& estGrapheEcart){
     std::map<int,float> poids;
     std::map<int,int> pred;
     std::vector<std::string> typeAEnlever;
 
-    if(estOpti){
-        for(const auto& e : optiTrajets){
+    if(estOpti){ //Si le trajet est optimisé
+        for(const auto& e : optiTrajets){ //On prend en compte les trajets à éviter
             if(e.second)
                 typeAEnlever.push_back(e.first);
         }
     }
 
 
-    if(estDijkstra)
+    if(estDijkstra)//Si plus court chemin en temps
         pred=dijkstraOpti(s0,poids,typeAEnlever,estGrapheEcart);
-    else{
+    else{//Si plus court chemin en nombre de trajets
         pred=parcoursBFSOpti(s0,typeAEnlever,estGrapheEcart);
         for(const auto& elem : m_sommets)
             poids[elem.first]=-5;
     }
 
-    if(sF!=-5)
+    if(sF!=-5) //Si on veut afficher le plus court chemin entre 2 points
         affichePlusCourtChemin(s0,sF,pred,poids[sF],estOpti,optiTrajets,true,estGrapheEcart);
-    else{
+    else{ //Si on veut afficher le plus court chemin entre 1 point et tous les autres
         std::cout <<
         "---------------------------------------------------------------------------------------"<<std::endl;
         std::cout << " Point |  Chemin (liste de trajets)"<<std::endl;
@@ -211,6 +224,7 @@ void Domaine::plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const 
     }
 }
 
+///Méthode permettant de convertir des secondes en heures/minutes/secondes
 std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
 
     float minutes = seconde / 60;
@@ -234,6 +248,7 @@ std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
     }
 }
 
+///Méthode permettant d'afficher le plus chemin entre 2 points
 void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe,const bool& estGrapheEtat){
     std::vector<int> listeTrajets;
     bool cheminPossible=true;
@@ -302,11 +317,11 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
                     std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
                     if(getHoraire()+poids > heureMax)
                     {
-                        std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
+                        std::cout << "   Arrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
                     }
                     else
                     {
-                        std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+                        std::cout << "   Arrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
 
                     }
                 }
@@ -315,20 +330,17 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
                     std::cout << std::endl<<"   Nombre de skieurs sur le chemin: "  << poids << std::endl<<std::endl;
 
 
-
-
-
             }
             else
             {
                 std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
                 if(getHoraire()+poids > heureMax)
                 {
-                    std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
+                    std::cout << "       |  Arrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
                 }
                 else
                 {
-                    std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+                    std::cout << "       |  Arrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
 
                 }
             }
@@ -367,16 +379,19 @@ void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const in
     }
 }
 
+///Méthode permettant d'afficher les infos du domaine skiable
 void Domaine::afficheInfo(){
     std::map<char, int> traj;
 
     traj['D']=0;
     traj['R']=0;
     traj['B']=0;
+    //On compte le nombre de pistes, remontées et navettes
     for(const auto& t: m_trajets)
         traj[t.second->getGType()]+=1;
     std::cout <<"----------------------------------" << std::endl;
-    std::cout <<  "    Information sur le domaine   " << std::endl;
+    print("    Information sur le domaine   ",color_dark_blue);
+    std::cout << std::endl;
     std::cout << "----------------------------------" << std::endl<<std::endl;
     std::cout << "Le domaine skiable possede " << getOrdre() << " points" << std::endl;
     std::cout << "et " << getTaille() << " trajets";
@@ -384,6 +399,7 @@ void Domaine::afficheInfo(){
 
 }
 
+///Méthode permettant de changer les durées
 bool Domaine::changementDuree() {
     std::string choix;
     std::string categorie;
@@ -391,8 +407,6 @@ bool Domaine::changementDuree() {
         std::system("clear || cls");
         std::cout << "Choississez une categorie pour afficher ses valeurs: " << std::endl;
         //affichage de tous les types
-
-
 
         std::cout << "D : Descentes (pistes)" <<std::endl;
         std::cout << "R : Remontee" <<std::endl;
@@ -409,9 +423,6 @@ bool Domaine::changementDuree() {
     int i=0;
 
     std::system("clear || cls");
-
-
-
 
 
     if(it->first=='D' || it->first=='B'){
@@ -528,10 +539,9 @@ bool Domaine::changementDuree() {
 
 
 void Domaine::finProgrammeActu(const std::string& phrase){
-    std::cout <<std::endl<< phrase;
-
+    std::cout << std::endl;
+    print(phrase,color_dark_green);
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
 }
 
 
@@ -622,6 +632,7 @@ bool Domaine::modifDureeBD(const std::string& categorie){
     return true;
 }
 
+///Méthode permettant de rentrer un nombre =
 int Domaine::entrerUnNombrePositif(const std::string& phrase){
     std::string parametre;
     do{
@@ -633,6 +644,7 @@ int Domaine::entrerUnNombrePositif(const std::string& phrase){
     return std::stoi(parametre);
 }
 
+///Méthode permettant de faire l'algorithle de dijkstra en optimisé et en non optimisé
 std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever, const bool& estGrapheEcart) {
     std::map<int,int> pred;
 
@@ -736,7 +748,7 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
     return pred;
 }
 
-///Sous-programme permettant d'effectuer le parcours BFS
+///Sous-programme permettant d'effectuer le parcours BFS en optimisé ou en non optimisé
 ///Renvoie le vecteur des prédécesseurs des sommets
 std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever,const bool& estGrapheEcart){
     //Initialisation des sommets
@@ -810,6 +822,7 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
     return pred;
 }
 
+///Méthode permettant de faire le BFS pour Ford (permet de trouver une chaine augmentante)
 std::map<int,std::pair<int,bool>> Domaine::BFSFord(const int& initial,const int& final,std::map<int,int>& sigma){
     //Initialisation des sommets
     std::map<int,std::pair<int,bool>> pred;
@@ -873,7 +886,7 @@ std::map<int,std::pair<int,bool>> Domaine::BFSFord(const int& initial,const int&
     return pred;
 }
 
-
+///Sous-Programme permettant d'effectuer l'alogrithme de fold fulkerson
 std::map<int,bool> Domaine::fordFulkerson(const int& initial,const int& final){
     std::map<int,bool> numTrajetsParcouru;
     //On initialise tous les flots à 0
@@ -887,7 +900,7 @@ std::map<int,bool> Domaine::fordFulkerson(const int& initial,const int& final){
     std::map<int,int> sigma;
 
     bool fin=false;
-    //Tant qu'on trouve une chaine augmentante
+
 
     do{
         if(!chaineAugmentante(initial,final,pred,sigma)){ //Si il n'y a pas de nouvelle chaine augmentante entre les 2 points
@@ -926,31 +939,32 @@ std::map<int,bool> Domaine::fordFulkerson(const int& initial,const int& final){
 
         }
 
-    }while(!fin);
+    }while(!fin);//Tant qu'on trouve une chaine augmentante
 
     return numTrajetsParcouru;
 }
 
+///Sous-programme permettant de calculer le flot maximal
 void Domaine::calculFlotMaximal(const int& final,int& flotMax){
     flotMax=0;
-
     for(const auto& elem : m_sommets[final]->getEntrants()){ //Pour tous les trajets entrant au sommet final
         //On augmente le flot maximal par le flot du trajet
         flotMax+=  elem->getFlot();
-
     }
-
 }
 
+///Sous-programme permttant d'effectuer d'effectuer les fonctionnalités du 4.6
 void Domaine::algosQuatreSix(const int& initial,const int& final){
 
+    //On fait l'algo de ford fulkerson
     std::map<int,bool> trajetsParcouru = fordFulkerson(initial,final);
 
     int flotTotal=0;
     std::string phrase;
+    //On calcule le flot maximal
     calculFlotMaximal(final,flotTotal);
 
-    if(flotTotal==0){
+    if(flotTotal==0){ //Si le flot est egal à 0 alors il est impossible de lier les 2 points
         std::cout << std::endl << "Flot impossible! Impossible de lier les 2 points.... " << std::endl;
         finProgrammeActu("Appuyez sur entree pour revenir au menu.....");
     }
@@ -959,6 +973,7 @@ void Domaine::algosQuatreSix(const int& initial,const int& final){
 
         finProgrammeActu("Appuyez sur entree pour afficher le graphe d'ecart deduit......");
 
+        //Permet de creer le graphe d'écart
         Domaine gE = Domaine(m_matriceDuree,m_vecteurCapacite,m_horaire);
         gE.creationGrapheEcart(m_trajets,trajetsParcouru);
 
@@ -1017,7 +1032,7 @@ void Domaine::algosQuatreSix(const int& initial,const int& final){
 }
 
 
-
+///Méthode permettant de creer un graphe d'ecart
 void Domaine::creationGrapheEcart(const std::map<int, Trajet*>& _trajets,std::map<int,bool>& trajetsParcouru){
     std::system("cls || clear");
     //On cree les sommets du graphe d'écart
@@ -1036,14 +1051,14 @@ void Domaine::creationGrapheEcart(const std::map<int, Trajet*>& _trajets,std::ma
     for(const auto& t : _trajets)
     {
         if(trajetsParcouru[t.first]){
-            if( m_vecteurCapacite[t.second->getType()] > t.second->getFlot()){ // m_vecteurCapacite[t.second->getType()]
+            if( m_vecteurCapacite[t.second->getType()] > t.second->getFlot()){ //Si le trajet n'est pas saturé alors on créer un arc direct
 
                 m_trajets[t.second->getNum()] = new Trajet(t.second->getNum(),t.second->getNom(),t.second->getType(),m_sommets[t.second->getSommets().first->getNum()],m_sommets[t.second->getSommets().second->getNum()],m_vecteurCapacite[t.second->getType()]  - t.second->getFlot(),'D');
                 m_sommets[t.second->getSommets().first->getNum()]->setSortant(m_trajets[t.second->getNum()]);
                 m_sommets[t.second->getSommets().second->getNum()]->setEntrant(m_trajets[t.second->getNum()]);
 
             }
-            if(t.second->getFlot()>0){
+            if(t.second->getFlot()>0){//Si le trajet a un flot supérieur à 0 alors on créé un trajet indirect
                 int i=1;
                 while(m_trajets.find(i)!=m_trajets.end()){
                     i++;
@@ -1073,7 +1088,8 @@ bool Domaine::afficheGrapheEcart(){
 
     for(const auto& t : m_trajets){
         if(t.second->getGType()=='D'){
-            std::cout <<t.second->getNom() <<": " << t.second->returnNomType();
+            print(t.second->getNom(),t.second->retourneCouleurType());
+            std::cout  <<": (" << t.second->returnNomType();
             std::cout << " allant du point " <<t.second->getSommets().first->afficheSimple() << " a "  << t.second->getSommets().second->afficheSimple() << " de valeur "<< t.second->getDuree() << " skieurs " <<  std::endl;
             std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
             nbDirects++;
@@ -1100,7 +1116,8 @@ bool Domaine::afficheGrapheEcart(){
         int i=0;
         for(const auto& t : m_trajets){
             if(t.second->getGType()=='I'){
-                std::cout <<t.second->getNom() <<": (" << t.second->returnNomType();
+                print(t.second->getNom(),t.second->retourneCouleurType());
+                std::cout  <<": (" << t.second->returnNomType();
                 std::cout << ") allant du point " <<t.second->getSommets().first->afficheSimple() << " a "  << t.second->getSommets().second->afficheSimple() << " de valeur "<< t.second->getDuree() << " skieurs " <<  std::endl;
                 std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
                 i++;
@@ -1335,5 +1352,3 @@ std::map<int, Sommet *>& Domaine::getSommets(){
 std::map<int, Trajet *>& Domaine::getTrajets(){
     return m_trajets;
 }
-
-

@@ -15,7 +15,7 @@ DonneeProfils::~DonneeProfils() {
         delete elem;
 }
 
-
+///Méthode permettant de lire le fichier profil
 void DonneeProfils::lectureFichierProfil() {
     std::ifstream fichier ("../profil.txt");
 
@@ -46,7 +46,7 @@ void DonneeProfils::lectureFichierProfil() {
 }
 
 
-
+///Méthode retournant vrai si le pseudo en parametre existe, retourne faux sinon
 bool DonneeProfils::pseudoExiste(const std::string& pseudoInput){
     for(auto& elem : m_vecteurProfil){
         if(pseudoLowerCase(pseudoInput)==pseudoLowerCase(elem->getProfil().first))

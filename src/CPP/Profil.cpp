@@ -28,6 +28,7 @@ Profil::Profil(std::string _pseudo, bool _estAdmin)
 
 }
 
+///Méthodde permettant de modifier les trajets préférés de l'utilisateur
 void Profil::prefTrajetsModification(const std::vector<std::pair<std::string,bool>>& _optiTrajets){
     m_prefTrajets.clear();
 

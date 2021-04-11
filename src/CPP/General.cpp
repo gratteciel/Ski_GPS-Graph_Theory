@@ -196,7 +196,8 @@ void General::boucle(){
 
 /// Interaction menu ///
 void General::finProgrammeActu(const std::string& phrase){
-    std::cout <<std::endl<< phrase;
+    std::cout << std::endl;
+    print(phrase,color_dark_green);
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 

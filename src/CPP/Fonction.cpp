@@ -3,6 +3,10 @@
 //
 #include "../Headers/Fonction.h"
 
+/*
+ * Source pour les couleurs : https://stackoverflow.com/questions/20608058/c-colour-console-text
+ */
+
 void print(const std::string s, const int textcolor, const int backgroundcolor) {
 #if defined(_WIN32)
     CONSOLE_SCREEN_BUFFER_INFO csbi;

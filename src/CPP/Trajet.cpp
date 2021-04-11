@@ -30,7 +30,7 @@ Trajet::Trajet( const std::string &_type)
 }
 
 //Méthodes
-
+///Sous-programme permettant d'afficher un trajet
 void Trajet::affichage(){
     std::cout << "Trajet n'"<<getNum() << ": ";
     print(getNom(),retourneCouleurType());
@@ -39,6 +39,7 @@ void Trajet::affichage(){
     std::cout << ") allant du point " <<m_sommets.first->afficheSimple() << " a "  << m_sommets.second->afficheSimple() << std::endl;
 }
 
+///Affichage complexe d'un trajet
 void Trajet::affichageComplexe(const bool& partant){
     std::cout << "n'"<<getNum() << ": "<<getNom() <<" ("<< returnNomType();
 
@@ -48,6 +49,7 @@ void Trajet::affichageComplexe(const bool& partant){
         std::cout << ") partant de "  << m_sommets.first->getNom() << std::endl;
 }
 
+///Retourne la couleur du trajet pour le print selon son type
 int Trajet::retourneCouleurType(){
     if(getType().size()==1){
 
@@ -76,6 +78,8 @@ int Trajet::retourneCouleurType(){
     return color_orange;
 
 }
+
+///Sous-programme permettant de retourner le nom complet du type du trajet
 std::string Trajet::returnNomType(){
 
     if(getType().size()==1){
