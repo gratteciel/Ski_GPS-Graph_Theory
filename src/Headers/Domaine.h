@@ -17,13 +17,14 @@ private:
     int m_ordre; // nombre de sommmets
     int m_taille; // nombre d'arcs
     t_mapDuree m_matriceDuree;
+    float m_horaire;
     std::map<std::string,int> m_vecteurCapacite;
 
 
 public:
     //Constructeur et destructeur
     Domaine();
-    Domaine(const t_mapDuree& m_matriceDuree, const std::map<std::string,int>& m_vecteurCapacite);
+    Domaine(const t_mapDuree& m_matriceDuree, const std::map<std::string,int>& m_vecteurCapacite,const float& horaire);
     ~Domaine();
 
     //Méthodes
@@ -52,11 +53,14 @@ public:
     void modifCapaciteAdmin();
     std::map<int,bool> fordFulkerson(const int& initial,const int& final);
     bool chaineAugmentante(const int& initial,const int& final,std::map<int,std::pair<int,bool>>& pred,std::map<int,int>& sigma);
-    void getPlusCourtCheminBFSFord(int i,std::map<int, std::pair<int, bool>>& pred, const int &initial,
+    void getPlusCourtCheminBFSFord(int i,int ancienI,std::map<int, std::pair<int, bool>>& pred, const int &initial,
                                    std::vector<std::pair<int,bool>>& listeTrajets, bool &cheminPossible);
     void calculFlotMaximal(const int& final,int& flotMax);
     bool afficheGrapheEcart();
     void algosQuatreSix(const int &initial, const int &final);
+    void horaire();
+    float initialisationHoraire();
+    float getHoraire();
     void creationGrapheEcart(const std::map<int, Trajet*>& _trajets,std::map<int,bool>& trajetsParcouru);
     void finProgrammeActu(const std::string &phrase);
     //Getters & Setters
@@ -72,6 +76,13 @@ public:
     std::map<int, Trajet *>& getTrajets();
 
 
+
+
+
+    /// Concernant les horaires ///
+
+
+    void calculFlotMaximal(const int &initial, const int &final);
 
 };
 

@@ -14,7 +14,9 @@ class General {
 private:
     Domaine arcs;
     Profil* m_profilActif;
+
     DonneeProfils m_baseUtilisateur;
+
 
     bool m_estOptiChemin;
     std::vector<std::pair<std::string,bool>> m_optiTrajets;
@@ -56,6 +58,7 @@ public:
     void connection();
     void menuAdminAffichage();
     void interactionDonneeAdmin(const std::string &donnee, int &menuActu);
+
 };
 
 

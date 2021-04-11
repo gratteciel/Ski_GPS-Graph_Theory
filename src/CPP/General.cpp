@@ -15,8 +15,8 @@ General::General(const std::string &nomfichier)
     lecturefichier(nomfichier,fCharge);
     arcs.initialisation(fCharge);
     lectureFichierCapacite();
-}
 
+}
 
 //Méthodes
 
@@ -118,9 +118,9 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 void General::connection(){
     std::string pseudoInput;
 
-
-    std::cout << "Bonjour!"
-              <<std::endl
+    std::cout << "Bonjour !" << std::endl;
+    arcs.horaire();
+    std::cout <<std::endl
               <<std::endl
               <<"Veuillez renseigner votre pseudo (pas d'espace): ";
     std::cin >> pseudoInput;
@@ -164,6 +164,7 @@ void General::connection(){
 
 
 
+
 void General::boucle(){
     int menuActu=1;
 
@@ -182,7 +183,6 @@ void General::boucle(){
 
     }
 }
-
 
 /// Interaction menu ///
 void General::finProgrammeActu(const std::string& phrase){
@@ -326,8 +326,6 @@ void General::interactionDonneeMenu3(const std::string& donnee, int& menuActu){
 
 }
 
-
-
 void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu,const bool& estDijkstra){
     if(donnee.size()==1){
         switch(donnee[0]){
@@ -404,6 +402,7 @@ void General::interactionDonneeMenu11(const std::string& donnee,int& menuActu) {
 
 
 }
+
 void General::interactionDonneeMenu7(const std::string& donnee, int& menuActu){
     if(donnee.size()==1){
         switch(donnee[0]){
@@ -571,9 +570,6 @@ void General::menu11() {
 
 }
 
-
-
-
 void General::menuAdminAffichage(){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
@@ -584,16 +580,10 @@ void General::menuAdminAffichage(){
 
 }
 
-
-
 void General::menu9() {
 
     std::cout << "1 : Modifier les capacites" << std::endl;
 }
-
-
-
-
 
 
 /// Fonction Fichier concernant la capacite ///
@@ -629,6 +619,7 @@ void General::lectureFichierCapacite() {
     }
 
 }
+
 void General::menu7(){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
@@ -638,8 +629,6 @@ void General::menu7(){
     std::cout << "2 : Trouver les plus courts chemins selon vos preferences" << std::endl;
 
 }
-
-
 
 void General::afficherOptiTrajets(){
 
@@ -751,5 +740,6 @@ std::vector<std::pair<std::string,bool>> General::getOptiTrajets() const {
 void General::setEstOptiChemin(const bool& _valeur) {
     m_estOptiChemin=_valeur;
 }
+
 
 

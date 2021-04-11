@@ -2,7 +2,7 @@
 
 int main() {
     try{
-
+        srand(time(NULL)); //Pour trouver l'horaire aleatoirement
         General projet("../data_arcs.txt");
         projet.connection();
         projet.boucle();

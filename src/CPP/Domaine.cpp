@@ -10,10 +10,11 @@ Domaine::Domaine() {
     m_matriceDuree['B'];
     m_matriceDuree['R'];
     m_matriceDuree['D'];
+    m_horaire = initialisationHoraire();
 }
 
-Domaine::Domaine(const t_mapDuree& _matriceDuree, const std::map<std::string,int>& _vecteurCapacite)
-        :m_matriceDuree(_matriceDuree),m_vecteurCapacite(_vecteurCapacite)
+Domaine::Domaine(const t_mapDuree& _matriceDuree, const std::map<std::string,int>& _vecteurCapacite,const float& _horaire)
+        :m_matriceDuree(_matriceDuree),m_vecteurCapacite(_vecteurCapacite),m_horaire(_horaire)
 {
 
 }
@@ -34,12 +35,32 @@ void Domaine::initialisation(const t_chargeFichier& fCharge){
     creationTrajets(fCharge.trajets);
 }
 
+float Domaine::initialisationHoraire() {
+    int heure = 0;
+    int minute = 0;
+    int seconde = 0;
+    int horaire;
+
+    heure = 7 + rand()%(19-7+1);
+    minute = rand()%(59-0+1);
+    seconde = rand()%(59-0+1);
+    horaire = heure * 3600;
+    horaire += minute * 60;
+    horaire += seconde;
+    return horaire;
+
+}
+
+void Domaine::horaire() { //programme qui affiche l'heure au début du programme
+
+    std::cout << "Il est: " << convertSecondeHeuresMinS(getHoraire()) << std::endl;
+
+}
 
 void Domaine::creationSommets(const std::vector<t_chargeSommets>& _som){
     for(const auto s: _som)
         m_sommets[s.num] = new Sommet(s.num,s.nom,s.altitude);
 }
-
 
 void Domaine::creationTrajets(const std::vector<t_chargeTrajet>& _tra){
     for(const auto t: _tra){
@@ -104,7 +125,6 @@ void Domaine::afficheTrajets(const char& type, std::string trajetChoisie){
 
     std::cout << std::endl;
 }
-
 
 void Domaine::afficheSommets(const std::string& sommetChoisie){
     if(sommetChoisie=="n")
@@ -216,6 +236,7 @@ std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
 void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe,const bool& estGrapheEtat){
     std::vector<int> listeTrajets;
     bool cheminPossible=true;
+    float heureMax = 68400; // = 19h
 
     getPlusCourtCheminRecursif(pred[sF],pred,s0,listeTrajets,cheminPossible);
 
@@ -277,13 +298,41 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
             if(complexe){
                 std::cout <<std::endl;
 
-                if(!estGrapheEtat)
+
+                if(!estGrapheEtat){
                     std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+                    if(getHoraire()+poids > heureMax)
+                    {
+                        std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+
+                    }
+                }
+
                 else
                     std::cout << std::endl<<"   Nombre de skieurs sur le chemin: "  << poids << std::endl<<std::endl;
+
+
+
+
+
             }
             else
+            {
                 std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
+                if(getHoraire()+poids > heureMax)
+                {
+                    std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << " c'est trop tard!" << std::endl;
+                }
+                else
+                {
+                    std::cout << "\tArrivee a: " << convertSecondeHeuresMinS(getHoraire()+poids) << std::endl;
+
+                }
+            }
         }
         else
             std::cout << std::endl;
@@ -310,6 +359,7 @@ void Domaine::getPlusCourtCheminRecursif(int i, std::map<int,int> pred, const in
 
     else
     {
+
         listeTrajets.push_back(pred[m_trajets[i]->getSommets().second->getNum()]); //On ajoute le trajet à la file
         if(initial!=m_trajets[i]->getSommets().first->getNum()){
             getPlusCourtCheminRecursif(pred[m_trajets[i]->getSommets().first->getNum()], pred,initial,listeTrajets,cheminPossible);
@@ -334,7 +384,6 @@ void Domaine::afficheInfo(){
     std::cout << " dont " << traj['D'] << " pistes, " << traj['R']<< " remontees et " << traj['B'] << " navettes" <<std::endl;
 
 }
-
 
 bool Domaine::changementDuree() {
     std::string choix;
@@ -476,12 +525,14 @@ bool Domaine::changementDuree() {
 }
 
 
+
 void Domaine::finProgrammeActu(const std::string& phrase){
     std::cout <<std::endl<< phrase;
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 }
+
 
 bool Domaine::modifDureeBD(const std::string& categorie){
     std::vector<std::string> typeD;
@@ -563,7 +614,6 @@ bool Domaine::modifDureeBD(const std::string& categorie){
         std::cout << "Duree de " << tempTrajets[paramChoisi].returnNomType() <<" : " << convertSecondeHeuresMinS(m_matriceDuree[categorie[0]][typeD[paramChoisi]][0])<< std::endl;
     return true;
 }
-
 
 int Domaine::entrerUnNombrePositif(const std::string& phrase){
     std::string parametre;
@@ -816,9 +866,11 @@ std::map<int,std::pair<int,bool>> Domaine::BFSFord(const int& initial,const int&
     return pred;
 }
 
+
 std::map<int,bool> Domaine::fordFulkerson(const int& initial,const int& final){
     std::map<int,bool> numTrajetsParcouru;
     //On initialise tous les flots à 0
+
     for(auto& s : m_trajets){
         s.second->setFlot(0);
         numTrajetsParcouru[s.first] =false;
@@ -827,30 +879,48 @@ std::map<int,bool> Domaine::fordFulkerson(const int& initial,const int& final){
     std::map<int,std::pair<int,bool>> pred;
     std::map<int,int> sigma;
 
+    bool fin=false;
     //Tant qu'on trouve une chaine augmentante
-    while(chaineAugmentante(initial,final,pred,sigma)){
-        std::vector<std::pair<int,bool>> listeTrajets;
 
-        bool cheminPossible=true;
-        getPlusCourtCheminBFSFord(pred[final].first,pred,initial,listeTrajets,cheminPossible);
-        int augmentationFlotActu=INT_MAX;
-
-        //On trouve le minimum pour l'augmentation des flots des trajets de la chaine augmentante
-        for(const auto& trajet : listeTrajets){
-            if(abs(sigma[trajet.first]) < augmentationFlotActu)
-                augmentationFlotActu = abs(sigma[trajet.first]);
+    do{
+        if(!chaineAugmentante(initial,final,pred,sigma)){ //Si il n'y a pas de nouvelle chaine augmentante entre les 2 points
+            fin=true;
         }
 
-        for(const auto& trajet : listeTrajets){
-            //Si on a pris le trajet dans le sens direct
-            if(trajet.second)
-                m_trajets[trajet.first]->setFlot( m_trajets[trajet.first]->getFlot() + augmentationFlotActu);
-            else //Si on a pris le trajet dans le sens indirect
-                m_trajets[trajet.first]->setFlot( m_trajets[trajet.first]->getFlot() - augmentationFlotActu);
+        else{ //Si on a trouvé une chaine augmentante
+            std::vector<std::pair<int,bool>> listeTrajets;
 
-            numTrajetsParcouru[trajet.first]=true;
+            bool cheminPossible=true;
+
+            getPlusCourtCheminBFSFord(pred[final].first,-6,pred,initial,listeTrajets,cheminPossible);
+            if(!cheminPossible)
+                fin=true;
+            else{
+                int augmentationFlotActu=INT_MAX;
+
+                //On trouve le minimum pour l'augmentation des flots des trajets de la chaine augmentante
+                for(const auto& trajet : listeTrajets){
+                    if(abs(sigma[trajet.first]) < augmentationFlotActu)
+                        augmentationFlotActu = abs(sigma[trajet.first]);
+                }
+
+                for(const auto& trajet : listeTrajets){
+                    //Si on a pris le trajet dans le sens direct
+                    if(trajet.second)
+                        m_trajets[trajet.first]->setFlot( m_trajets[trajet.first]->getFlot() + augmentationFlotActu);
+                    else //Si on a pris le trajet dans le sens indirect
+                        m_trajets[trajet.first]->setFlot( m_trajets[trajet.first]->getFlot() - augmentationFlotActu);
+
+                    numTrajetsParcouru[trajet.first]=true;
+                }
+
+
+            }
+
         }
-    }
+
+    }while(!fin);
+
     return numTrajetsParcouru;
 }
 
@@ -866,6 +936,7 @@ void Domaine::calculFlotMaximal(const int& final,int& flotMax){
 }
 
 void Domaine::algosQuatreSix(const int& initial,const int& final){
+
     std::map<int,bool> trajetsParcouru = fordFulkerson(initial,final);
 
     int flotTotal=0;
@@ -881,7 +952,7 @@ void Domaine::algosQuatreSix(const int& initial,const int& final){
 
         finProgrammeActu("Appuyez sur entree pour afficher le graphe d'ecart deduit......");
 
-        Domaine gE = Domaine(m_matriceDuree,m_vecteurCapacite);
+        Domaine gE = Domaine(m_matriceDuree,m_vecteurCapacite,m_horaire);
         gE.creationGrapheEcart(m_trajets,trajetsParcouru);
 
 
@@ -953,23 +1024,28 @@ void Domaine::creationGrapheEcart(const std::map<int, Trajet*>& _trajets,std::ma
 
     //int capacite[] = {11,12,1,12,11,4,20,7}; //Capacite de test !
 
-    int i=1;
+
     //On cree les trajets du graphe d'écart
     for(const auto& t : _trajets)
     {
         if(trajetsParcouru[t.first]){
             if( m_vecteurCapacite[t.second->getType()] > t.second->getFlot()){ // m_vecteurCapacite[t.second->getType()]
 
-                m_trajets[i] = new Trajet(t.second->getNum(),t.second->getNom(),t.second->getType(),m_sommets[t.second->getSommets().first->getNum()],m_sommets[t.second->getSommets().second->getNum()],m_vecteurCapacite[t.second->getType()]  - t.second->getFlot(),'D');
-                m_sommets[t.second->getSommets().first->getNum()]->setSortant(m_trajets[i]);
-                m_sommets[t.second->getSommets().second->getNum()]->setEntrant(m_trajets[i]);
-                i++;
+                m_trajets[t.second->getNum()] = new Trajet(t.second->getNum(),t.second->getNom(),t.second->getType(),m_sommets[t.second->getSommets().first->getNum()],m_sommets[t.second->getSommets().second->getNum()],m_vecteurCapacite[t.second->getType()]  - t.second->getFlot(),'D');
+                m_sommets[t.second->getSommets().first->getNum()]->setSortant(m_trajets[t.second->getNum()]);
+                m_sommets[t.second->getSommets().second->getNum()]->setEntrant(m_trajets[t.second->getNum()]);
+
             }
             if(t.second->getFlot()>0){
+                int i=1;
+                while(m_trajets.find(i)!=m_trajets.end()){
+                    i++;
+                }
+
                 m_trajets[i] = new Trajet(t.second->getNum(),t.second->getNom(),t.second->getType(),m_sommets[t.second->getSommets().second->getNum()],m_sommets[t.second->getSommets().first->getNum()],t.second->getFlot(),'I');
                 m_sommets[t.second->getSommets().second->getNum()]->setSortant(m_trajets[i]);
                 m_sommets[t.second->getSommets().first->getNum()]->setEntrant(m_trajets[i]);
-                i++;
+
             }
 
         }
@@ -1010,7 +1086,7 @@ bool Domaine::afficheGrapheEcart(){
     std::string param;
     do{
         std::system("cls || clear");
-        std::cout << "Affichage des trajets indirects (tous les trajets avec un flot de skieurs stricement positif: " << std::endl;
+        std::cout << "Affichage des trajets indirects (tous les trajets avec un flot de skieurs strictement positif): " << std::endl;
         std::cout << "La valeur correspond a combien on peut diminuer le flot de skieurs" <<std::endl<<std::endl;
 
         std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
@@ -1049,24 +1125,30 @@ bool Domaine::afficheGrapheEcart(){
 }
 
 
-void Domaine::getPlusCourtCheminBFSFord(int i,  std::map<int,std::pair<int,bool>>& pred, const int& initial,std::vector<std::pair<int,bool>>& listeTrajets,bool& cheminPossible){
+void Domaine::getPlusCourtCheminBFSFord(int i, int ancienI, std::map<int,std::pair<int,bool>>& pred, const int& initial,std::vector<std::pair<int,bool>>& listeTrajets,bool& cheminPossible){
 
-    if(i==-1)
+    if(i==-1 || i==ancienI){
         cheminPossible=false;
+    }
+
 
     else
     {
         listeTrajets.push_back(std::make_pair(pred[m_trajets[i]->getSommets().second->getNum()].first,pred[m_trajets[i]->getSommets().second->getNum()].second)); //On ajoute le trajet à la file
+
+
         if(initial!=m_trajets[i]->getSommets().first->getNum()){
-            getPlusCourtCheminBFSFord(pred[m_trajets[i]->getSommets().first->getNum()].first, pred,initial,listeTrajets,cheminPossible);
+            getPlusCourtCheminBFSFord(pred[m_trajets[i]->getSommets().first->getNum()].first,i, pred,initial,listeTrajets,cheminPossible);
 
         }
+
     }
 }
 
 
 bool Domaine::chaineAugmentante(const int& initial,const int& final,std::map<int,std::pair<int,bool>>& pred,std::map<int,int>& sigma){
     sigma.clear();
+    pred.clear();
     pred= BFSFord(initial,final,sigma);
 
     if(pred[final].first!=-1) //Si le sommet final est marque
@@ -1076,10 +1158,7 @@ bool Domaine::chaineAugmentante(const int& initial,const int& final,std::map<int
     return false;
 }
 
-
-
 void Domaine::interactionCapaciteFlot(const bool& estAdmin){
-
 
     std::string parametre;
     bool fin=false;
@@ -1103,6 +1182,7 @@ void Domaine::interactionCapaciteFlot(const bool& estAdmin){
     if(parametre=="m" && estAdmin)
         modifCapaciteAdmin();
 }
+
 void Domaine::afficherCapaciteFlot(const bool& estAdmin){
     std::cout << "Type                                 Capacite (en skieur/heure) " <<std::endl;
 
@@ -1118,6 +1198,7 @@ void Domaine::afficherCapaciteFlot(const bool& estAdmin){
         std::cout << "Appuyez sur \"m\" pour modifier ces valeurs " << std::endl;
     std::cout << "Votre choix: ";
 }
+
 
 void Domaine::modifCapaciteAdmin() {
     std::string parametre;
@@ -1184,6 +1265,7 @@ void Domaine::modifCapaciteAdmin() {
 
 
 }
+
 void Domaine::reecrireFichierCapacite(){
     std::ofstream fichier ("../capacite.txt");
     fichier << 12 << std::endl;
@@ -1223,6 +1305,9 @@ void Domaine::setVecteurCapacite(const std::pair<std::string,int> _pairCapacite)
 {
     m_vecteurCapacite[_pairCapacite.first] = _pairCapacite.second;
 
+}
+float Domaine::getHoraire() {
+    return m_horaire;
 }
 
 
