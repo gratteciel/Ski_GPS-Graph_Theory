@@ -43,22 +43,19 @@ public:
     void changementValeurFichierCapacite(const std::string nomFichier);
     void menu11();//menu concernant les flots avec lecture du fichier et écriture
     void interactionDonneeMenu11(const std::string& donnee,int& menuActu);
-    void interactionDonneeMenu8(const std::string& donnee,int& menuActu);
-    void interactionDonneeMenu9(const std::string& donnee,int& menuActu);
-    void menu8();
-    void menu9();
     void finProgrammeActu(const std::string& phrase = "Appuyez sur entree pour revenir au menu...........");
     void menu7();
     void interactionDonneeMenu7(const std::string &donnee, int &menuActu);
-    bool getEstOptiChemin() const;
-    void setEstOptiChemin(const bool& _valeur);
     void afficherOptiTrajets();
     void modifierOptiTrajets();
-    std::vector<std::pair<std::string, bool>> getOptiTrajets() const;
     void connection();
     void menuAdminAffichage();
     void interactionDonneeAdmin(const std::string &donnee, int &menuActu);
 
+    //Getters & Setters
+    bool getEstOptiChemin() const;
+    void setEstOptiChemin(const bool& _valeur);
+    std::vector<std::pair<std::string, bool>> getOptiTrajets() const;
 };
 
 

@@ -20,6 +20,7 @@ General::General(const std::string &nomfichier)
 
 //Méthodes
 
+///Méthode permettant de lire le fichier data_arcs.txt
 void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCharge) {
 
     std::ifstream fichier (nomfichier);
@@ -115,6 +116,27 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 
 }
 
+///Methode permettant de lire le fichier capacité
+void General::lectureFichierCapacite() {
+    std::ifstream fichier ("../capacite.txt");
+    int taille;
+
+    if(!fichier)
+        throw std::runtime_error( "Impossible d'ouvrir en lecture ");
+
+    fichier >> taille;
+
+    for(int i = 0 ; i< taille ; i++)
+    {
+        std::pair <std::string, int> temp;
+        fichier >> temp.first;
+        fichier >> temp.second;
+        arcs.setVecteurCapacite(temp);
+    }
+
+}
+
+///Methode permettant de connecter l'utilisateur au lancement de la borne
 void General::connection(){
     std::string pseudoInput;
 
@@ -173,8 +195,7 @@ void General::connection(){
 }
 
 
-
-
+///Méthode principal du projet permettant d'intéragir et d'afficher les menus
 void General::boucle(){
     int menuActu=1;
 
@@ -194,7 +215,8 @@ void General::boucle(){
     }
 }
 
-/// Interaction menu ///
+
+
 void General::finProgrammeActu(const std::string& phrase){
     std::cout << std::endl;
     print(phrase,color_dark_green);
@@ -203,6 +225,7 @@ void General::finProgrammeActu(const std::string& phrase){
 
 }
 
+/// Interaction menu ///
 void General::interactionDonnee(const std::string &donnee, int &menuActu) {
     if(donnee=="q")
         menuActu=0;
@@ -228,9 +251,7 @@ void General::interactionDonnee(const std::string &donnee, int &menuActu) {
                 break;
             case 7:
                 interactionDonneeMenu7(donnee,menuActu);
-            case 8:
-                interactionDonneeMenu8(donnee,menuActu);
-                break;
+
             case 11:
                 interactionDonneeMenu11(donnee,menuActu);
                 break;
@@ -432,17 +453,8 @@ void General::interactionDonneeMenu7(const std::string& donnee, int& menuActu){
 
 }
 
-void General::interactionDonneeMenu8(const std::string& donnee,int& menuActu) {
 
 
-
-
-
-}
-
-void General::interactionDonneeMenu9(const std::string& donnee,int& menuActu){
-
-}
 
 void General::interactionDonneeAdmin(const std::string& donnee,int& menuActu){
     if(donnee.size()==1){
@@ -606,10 +618,18 @@ void General::menuAdminAffichage(){
 
 }
 
-void General::menu9() {
+void General::menu7(){
+    std::cout << "0 : Retour en arriere" << std::endl;
+    std::cout << std::endl <<"----------------------------------" << std::endl;
+    print( " Plus court chemin optimise (4.5)   " ,color_dark_blue);
+    std::cout << std::endl;
+    std::cout << "----------------------------------" << std::endl;
+    std::cout << std::endl <<"1 : Afficher/Modifier vos preferences a l'interet des trajets" << std::endl;
+    std::cout << "2 : Trouver les plus courts chemins selon vos preferences" << std::endl;
 
-    std::cout << "1 : Modifier les capacites" << std::endl;
 }
+
+
 
 
 /// Fonction Fichier concernant la capacite ///
@@ -627,36 +647,10 @@ void General::changementValeurFichierCapacite(const std::string nomFichier) {
       fichier << elem.first << " " << elem.second << std::endl;
 }
 
-void General::lectureFichierCapacite() {
-    std::ifstream fichier ("../capacite.txt");
-    int taille;
 
-    if(!fichier)
-        throw std::runtime_error( "Impossible d'ouvrir en lecture ");
 
-    fichier >> taille;
 
-    for(int i = 0 ; i< taille ; i++)
-    {
-        std::pair <std::string, int> temp;
-        fichier >> temp.first;
-        fichier >> temp.second;
-        arcs.setVecteurCapacite(temp);
-    }
-
-}
-
-void General::menu7(){
-    std::cout << "0 : Retour en arriere" << std::endl;
-    std::cout << std::endl <<"----------------------------------" << std::endl;
-    print( " Plus court chemin optimise (4.5)   " ,color_dark_blue);
-    std::cout << std::endl;
-    std::cout << "----------------------------------" << std::endl;
-    std::cout << std::endl <<"1 : Afficher/Modifier vos preferences a l'interet des trajets" << std::endl;
-    std::cout << "2 : Trouver les plus courts chemins selon vos preferences" << std::endl;
-
-}
-
+///Méthode permettant d'affcher les preferences trajets
 void General::afficherOptiTrajets(){
 
 
@@ -681,6 +675,7 @@ void General::afficherOptiTrajets(){
 
 }
 
+///Méthode prmettant de modifier les preferences utilisateurs
 void General::modifierOptiTrajets(){
 
     std::string donnee;
@@ -758,6 +753,7 @@ void General::modifierOptiTrajets(){
     }
 }
 
+//Getters & Setters
 bool General::getEstOptiChemin() const {
     return m_estOptiChemin;
 }
