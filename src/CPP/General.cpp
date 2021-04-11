@@ -133,6 +133,7 @@ void General::lectureFichierCapacite() {
         fichier >> temp.second;
         arcs.setVecteurCapacite(temp);
     }
+    fichier.close();
 
 }
 
@@ -155,7 +156,6 @@ void General::connection(){
     bool dejaInscript = m_baseUtilisateur.pseudoExiste(pseudoInput);
     if(!dejaInscript){
         m_profilActif = m_baseUtilisateur.ajoutProfil(pseudoInput);
-
     }
     else
         m_profilActif= m_baseUtilisateur.getProfil(pseudoInput);
@@ -251,7 +251,7 @@ void General::interactionDonnee(const std::string &donnee, int &menuActu) {
                 break;
             case 7:
                 interactionDonneeMenu7(donnee,menuActu);
-
+                break;
             case 11:
                 interactionDonneeMenu11(donnee,menuActu);
                 break;

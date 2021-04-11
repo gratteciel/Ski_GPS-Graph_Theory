@@ -22,8 +22,10 @@ void DonneeProfils::lectureFichierProfil() {
     if(!fichier)
         throw std::runtime_error( "Impossible d'ouvrir en lecture ");
 
-    while(!fichier.eof())
-    {
+    int nbUtilisateur=0;
+    fichier >> nbUtilisateur;
+    for(int i=0; i<nbUtilisateur; i++){
+
         int nbTrucsEviter=0;
         std::string pseudo;
         std::vector<std::string> prefT;
@@ -42,6 +44,7 @@ void DonneeProfils::lectureFichierProfil() {
         m_vecteurProfil.push_back(new Profil(pseudo,estAdmin,prefT));
 
     }
+    fichier.close();
 
 }
 
@@ -71,7 +74,7 @@ Profil* DonneeProfils::ajoutProfil(const std::string& pseudo) {
 
     if(!fichier)
         throw std::runtime_error( "Impossible d'ouvrir profil.txt  en ecriture");
-
+    fichier << m_vecteurProfil.size()+1 << std::endl;
     for( auto& elem: m_vecteurProfil)
     {
         fichier << elem->getProfil().first;
@@ -86,9 +89,10 @@ Profil* DonneeProfils::ajoutProfil(const std::string& pseudo) {
 
         fichier << std::endl;
     }
-    //ajout d'un nouvel utilisateur qui n'est pas admin
-    fichier << pseudo << " " << 0  << " " << 6 <<" TPH TC TSD TS TK BUS" ;
 
+    //ajout d'un nouvel utilisateur qui n'est pas admin
+    fichier << pseudo << " " << 0  << " " << 6 <<" TPH TC TSD TS TK BUS" <<std::endl;
+    fichier.close();
     m_vecteurProfil.push_back( new Profil(pseudo,false));
     return m_vecteurProfil.back();
 
@@ -96,6 +100,9 @@ Profil* DonneeProfils::ajoutProfil(const std::string& pseudo) {
 
 void DonneeProfils::reecrireFichierProfil(){
     std::ofstream fichier ("../profil.txt");
+
+    fichier << m_vecteurProfil.size() << std::endl;
+
     for( auto& elem: m_vecteurProfil)
     {
         fichier << elem->getProfil().first;
@@ -107,9 +114,10 @@ void DonneeProfils::reecrireFichierProfil(){
             fichier << " ";
             fichier << elem2;
         }
-
         fichier << std::endl;
+
     }
+    fichier.close();
 }
 
 Profil* DonneeProfils::getProfil(const std::string& pseudo) {
