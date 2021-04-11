@@ -41,7 +41,8 @@ float Domaine::initialisationHoraire() {
     int seconde = 0;
     int horaire;
 
-    heure = 7 + rand()%(19-7+1);
+    heure = 7 + rand()%(18
+            -7+1);
     minute = rand()%(59-0+1);
     seconde = rand()%(59-0+1);
     horaire = heure * 3600;
@@ -268,11 +269,9 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
                 }
             }
 
-
-            std::cout << m_trajets[listeTrajets[i]]->getNom()
-                      << " ("<<  m_trajets[listeTrajets[i]]->getSommets().first->getNum()
+            print(m_trajets[listeTrajets[i]]->getNom(),m_trajets[listeTrajets[i]]->retourneCouleurType());
+            std::cout << " ("<<  m_trajets[listeTrajets[i]]->getSommets().first->getNum()
                       << "-" <<m_trajets[listeTrajets[i]]->getSommets().second->getNum()
-                      << "|"<<m_trajets[listeTrajets[i]]->getType()
                       << ")";
             if(i!=0)
                 std::cout << " -> ";
@@ -449,7 +448,9 @@ bool Domaine::changementDuree() {
             for (const auto &elem1 : it->second)
             {
 
-                std::cout <<"|     " << i << "      |  "<< tempTrajets[i].returnNomType() << " -> " << convertSecondeHeuresMinS(elem1.second[1]) << " -> " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
+                std::cout <<"|     " << i << "      |  ";
+                print(tempTrajets[i].returnNomType(),tempTrajets[i].retourneCouleurType());
+                std::cout << " -> " << convertSecondeHeuresMinS(elem1.second[1]) << " -> " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
                 i++;
             }
 
@@ -566,10 +567,16 @@ bool Domaine::modifDureeBD(const std::string& categorie){
         i=0;
         for (const auto &elem1 : it->second)
         {
-            if(categorie[0]=='B')
-                std::cout <<"|     " << i << "      |  "<< elem1.first << "    ->    " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
-            else
-                std::cout <<"|     " << i << "      |  "<< tempTrajets[i].returnNomType() << "    ->    " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
+            if(categorie[0]=='B'){
+                std::cout <<"|     " << i << "      |  ";
+                print(elem1.first,color_yellow);
+            }
+            else{
+                std::cout <<"|     " << i << "      |  ";
+                print(tempTrajets[i].returnNomType(),tempTrajets[i].retourneCouleurType());
+            }
+
+            std::cout << "    ->    " << convertSecondeHeuresMinS(elem1.second[0]) << " pour 100m" << std::endl;
             i++;
         }
 
@@ -807,7 +814,7 @@ std::map<int,std::pair<int,bool>> Domaine::BFSFord(const int& initial,const int&
     //Initialisation des sommets
     std::map<int,std::pair<int,bool>> pred;
     std::map<int,bool> marque;
-    //int capacite[] = {11,12,1,12,11,4,20,7}; //Capacite de test !
+
 
     //Initialisation des sommets (predecesseurs & marquage)
     for(const auto& elem : m_sommets) {
@@ -1022,7 +1029,7 @@ void Domaine::creationGrapheEcart(const std::map<int, Trajet*>& _trajets,std::ma
         }
     }
 
-    //int capacite[] = {11,12,1,12,11,4,20,7}; //Capacite de test !
+
 
 
     //On cree les trajets du graphe d'écart
@@ -1189,7 +1196,8 @@ void Domaine::afficherCapaciteFlot(const bool& estAdmin){
     for(const auto& elem : m_vecteurCapacite)
     {
         Trajet temp=Trajet(elem.first);
-        std::cout << temp.returnNomType() << "                              " << elem.second << std::endl;
+        print(temp.returnNomType(),temp.retourneCouleurType());
+        std::cout << "                              " << elem.second << std::endl;
 
     }
 
@@ -1218,7 +1226,9 @@ void Domaine::modifCapaciteAdmin() {
         for(const auto& elem : m_vecteurCapacite)
         {
             Trajet temp=Trajet(elem.first);
-            std::cout << " " << i<< "                  "  << temp.returnNomType() << "                              " << elem.second << std::endl;
+            std::cout << " " << i<< "                  ";
+            print(temp.returnNomType(),temp.retourneCouleurType());
+            std::cout << "                              " << elem.second << std::endl;
             i++;
         }
 
@@ -1252,7 +1262,9 @@ void Domaine::modifCapaciteAdmin() {
     do{
 
         Trajet temp=Trajet(typesOrdre[choixType]);
-        std::cout << "Vous avez decide de modifer la capacite de: " << temp.returnNomType() << std::endl<<std::endl;
+        std::cout << "Vous avez decide de modifer la capacite de: ";
+        print(temp.returnNomType(),temp.retourneCouleurType());
+        std::cout<< std::endl<<std::endl;
 
         std::cout  << "Ancienne valeur: " << getVecteurCapacite()[typesOrdre[choixType]] << " skieurs/heure" << std::endl;
         std::cout << "Nouvelle valeur: " ;

@@ -1,5 +1,9 @@
 #include "Headers/General.h"
 
+/*
+ * Source pour les couleurs : https://stackoverflow.com/questions/20608058/c-colour-console-text
+ */
+
 int main() {
     try{
         srand(time(NULL)); //Pour trouver l'horaire aleatoirement

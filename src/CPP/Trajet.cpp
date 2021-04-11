@@ -32,9 +32,11 @@ Trajet::Trajet( const std::string &_type)
 //Méthodes
 
 void Trajet::affichage(){
-    std::cout << "Trajet n'"<<getNum() << ": "<<getNom() <<" (" << returnNomType();
+    std::cout << "Trajet n'"<<getNum() << ": ";
+    print(getNom(),retourneCouleurType());
+    std::cout <<" (" << returnNomType();
 
-    std::cout << ") allant du point " <<m_sommets.first->getNom() << " a "  << m_sommets.second->getNom() << std::endl;
+    std::cout << ") allant du point " <<m_sommets.first->afficheSimple() << " a "  << m_sommets.second->afficheSimple() << std::endl;
 }
 
 void Trajet::affichageComplexe(const bool& partant){
@@ -46,7 +48,34 @@ void Trajet::affichageComplexe(const bool& partant){
         std::cout << ") partant de "  << m_sommets.first->getNom() << std::endl;
 }
 
+int Trajet::retourneCouleurType(){
+    if(getType().size()==1){
 
+        switch(getType()[0]){
+            case 'V':
+                return color_dark_green;
+                break;
+            case 'B':
+                return color_dark_blue;
+                break;
+            case 'R':
+                return color_dark_red;
+                break;
+            case 'N':
+                return color_light_gray;
+                break;
+        }
+    }
+    if(getType()=="KL")
+        return color_pink;
+    if(getType()=="SURF")
+        return color_cyan;
+    if(getType()=="BUS")
+        return color_yellow;
+
+    return color_orange;
+
+}
 std::string Trajet::returnNomType(){
 
     if(getType().size()==1){

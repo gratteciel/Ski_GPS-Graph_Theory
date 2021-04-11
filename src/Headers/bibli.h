@@ -4,6 +4,22 @@
 
 #ifndef SKIPISCINE_BIBLI_H
 #define SKIPISCINE_BIBLI_H
+
+/*
+ * Source pour les couleurs : https://stackoverflow.com/questions/20608058/c-colour-console-text
+ */
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
+#include <Windows.h>
+#endif // _WIN32
+
+
+
+
+
+#include "Fonction.h"
 #include <vector>
 #include <map>
 #include <fstream>
@@ -55,6 +71,7 @@ struct comparaisonDijkstraOpti
         return a.second.first > b.second.first;
     }
 };
+
 
 
 #endif //SKIPISCINE_BIBLI_H

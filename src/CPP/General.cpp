@@ -118,11 +118,15 @@ void General::lecturefichier(const std::string &nomfichier,t_chargeFichier& fCha
 void General::connection(){
     std::string pseudoInput;
 
-    std::cout << "Bonjour !" << std::endl;
+    print("Bonjour ! ",color_red);
+    std::cout << std::endl;
+
     arcs.horaire();
     std::cout <<std::endl
               <<std::endl
-              <<"Veuillez renseigner votre pseudo (pas d'espace): ";
+              <<"Veuillez renseigner votre ";
+    print("pseudo ",color_dark_green);
+    std::cout <<"(pas d'espace): ";
     std::cin >> pseudoInput;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -147,12 +151,18 @@ void General::connection(){
     }
 
     std::system("cls || clear");
-    std::cout << "Bonjour " << m_profilActif->getProfil().first << "!" << std::endl;
+    std::cout << "Bonjour " ;
+    print(m_profilActif->getProfil().first,color_green);
+    std::cout << "!" << std::endl;
 
     if(dejaInscript){
         std::cout << "Votre compte a bien ete charge avec vos preferences! " << std::endl;
-        if(m_profilActif->getProfil().second)
-            std::cout << "Vous etes administrateur de cette borne" << std::endl;
+        if(m_profilActif->getProfil().second){
+            std::cout << "Vous etes ";
+            print("administrateur",color_dark_red);
+            std::cout << " de cette borne" << std::endl;
+        }
+
     }
 
     else
@@ -489,7 +499,8 @@ void General::afficheMenu(const int& menuActu){
 
 void General::menu1(){
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout <<  "     Domaine skiable des arcs   " << std::endl;
+    print("     Domaine skiable des arcs   ",color_dark_blue);
+    std::cout << std::endl;
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : A propos du domaine skiable des Arcs" << std::endl;
     std::cout << "2 : Afficher/Modifier les temps par default des trajets (4.1)" << std::endl;
@@ -500,14 +511,18 @@ void General::menu1(){
     std::cout << "7 : A propos des flots (4.6)" << std::endl;
 
     if(m_profilActif->getProfil().second){//Si est admin
-        std::cout << std::endl<< "A : Pannel admin" << std::endl;
+        std::cout << std::endl;
+        print("A : Pannel admin" ,color_dark_red);
+        std::cout << std::endl;
+
     }
 }
 
 void General::menu2(){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout <<  "       A propos des points   " << std::endl;
+    print("       A propos des points   ",color_dark_blue);
+    std::cout << std::endl;
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : Afficher tous les points" << std::endl;
     std::cout << "2 : Information sur 1 point" << std::endl;
@@ -516,7 +531,8 @@ void General::menu2(){
 void General::menu3(){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout <<  "       A propos des trajets   " << std::endl;
+    print( "       A propos des trajets   ",color_dark_blue);
+    std::cout << std::endl;
     std::cout << "----------------------------------" << std::endl;
     std::cout <<std::endl << "1 : Afficher tous les trajets" << std::endl;
     std::cout << "2 : Afficher toutes les pistes" << std::endl;
@@ -532,13 +548,19 @@ void General::menu4(const bool& estDijkstra){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
 
-    if(estDijkstra)
-        std::cout <<  "            En temps " << std::endl;
-    else
-        std::cout <<  "      En nombre de trajets" << std::endl;
+    if(estDijkstra){
+        print( "            En temps ",color_dark_blue);
+        std::cout << std::endl;
+    }
+
+    else{
+        print( "      En nombre de trajets",color_dark_blue);
+        std::cout << std::endl;
+    }
 
 
-    std::cout <<  phraseOpti;
+    print( phraseOpti,color_dark_blue);
+
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : Tous les plus courts chemin en partant d'un point" << std::endl;
     std::cout << "2 : Plus court chemin entre 2 points" << std::endl;
@@ -550,8 +572,9 @@ void General::menu6(){
         phraseOpti="        avec optimisation \n";
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout <<  "        Plus court chemin "  << std::endl;
-    std::cout << phraseOpti;
+    print( "        Plus court chemin " ,color_dark_blue);
+    std::cout << std::endl;
+    print( phraseOpti ,color_dark_blue);
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : Plus court chemin en temps" << std::endl;
     std::cout << "2 : Plus court chemin en nombre de trajets" << std::endl;
@@ -561,7 +584,8 @@ void General::menu6(){
 void General::menu11() {
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout <<  "  Etudes des flots des skieurs   " << std::endl;
+    print( "  Etudes des flots des skieurs   " ,color_dark_blue);
+    std::cout << std::endl;
     std::cout << "----------------------------------" << std::endl;
 
     std::cout << std::endl <<"1 : Afficher les capacites des trajets" << std::endl;
@@ -573,7 +597,8 @@ void General::menu11() {
 void General::menuAdminAffichage(){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout <<  "       Pannel admin   " << std::endl;
+    print( "       Pannel admin   " ,color_dark_red);
+    std::cout << std::endl;
     std::cout << "----------------------------------" << std::endl;
 
     std::cout << "1 : Modifier les capacites" << std::endl;
@@ -623,7 +648,8 @@ void General::lectureFichierCapacite() {
 void General::menu7(){
     std::cout << "0 : Retour en arriere" << std::endl;
     std::cout << std::endl <<"----------------------------------" << std::endl;
-    std::cout <<  " Plus court chemin optimisé (4.5)   " << std::endl;
+    print( " Plus court chemin optimise (4.5)   " ,color_dark_blue);
+    std::cout << std::endl;
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : Afficher/Modifier vos preferences a l'interet des trajets" << std::endl;
     std::cout << "2 : Trouver les plus courts chemins selon vos preferences" << std::endl;
@@ -640,9 +666,9 @@ void General::afficherOptiTrajets(){
         Trajet temp=Trajet(elem.first);
 
 
-        std::cout << " "
-                  <<temp.returnNomType()
-                  <<"         ";
+        std::cout << " ";
+        print(temp.returnNomType(),temp.retourneCouleurType());
+        std::cout  <<"         ";
 
         if(elem.second)
             std::cout << "Oui";
@@ -682,7 +708,9 @@ void General::modifierOptiTrajets(){
                     Trajet temp= Trajet(elem.first);
                     do{
                         std::system("cls || clear");
-                        std::cout <<"Souhaitez vous eviter: "<< temp.returnNomType() << "?" << std::endl << std::endl;
+                        std::cout <<"Souhaitez vous eviter: ";
+                        print(temp.returnNomType(),temp.retourneCouleurType());
+                        std::cout << "?" << std::endl << std::endl;
                         std::cout <<"Ecrire \"o\" pour \"oui\" ou  \"n\" pour \"non\": ";
                         std::cin >> parametre;
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

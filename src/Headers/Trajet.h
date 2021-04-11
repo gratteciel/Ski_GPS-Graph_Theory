@@ -37,6 +37,8 @@ public:
     std::pair<Sommet*,Sommet*> getSommets() const;
     void setGType();
     char getGType() const;
+
+    int retourneCouleurType();
 };
 
 
