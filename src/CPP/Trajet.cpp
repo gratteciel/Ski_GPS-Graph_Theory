@@ -7,12 +7,20 @@
 //Constructeur
 
 Trajet::Trajet(const int &_num, const std::string &_nom, const std::string &_type,  Sommet *depart,  Sommet *arrivee, const t_mapDuree& matriceDuree)
-      :AbstractIdentite(_num,_nom), m_type(_type)
+      :AbstractIdentite(_num,_nom), m_type(_type),m_flot(0)
 {
     m_sommets.first=depart;
     m_sommets.second=arrivee;
     setGType();
     m_duree = calculDuree(matriceDuree);
+}
+
+Trajet::Trajet(const int& _num, const std::string& _nom, const std::string& _type,  Sommet* depart,  Sommet* arrivee, const float& _duree, const char& DouI)
+       :AbstractIdentite(_num,_nom), m_type(_type),m_flot(0),m_duree(_duree),m_gType(DouI)
+{
+    m_sommets.first=depart;
+    m_sommets.second=arrivee;
+
 }
 
 Trajet::Trajet( const std::string &_type)
@@ -130,4 +138,12 @@ char Trajet::getGType() const{
 
 float Trajet::getDuree() const {
     return m_duree;
+}
+
+int Trajet::getFlot() const {
+    return m_flot;
+}
+
+void Trajet::setFlot(const int& _flot) {
+    m_flot=_flot;
 }

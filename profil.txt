@@ -1,6 +1,6 @@
 Admin 1 0
 Emilian 0 0
-Mathis 1 1 B
+Mathis 1 1 N
 babe 0 6 TPH TC TSD TS TK BUS
 bob 0 6 TPH TC TSD TS TK BUS
 mathus 0 6 TPH TC TSD TS TK BUS
@@ -8,3 +8,6 @@ eddy 0 6 TPH TC TSD TS TK BUS
 omar 0 6 TPH TC TSD TS TK BUS
 Touchousse 1 6 TPH TC TSD TS TK BUS
 gege 0 6 TPH TC TSD TS TK BUS
+dimitri 0 6 TPH TC TSD TS TK BUS
+ma 0 6 TPH TC TSD TS TK BUS
+d 0 6 TPH TC TSD TS TK BUS

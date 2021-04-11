@@ -22,7 +22,7 @@ public:
     ~Sommet() = default;
     //Méthodes
     void affichage();
-
+    std::string afficheSimple();
     void affichageComplexe(const std::map<int,Trajet*>& _trajet);
     void trierSortants();
     //Getters & Setters
@@ -32,7 +32,6 @@ public:
     std::vector<Trajet *> getSortants() const;
     std::vector<Trajet *> getEntrants() const;
 
-    std::string afficheSimple();
 
 
 };

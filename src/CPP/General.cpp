@@ -166,7 +166,7 @@ void General::connection(){
 
 void General::boucle(){
     int menuActu=1;
-    arcs.calculFlotMaximal(6,5);
+
 
     while(menuActu!=0){
         std::system("clear || cls");
@@ -336,6 +336,7 @@ void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu,co
                 break;
             case '1':{
                 int s = arcs.entreePoint("Nom ou numero du point initial: ");
+                std::cout << std::endl;
                 arcs.plusCourtChemin(estDijkstra,getEstOptiChemin(),getOptiTrajets(),s);
                 finProgrammeActu();
                 break;
@@ -344,6 +345,7 @@ void General::interactionDonneeMenu4(const std::string& donnee, int& menuActu,co
             case '2':{
                 int s0 = arcs.entreePoint("Nom ou numero du point initial: ");
                 int sF = arcs.entreePoint("Nom ou numero du point final: ");
+                std::cout << std::endl;
                 arcs.plusCourtChemin(estDijkstra,getEstOptiChemin(),getOptiTrajets(),s0,sF);
                 finProgrammeActu();
                 break;
@@ -391,7 +393,10 @@ void General::interactionDonneeMenu11(const std::string& donnee,int& menuActu) {
                 arcs.interactionCapaciteFlot(m_profilActif->getProfil().second);
                 break;
             case '2':
-                menuActu=9;
+                int s0 = arcs.entreePoint("Nom ou numero de la source: ");
+                int sF = arcs.entreePoint("Nom ou numero du puit: ");
+                arcs.algosQuatreSix(s0,sF);
+
                 break;
 
         }
@@ -471,9 +476,7 @@ void General::afficheMenu(const int& menuActu){
             menu7();
             break;
 
-        case 9://menu calcul de flot
-            menu9();
-            break;
+
         case 11://Menu affcihage capacité
             menu11();
             break;
@@ -494,7 +497,7 @@ void General::menu1(){
     std::cout << "3 : A propos des points (4.3)" << std::endl;
     std::cout << "4 : A propos des trajets (4.3)" << std::endl;
     std::cout << "5 : Plus courts chemins (4.4)" << std::endl;
-    std::cout << "6 : Optimisation des vacances -> Plus courts chemin avec selection (4.5)" << std::endl;
+    std::cout << "6 : Plus courts chemins selon vos preferences (4.5)" << std::endl;
     std::cout << "7 : A propos des flots (4.6)" << std::endl;
 
     if(m_profilActif->getProfil().second){//Si est admin
@@ -531,7 +534,7 @@ void General::menu4(const bool& estDijkstra){
     std::cout << std::endl <<"----------------------------------" << std::endl;
 
     if(estDijkstra)
-        std::cout <<  "            En temps " << std::endl << " ";
+        std::cout <<  "            En temps " << std::endl;
     else
         std::cout <<  "      En nombre de trajets" << std::endl;
 
@@ -563,7 +566,7 @@ void General::menu11() {
     std::cout << "----------------------------------" << std::endl;
 
     std::cout << std::endl <<"1 : Afficher les capacites des trajets" << std::endl;
-    std::cout << "2 : Faire l'algorithme de Ford-Fulkerson" << std::endl;
+    std::cout << "2 : Trouver le flot maximal entre 2 points" << std::endl;
 
 
 }
@@ -585,6 +588,7 @@ void General::menuAdminAffichage(){
 
 void General::menu9() {
 
+    std::cout << "1 : Modifier les capacites" << std::endl;
 }
 
 
@@ -631,7 +635,7 @@ void General::menu7(){
     std::cout <<  " Plus court chemin optimisé (4.5)   " << std::endl;
     std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl <<"1 : Afficher/Modifier vos preferences a l'interet des trajets" << std::endl;
-    std::cout << "2 : Faire les plus courts chemins les parametres du \"1\"" << std::endl;
+    std::cout << "2 : Trouver les plus courts chemins selon vos preferences" << std::endl;
 
 }
 

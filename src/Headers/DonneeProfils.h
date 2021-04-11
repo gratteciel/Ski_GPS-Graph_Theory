@@ -2,18 +2,18 @@
 // Created by ultra gamer on 09/04/2021.
 //
 
-#ifndef SKIPISCINE_DONNEEPSEUDO_H
-#define SKIPISCINE_DONNEEPSEUDO_H
+#ifndef SKIPISCINE_DONNEEPROFILS_H
+#define SKIPISCINE_DONNEEPROFILS_H
 #include "bibli.h"
 #include "Profil.h"
 
-class DonneePseudo {
+class DonneeProfils {
 private:
     std::vector<Profil*> m_vecteurProfil;
 
 public:
-    DonneePseudo();
-    ~DonneePseudo();
+    DonneeProfils();
+    ~DonneeProfils();
     void lectureFichierProfil();
     Profil* ajoutProfil(const std::string& pseudo);
 
@@ -29,4 +29,4 @@ public:
 };
 
 
-#endif //SKIPISCINE_DONNEEPSEUDO_H
+#endif //SKIPISCINE_DONNEEPROFILS_H

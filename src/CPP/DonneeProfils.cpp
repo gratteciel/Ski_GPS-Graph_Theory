@@ -2,15 +2,21 @@
 // Created by ultra gamer on 09/04/2021.
 //
 
-#include "../Headers/DonneePseudo.h"
+#include "../Headers/DonneeProfils.h"
 
 
 
-DonneePseudo::DonneePseudo() {
+DonneeProfils::DonneeProfils() {
     lectureFichierProfil();
 }
 
-void DonneePseudo::lectureFichierProfil() {
+DonneeProfils::~DonneeProfils() {
+    for(auto elem : m_vecteurProfil)
+        delete elem;
+}
+
+
+void DonneeProfils::lectureFichierProfil() {
     std::ifstream fichier ("../profil.txt");
 
     if(!fichier)
@@ -41,7 +47,7 @@ void DonneePseudo::lectureFichierProfil() {
 
 
 
-bool DonneePseudo::pseudoExiste(const std::string& pseudoInput){
+bool DonneeProfils::pseudoExiste(const std::string& pseudoInput){
     for(auto& elem : m_vecteurProfil){
         if(pseudoLowerCase(pseudoInput)==pseudoLowerCase(elem->getProfil().first))
             return true;
@@ -50,7 +56,7 @@ bool DonneePseudo::pseudoExiste(const std::string& pseudoInput){
 }
 
 
-std::string DonneePseudo::pseudoLowerCase(const std::string& donnee){
+std::string DonneeProfils::pseudoLowerCase(const std::string& donnee){
     std::string pseudo;
     for(const auto& elem : donnee)
     {
@@ -59,12 +65,12 @@ std::string DonneePseudo::pseudoLowerCase(const std::string& donnee){
     return pseudo;
 }
 
-Profil* DonneePseudo::ajoutProfil(const std::string& pseudo) {
+Profil* DonneeProfils::ajoutProfil(const std::string& pseudo) {
 
     std::ofstream fichier ("../profil.txt");
 
     if(!fichier)
-        throw std::runtime_error( "Impossible profil.txt d'ouvrir en ecriture");
+        throw std::runtime_error( "Impossible d'ouvrir profil.txt  en ecriture");
 
     for( auto& elem: m_vecteurProfil)
     {
@@ -88,7 +94,7 @@ Profil* DonneePseudo::ajoutProfil(const std::string& pseudo) {
 
 }
 
-void DonneePseudo::reecrireFichierProfil(){
+void DonneeProfils::reecrireFichierProfil(){
     std::ofstream fichier ("../profil.txt");
     for( auto& elem: m_vecteurProfil)
     {
@@ -106,7 +112,7 @@ void DonneePseudo::reecrireFichierProfil(){
     }
 }
 
-Profil* DonneePseudo::getProfil(const std::string& pseudo) {
+Profil* DonneeProfils::getProfil(const std::string& pseudo) {
 
     for(auto&  elem : m_vecteurProfil)
     {
@@ -117,11 +123,7 @@ Profil* DonneePseudo::getProfil(const std::string& pseudo) {
 
 }
 
-std::vector<Profil*> DonneePseudo::getVecteurProfil() const {
+std::vector<Profil*> DonneeProfils::getVecteurProfil() const {
     return m_vecteurProfil;
 }
 
-DonneePseudo::~DonneePseudo() {
-    for(auto elem : m_vecteurProfil)
-        delete elem;
-}

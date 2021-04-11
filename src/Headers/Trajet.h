@@ -16,9 +16,11 @@ private:
     char m_gType;
     std::string m_type;
     float m_duree;
+    int m_flot;
 public:
     //Constructeur et destructeur
     Trajet(const int& _num, const std::string& _nom, const std::string& _type,  Sommet* depart,  Sommet* arrivee, const t_mapDuree& matriceDuree);
+    Trajet(const int& _num, const std::string& _nom, const std::string& _type,  Sommet* depart,  Sommet* arrivee, const float& _duree, const char& DouI);
     Trajet( const std::string &_type);
     ~Trajet() = default;
     //Méthodes
@@ -26,6 +28,8 @@ public:
     std::string returnNomType();
     void affichageComplexe(const bool& partant);
     //Getters & Setters
+    int getFlot() const;
+    void setFlot(const int& _flot);
     float calculDuree(const t_mapDuree& matriceDuree);
     std::string getType() const;
     float getDuree() const;

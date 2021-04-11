@@ -12,6 +12,13 @@ Domaine::Domaine() {
     m_matriceDuree['D'];
 }
 
+Domaine::Domaine(const t_mapDuree& _matriceDuree, const std::map<std::string,int>& _vecteurCapacite)
+        :m_matriceDuree(_matriceDuree),m_vecteurCapacite(_vecteurCapacite)
+{
+
+}
+
+
 Domaine::~Domaine(){
     for(auto s : m_sommets)
         delete s.second;
@@ -117,7 +124,7 @@ int Domaine::entreePoint(const std::string& phrase){
     std::string s0;
     do{
         if(s0Int==-1)
-            std::cout << "Ce point n'existe pas!" <<std::endl;
+            std::cout << "Ce point n'est pas dans le graphe!" <<std::endl;
         std::cout << phrase;
 
         std::cin >> s0;
@@ -147,7 +154,7 @@ int Domaine::returnPointId(const std::string& entree){
     return -1;
 }
 
-void Domaine::plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets, int s0, int sF){
+void Domaine::plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets, int s0, int sF, const bool& estGrapheEcart){
     std::map<int,float> poids;
     std::map<int,int> pred;
     std::vector<std::string> typeAEnlever;
@@ -161,18 +168,18 @@ void Domaine::plusCourtChemin(const bool& estDijkstra,const bool& estOpti,const 
 
 
     if(estDijkstra)
-        pred=dijkstraOpti(s0,poids,typeAEnlever);
+        pred=dijkstraOpti(s0,poids,typeAEnlever,estGrapheEcart);
     else{
-        pred=parcoursBFSOpti(s0,typeAEnlever);
+        pred=parcoursBFSOpti(s0,typeAEnlever,estGrapheEcart);
         for(const auto& elem : m_sommets)
             poids[elem.first]=-5;
     }
 
     if(sF!=-5)
-        affichePlusCourtChemin(s0,sF,pred,poids[sF],estOpti,optiTrajets);
+        affichePlusCourtChemin(s0,sF,pred,poids[sF],estOpti,optiTrajets,true,estGrapheEcart);
     else{
-        std::cout << std::endl;
-        std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
+        std::cout <<
+        "---------------------------------------------------------------------------------------"<<std::endl;
         std::cout << " Point |  Chemin (liste de trajets)"<<std::endl;
         std::cout << " final |  de forme \"nomTrajet\" (\"point intial\"-\"point final\"|\"type\" )"<<std::endl;
         std::cout << "---------------------------------------------------------------------------------------"<<std::endl;
@@ -206,7 +213,7 @@ std::string Domaine::convertSecondeHeuresMinS(const float& seconde){
     }
 }
 
-void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe){
+void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,int>& pred,const float& poids,const bool& estOpti,const std::vector<std::pair<std::string,bool>>& optiTrajets,const bool& complexe,const bool& estGrapheEtat){
     std::vector<int> listeTrajets;
     bool cheminPossible=true;
 
@@ -223,7 +230,7 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
 
     if(cheminPossible){
         if(complexe)
-            std::cout << std::endl
+            std::cout
                       << "Trajets a parcourir dans l'ordre entre les points " + m_sommets[s0]->afficheSimple() + " et " + m_sommets[sF]->afficheSimple()  + ": " <<std::endl<<std::endl
                       << "   ";
 
@@ -269,7 +276,11 @@ void Domaine::affichePlusCourtChemin(const int& s0,const int& sF,  std::map<int,
         if(poids!=-5){
             if(complexe){
                 std::cout <<std::endl;
-                std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+
+                if(!estGrapheEtat)
+                    std::cout << std::endl<<"   duree: "  << convertSecondeHeuresMinS(poids) << std::endl<<std::endl;
+                else
+                    std::cout << std::endl<<"   Nombre de skieurs sur le chemin: "  << poids << std::endl<<std::endl;
             }
             else
                 std::cout << std::endl<<"       |  duree: "  << convertSecondeHeuresMinS(poids) << std::endl;
@@ -465,6 +476,13 @@ bool Domaine::changementDuree() {
 }
 
 
+void Domaine::finProgrammeActu(const std::string& phrase){
+    std::cout <<std::endl<< phrase;
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+}
+
 bool Domaine::modifDureeBD(const std::string& categorie){
     std::vector<std::string> typeD;
     std::vector<Trajet> tempTrajets;
@@ -558,7 +576,7 @@ int Domaine::entrerUnNombrePositif(const std::string& phrase){
     return std::stoi(parametre);
 }
 
-std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever) {
+std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &poids,const std::vector<std::string>& typeAEnlever, const bool& estGrapheEcart) {
     std::map<int,int> pred;
 
     std::map<int,char> marque;
@@ -631,6 +649,10 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
                         }
                     }
 
+                    if(estGrapheEcart&&a->getGType() == 'I')
+                        nePasParcourir=true;
+
+
                     if(!nePasParcourir){
                         //Si la distance du sommet actuel avec la plus petite distance de sInit + la distance entre ce sommet et son adjacent
                         //est inférieur à la distance de l'adjacent à sInit
@@ -659,7 +681,7 @@ std::map<int,int> Domaine::dijkstraOpti(const int &sInit, std::map<int, float> &
 
 ///Sous-programme permettant d'effectuer le parcours BFS
 ///Renvoie le vecteur des prédécesseurs des sommets
-std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever){
+std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std::string>& typeAEnlever,const bool& estGrapheEcart){
     //Initialisation des sommets
     std::map<int,int> pred;
     std::map<int,float> ordreDecouverte;
@@ -703,23 +725,25 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
 
         queue.pop();//On défile le prochain sommet de la file
         for(auto a : m_sommets[sommetActu]->getSortants()){//Pour tous les sommets adjacents
-
-
-            if(marque[a->getSommets().second->getNum()]=='B'||marque[a->getSommets().second->getNum()]=='G'){//Si le sommet adjacent n'est pas marqué 'N'
-
-
-                if(aEnlever[a->getNum()])
-                    marque[a->getSommets().second->getNum()]= 'G';
-                else
-                    marque[a->getSommets().second->getNum()]= 'N';
-
-
-
-                pred[a->getSommets().second->getNum()]=a->getNum(); //Le prédecesseur du sommet adjacent devient le trajet allant du sommet actu à ce sommet adjacent
-                queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(decouverte,aEnlever[a->getNum()])));
-                ordreDecouverte[a->getSommets().second->getNum()]=decouverte;
-                decouverte++;
+            bool nePasParcourir=false;
+            if(estGrapheEcart&&a->getGType() == 'I'){
+                nePasParcourir=true;
             }
+
+            if(!nePasParcourir){
+                if(marque[a->getSommets().second->getNum()]=='B'||marque[a->getSommets().second->getNum()]=='G'){//Si le sommet adjacent n'est pas marqué 'N'
+                    if(aEnlever[a->getNum()])
+                        marque[a->getSommets().second->getNum()]= 'G';
+                    else
+                        marque[a->getSommets().second->getNum()]= 'N';
+
+                    pred[a->getSommets().second->getNum()]=a->getNum(); //Le prédecesseur du sommet adjacent devient le trajet allant du sommet actu à ce sommet adjacent
+                    queue.push(std::make_pair(a->getSommets().second->getNum(),std::make_pair(decouverte,aEnlever[a->getNum()])));
+                    ordreDecouverte[a->getSommets().second->getNum()]=decouverte;
+                    decouverte++;
+                }
+            }
+
         }
 
         //s devient exploré (marqué)
@@ -729,89 +753,87 @@ std::map<int,int> Domaine::parcoursBFSOpti(const int& _num,const std::vector<std
     return pred;
 }
 
-std::map<int,std::pair<int,bool>> Domaine::BFSFord(std::map<int, int>& flot,const int& initial,std::map<int,int>& sigma){
+std::map<int,std::pair<int,bool>> Domaine::BFSFord(const int& initial,const int& final,std::map<int,int>& sigma){
     //Initialisation des sommets
     std::map<int,std::pair<int,bool>> pred;
     std::map<int,bool> marque;
-    //int capacite[] = {11,12,1,12,11,4,19,7}; capacite[t->getNum()-1]
+    //int capacite[] = {11,12,1,12,11,4,20,7}; //Capacite de test !
 
     //Initialisation des sommets (predecesseurs & marquage)
     for(const auto& elem : m_sommets) {
         pred[elem.first].first = -1;
         pred[elem.first].second =true;
         marque[elem.first] = false;
-
     }
 
     for(const auto& elem : m_trajets) {
         sigma[elem.first] = INT_MAX;
     }
 
-    //Création de la file vide
-    std::queue<int> file;
+
+    std::queue<int> file;    //Création de la file vide
     file.push(initial); //On enfile le sommet initial
     marque[initial]=true; //On marque le sommet initial
 
-    while(!file.empty()){ ///Ajoute ou pred[Final] !=-1
+    bool fin=false;
+    while(!fin){ //Tant que la file n'est pas vide OU que le sommet final n'est pas marqué
+        fin=false;
 
         int sommetActu= file.front();
         file.pop();//On défile le prochain sommet de la file
 
-        for(auto t : m_sommets[sommetActu]->getSortants()){//Pour tous les sommets sortants
+        if(sommetActu!=final) { //on ne prend pas les trajets sortants au sommet final
+            for (auto t : m_sommets[sommetActu]->getSortants()) {//Pour tous les sommets sortants
+                if (!marque[t->getSommets().second->getNum()] && t->getFlot() < m_vecteurCapacite[t->getType()]) { //m_vecteurCapacite[t->getType()]
+                    //Si le sommet adjacent n'est pas marqué et le flot du trajt est inférieur a sa capacite
 
-
-            if(!marque[t->getSommets().second->getNum()]){//Si le sommet adjacent n'est pas marqué
-                if(flot[t->getNum()] < m_vecteurCapacite[t->getType()]){ ///m_vecteurCapacite[t->getType()]
                     file.push(t->getSommets().second->getNum());
-                    marque[t->getSommets().second->getNum()]=true;
-
-                    pred[t->getSommets().second->getNum()].first=t->getNum(); //Le prédecesseur du sommet adjacent devient le sommet actuel
-                    pred[t->getSommets().second->getNum()].second=true; //Le prédecesseur du sommet adjacent devient le sommet actuel
-
-                    sigma[t->getNum()] =m_vecteurCapacite[t->getType()]- flot[t->getNum()];
+                    marque[t->getSommets().second->getNum()] = true;
+                    pred[t->getSommets().second->getNum()].first = t->getNum(); //Le prédecesseur du sommet adjacent devient le sommet actuel
+                    pred[t->getSommets().second->getNum()].second = true; //Le prédecesseur du sommet adjacent devient le sommet actuel
+                    sigma[t->getNum()] = m_vecteurCapacite[t->getType()] - t->getFlot() ;
                 }
             }
         }
-
-        for(auto t : m_sommets[sommetActu]->getEntrants()){//Pour tous les sommets entrants
-
-            if(!marque[t->getSommets().first->getNum()]){//Si le sommet adjacent n'est pas marqué
-                if(flot[t->getNum()] > 0){
+        if(sommetActu!=initial){ //On ne prend pas les trajets entrant au sommet initial
+            for(auto t : m_sommets[sommetActu]->getEntrants()){//Pour tous les sommets entrants
+                if(!marque[t->getSommets().first->getNum()] && t->getFlot()  > 0){
+                    //Si le sommet adjacent n'est pas marqué et le flot du trajet est strictement positif
                     file.push(t->getSommets().first->getNum());
                     marque[t->getSommets().first->getNum()]=true;
                     pred[t->getSommets().first->getNum()].first=t->getNum(); //Le prédecesseur du sommet adjacent devient le sommet actuel
                     pred[t->getSommets().first->getNum()].second=false; //Le prédecesseur du sommet adjacent devient le sommet actuel
-                    sigma[t->getNum()] = flot[t->getNum()];
+                    sigma[t->getNum()] = t->getFlot() ;
+
                 }
             }
         }
-
         //s devient exploré (marqué)
         marque[sommetActu]=true;
+        if(pred[final].first !=-1 || file.empty() )
+            fin=true;
     }
-
     return pred;
 }
 
-
-
-
-std::map<int, int> Domaine::fordFulkerson(const int& initial,const int& final){
-    std::map<int, int> flot;
-
+std::map<int,bool> Domaine::fordFulkerson(const int& initial,const int& final){
+    std::map<int,bool> numTrajetsParcouru;
+    //On initialise tous les flots à 0
     for(auto& s : m_trajets){
-        flot[s.first] = 0;
+        s.second->setFlot(0);
+        numTrajetsParcouru[s.first] =false;
     }
 
     std::map<int,std::pair<int,bool>> pred;
     std::map<int,int> sigma;
-    while(chaineAugmentante(flot,initial,final,pred,sigma)){
+
+    //Tant qu'on trouve une chaine augmentante
+    while(chaineAugmentante(initial,final,pred,sigma)){
         std::vector<std::pair<int,bool>> listeTrajets;
 
         bool cheminPossible=true;
         getPlusCourtCheminBFSFord(pred[final].first,pred,initial,listeTrajets,cheminPossible);
         int augmentationFlotActu=INT_MAX;
-
 
         //On trouve le minimum pour l'augmentation des flots des trajets de la chaine augmentante
         for(const auto& trajet : listeTrajets){
@@ -820,28 +842,213 @@ std::map<int, int> Domaine::fordFulkerson(const int& initial,const int& final){
         }
 
         for(const auto& trajet : listeTrajets){
+            //Si on a pris le trajet dans le sens direct
             if(trajet.second)
-                flot[trajet.first]+=augmentationFlotActu;
-            else
-                flot[trajet.first]-=augmentationFlotActu;
+                m_trajets[trajet.first]->setFlot( m_trajets[trajet.first]->getFlot() + augmentationFlotActu);
+            else //Si on a pris le trajet dans le sens indirect
+                m_trajets[trajet.first]->setFlot( m_trajets[trajet.first]->getFlot() - augmentationFlotActu);
+
+            numTrajetsParcouru[trajet.first]=true;
         }
     }
-    return flot;
+    return numTrajetsParcouru;
 }
 
-void Domaine::calculFlotMaximal(const int& initial,const int& final){
-    std::map<int, int> flot = fordFulkerson(initial,final);
-
-    int flotMaximal=0;
+void Domaine::calculFlotMaximal(const int& final,int& flotMax){
+    flotMax=0;
 
     for(const auto& elem : m_sommets[final]->getEntrants()){ //Pour tous les trajets entrant au sommet final
         //On augmente le flot maximal par le flot du trajet
-        flotMaximal+= flot[elem->getNum()];
+        flotMax+=  elem->getFlot();
+
     }
 
-    std::cout << flotMaximal << std::endl;
+}
+
+void Domaine::algosQuatreSix(const int& initial,const int& final){
+    std::map<int,bool> trajetsParcouru = fordFulkerson(initial,final);
+
+    int flotTotal=0;
+    std::string phrase;
+    calculFlotMaximal(final,flotTotal);
+
+    if(flotTotal==0){
+        std::cout << std::endl << "Flot impossible! Impossible de lier les 2 points.... " << std::endl;
+        finProgrammeActu("Appuyez sur entree pour revenir au menu.....");
+    }
+    else{
+        std::cout << std::endl<< "Le flot maximal entre " << initial << " et " << final << " est: " << flotTotal << std::endl;
+
+        finProgrammeActu("Appuyez sur entree pour afficher le graphe d'ecart deduit......");
+
+        Domaine gE = Domaine(m_matriceDuree,m_vecteurCapacite);
+        gE.creationGrapheEcart(m_trajets,trajetsParcouru);
+
+
+        if(gE.afficheGrapheEcart()){ //Si veut faire le plus court chemin entre deux points du graphe d'ecart
+
+            std::string param;
+            do{
+                std::system("cls || clear");
+                std::cout << "1: Plus court chemin en nombre de trajet" << std::endl;
+                std::cout << "2: Plus court chemin en nombre de skieurs par piste (bonus)" << std::endl<<std::endl;
+                std::cout << "Faites votre choix: ";
+                std::cin >> param;
+            }while(param!="1" && param!="2");
+
+            int paramInt= std::stoi(param);
+
+            std::system("cls || clear");
+            bool estDijkstra = false;
+            if(paramInt==1){
+                std::cout << "Plus court chemin en nombre de trajets (que les trajets en sens directs)" << std::endl<<std::endl;
+                std::cout << "Si on considere le flot comme etant le nombre de skeurs sur le trajet a un moment t," << std::endl;
+                std::cout << "alors le chemin entre 2 points peut correspondre au plus court chemin \"disponible\"" << std::endl<<std::endl;
+
+            }
+            else{
+                std::cout << "Plus court chemin en nombre de skieurs par piste (que les trajets en sens directs)" << std::endl<<std::endl;
+                estDijkstra=true;
+            }
+            std::cout << "Liste des sommets dans le graphe d'ecart: ";
+            int i=0;
+            for(const auto& elem : gE.getSommets()){
+                std::cout << elem.second->getNum();
+                if(i!=gE.getSommets().size()-1)
+                    std::cout << ", ";
+                i++;
+            }
+                std::cout << std::endl<<std::endl;
+            std::vector<std::pair<std::string,bool>> optiTrajets;
+            int s0 = gE.entreePoint("Nom ou numero du point initial: ");
+            int sF = gE.entreePoint("Nom ou numero du point final: ");
+            std::system("cls || clear");
+
+
+            gE.plusCourtChemin(estDijkstra,false,optiTrajets,s0,sF,true);
+
+            finProgrammeActu("Appuyez sur entree pour revenir au menu.....");
+        }
+    }
+
+
+
+
+
 
 }
+
+
+
+void Domaine::creationGrapheEcart(const std::map<int, Trajet*>& _trajets,std::map<int,bool>& trajetsParcouru){
+    std::system("cls || clear");
+    //On cree les sommets du graphe d'écart
+    for(const auto& t : _trajets)
+    {
+        if(trajetsParcouru[t.first]){
+            ajoutSommet(t.second->getSommets().first);
+            ajoutSommet(t.second->getSommets().second);
+        }
+    }
+
+    //int capacite[] = {11,12,1,12,11,4,20,7}; //Capacite de test !
+
+    int i=1;
+    //On cree les trajets du graphe d'écart
+    for(const auto& t : _trajets)
+    {
+        if(trajetsParcouru[t.first]){
+            if( m_vecteurCapacite[t.second->getType()] > t.second->getFlot()){ // m_vecteurCapacite[t.second->getType()]
+
+                m_trajets[i] = new Trajet(t.second->getNum(),t.second->getNom(),t.second->getType(),m_sommets[t.second->getSommets().first->getNum()],m_sommets[t.second->getSommets().second->getNum()],m_vecteurCapacite[t.second->getType()]  - t.second->getFlot(),'D');
+                m_sommets[t.second->getSommets().first->getNum()]->setSortant(m_trajets[i]);
+                m_sommets[t.second->getSommets().second->getNum()]->setEntrant(m_trajets[i]);
+                i++;
+            }
+            if(t.second->getFlot()>0){
+                m_trajets[i] = new Trajet(t.second->getNum(),t.second->getNom(),t.second->getType(),m_sommets[t.second->getSommets().second->getNum()],m_sommets[t.second->getSommets().first->getNum()],t.second->getFlot(),'I');
+                m_sommets[t.second->getSommets().second->getNum()]->setSortant(m_trajets[i]);
+                m_sommets[t.second->getSommets().first->getNum()]->setEntrant(m_trajets[i]);
+                i++;
+            }
+
+        }
+
+    }
+    setOrdre(m_sommets.size());
+    setTaille(m_trajets.size());
+
+}
+
+bool Domaine::afficheGrapheEcart(){
+    //affichage des trajets directs
+    std::cout << "Affichage des trajets directs (le flot de skieurs est inferieur a la capacite sur ce trajet): " << std::endl;
+    std::cout << "La valeur correspond a combien au plus on peut augmenter le nombre de skieurs sur le trajet " <<std::endl<<std::endl;
+
+    std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
+    int nbDirects =0;
+
+    for(const auto& t : m_trajets){
+        if(t.second->getGType()=='D'){
+            std::cout <<t.second->getNom() <<": " << t.second->returnNomType();
+            std::cout << " allant du point " <<t.second->getSommets().first->afficheSimple() << " a "  << t.second->getSommets().second->afficheSimple() << " de valeur "<< t.second->getDuree() << " skieurs " <<  std::endl;
+            std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
+            nbDirects++;
+
+
+
+        }
+    }
+
+    if(nbDirects==0){
+        std::cout << std::endl<< "Aucun trajet direct dans le graphe d'ecart!-> impossible d'effectuer le plus court chemin " << std::endl;
+        std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
+    }
+
+    finProgrammeActu("Appuyez sur entree pour afficher les trajets indirects.....");
+
+    std::string param;
+    do{
+        std::system("cls || clear");
+        std::cout << "Affichage des trajets indirects (tous les trajets avec un flot de skieurs stricement positif: " << std::endl;
+        std::cout << "La valeur correspond a combien on peut diminuer le flot de skieurs" <<std::endl<<std::endl;
+
+        std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
+        int i=0;
+        for(const auto& t : m_trajets){
+            if(t.second->getGType()=='I'){
+                std::cout <<t.second->getNom() <<": (" << t.second->returnNomType();
+                std::cout << ") allant du point " <<t.second->getSommets().first->afficheSimple() << " a "  << t.second->getSommets().second->afficheSimple() << " de valeur "<< t.second->getDuree() << " skieurs " <<  std::endl;
+                std::cout << "-------------------------------------------------------------------------------------------------"<<std::endl;
+                i++;
+            }
+        }
+
+        if(i==0)
+            std::cout << "Aucun trajet indirects dans le graphe d'ecart!" << std::endl;
+
+        if(nbDirects!=0){
+            std::cout << std::endl << "Appuyez sur \"s\" pour revenir au menu " << std::endl  <<"ou sur \"p\" pour afficher le plus court chemin entre deux points dans ce graphe d'ecart" << std::endl;
+        }
+        else
+            std::cout << std::endl << "Appuyez sur \"s\" pour revenir au menu " << std::endl;
+        std::cout <<std::endl<< "Votre choix: ";
+        std::cin >> param;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+
+    }while(param!="s" && param!="p");
+
+    if(param=="p" && nbDirects!=0)
+        return true;
+
+    return false;
+
+
+
+}
+
+
 void Domaine::getPlusCourtCheminBFSFord(int i,  std::map<int,std::pair<int,bool>>& pred, const int& initial,std::vector<std::pair<int,bool>>& listeTrajets,bool& cheminPossible){
 
     if(i==-1)
@@ -858,15 +1065,14 @@ void Domaine::getPlusCourtCheminBFSFord(int i,  std::map<int,std::pair<int,bool>
 }
 
 
-bool Domaine::chaineAugmentante(std::map<int, int>& flot,const int& initial,const int& final,std::map<int,std::pair<int,bool>>& pred,std::map<int,int>& sigma){
+bool Domaine::chaineAugmentante(const int& initial,const int& final,std::map<int,std::pair<int,bool>>& pred,std::map<int,int>& sigma){
     sigma.clear();
-    pred= BFSFord(flot,initial,sigma);
+    pred= BFSFord(initial,final,sigma);
 
     if(pred[final].first!=-1) //Si le sommet final est marque
-    {
-
         return true;
-    }
+
+    //Si le sommet final n'est pas marqué alors on a pas trouvé de chemin augmentant
     return false;
 }
 
@@ -898,8 +1104,6 @@ void Domaine::interactionCapaciteFlot(const bool& estAdmin){
         modifCapaciteAdmin();
 }
 void Domaine::afficherCapaciteFlot(const bool& estAdmin){
-
-
     std::cout << "Type                                 Capacite (en skieur/heure) " <<std::endl;
 
     for(const auto& elem : m_vecteurCapacite)
@@ -913,12 +1117,9 @@ void Domaine::afficherCapaciteFlot(const bool& estAdmin){
     if(estAdmin)
         std::cout << "Appuyez sur \"m\" pour modifier ces valeurs " << std::endl;
     std::cout << "Votre choix: ";
-
-
 }
+
 void Domaine::modifCapaciteAdmin() {
-
-
     std::string parametre;
     bool fin=false;
 
@@ -972,8 +1173,8 @@ void Domaine::modifCapaciteAdmin() {
         Trajet temp=Trajet(typesOrdre[choixType]);
         std::cout << "Vous avez decide de modifer la capacite de: " << temp.returnNomType() << std::endl<<std::endl;
 
-        std::cout  << "Ancienne valeur :" << getVecteurCapacite()[typesOrdre[choixType]] << " skieurs/heure" << std::endl;
-        std::cout << "Nouvelle valeur :" ;
+        std::cout  << "Ancienne valeur: " << getVecteurCapacite()[typesOrdre[choixType]] << " skieurs/heure" << std::endl;
+        std::cout << "Nouvelle valeur: " ;
         std::cin >> parametre;
 
     }while(!estNombre(parametre));
@@ -1023,4 +1224,19 @@ void Domaine::setVecteurCapacite(const std::pair<std::string,int> _pairCapacite)
     m_vecteurCapacite[_pairCapacite.first] = _pairCapacite.second;
 
 }
+
+
+
+void Domaine::ajoutSommet(Sommet* som) {
+    m_sommets[som->getNum()] = new Sommet(som->getNum(),som->getNom(),som->getAltitude());
+}
+
+std::map<int, Sommet *>& Domaine::getSommets(){
+    return m_sommets;
+}
+
+std::map<int, Trajet *>& Domaine::getTrajets(){
+    return m_trajets;
+}
+
 
