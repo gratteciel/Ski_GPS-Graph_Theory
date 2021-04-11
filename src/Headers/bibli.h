@@ -9,11 +9,7 @@
  * Source pour les couleurs : https://stackoverflow.com/questions/20608058/c-colour-console-text
  */
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#define VC_EXTRALEAN
-#include <Windows.h>
-#endif // _WIN32
+
 
 
 

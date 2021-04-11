@@ -7,6 +7,12 @@
 #include <iostream>
 #include <string>
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
+#include <Windows.h>
+#endif // _WIN32
+
 #define color_black      0
 #define color_dark_blue  1
 #define color_dark_green 2
